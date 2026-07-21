@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { authService } from '../../../lib/container';
 
-export function withAuth(handler: (req: NextRequest, user: any) => Promise<NextResponse> | NextResponse) {
-  return async (req: NextRequest) => {
+export function withAuth(handler: (req: NextRequest, user: any, ...args: any[]) => Promise<NextResponse | Response | void> | NextResponse | Response | void) {
+  return async (req: NextRequest, ...args: any[]) => {
     let token = '';
 
     // First try to get token from Authorization header
@@ -28,6 +28,6 @@ export function withAuth(handler: (req: NextRequest, user: any) => Promise<NextR
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    return handler(req, userPayload);
+    return handler(req, userPayload, ...args);
   };
 }

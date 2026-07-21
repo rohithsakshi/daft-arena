@@ -1,5 +1,5 @@
 import mongoose, { Model, Schema } from 'mongoose';
-import { IBaseDocument, createBaseSchema } from './BaseSchema';
+import { IBaseDocument, createBaseSchema } from '../../../lib/db/BaseSchema';
 import { IPermissionGroup } from './PermissionGroup';
 
 export interface IPermission extends IBaseDocument {

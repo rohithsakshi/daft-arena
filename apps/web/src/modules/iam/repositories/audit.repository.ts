@@ -1,4 +1,4 @@
-import { BaseRepository } from './BaseRepository';
+import { BaseRepository } from '../../../lib/db/BaseRepository';
 import { AuditLogModel, IAuditLog } from '../models/AuditLog';
 import { ClientSession } from 'mongoose';
 

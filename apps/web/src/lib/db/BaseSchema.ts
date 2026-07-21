@@ -11,10 +11,22 @@ export interface IBaseDocument extends Omit<Document, 'id'> {
   version: number;
 }
 
+const transformOptions = {
+  virtuals: true,
+  versionKey: false,
+  transform: function (doc: any, ret: any) {
+    ret.id = ret._id;
+    delete ret._id;
+    return ret;
+  }
+};
+
 export const BaseSchemaOptions = {
   timestamps: true,
   optimisticConcurrency: true,
-  versionKey: 'version'
+  versionKey: 'version',
+  toJSON: transformOptions,
+  toObject: transformOptions
 };
 
 export const createBaseSchema = (schemaDefinition: any, options = {}) => {

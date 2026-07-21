@@ -9,10 +9,13 @@ export function withRole(roleCode: string, handler: (req: NextRequest, user: any
     const memberships = await organizationRepository.getUserMemberships(user.sub as string);
     
     const relevantMemberships = orgId 
-      ? memberships.filter(m => m.organizationId === orgId)
+      ? memberships.filter(m => String(m.organizationId) === orgId)
       : memberships;
 
-    const hasRole = relevantMemberships.some(m => m.role.code === roleCode || m.role.code === 'SUPER_ADMIN');
+    const hasRole = relevantMemberships.some(m => {
+      const role = m.roleId as any;
+      return role.code === roleCode || role.code === 'SUPER_ADMIN';
+    });
     
     if (!hasRole) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });

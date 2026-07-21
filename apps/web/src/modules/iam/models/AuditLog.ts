@@ -1,5 +1,5 @@
 import mongoose, { Model, Schema } from 'mongoose';
-import { IBaseDocument, createBaseSchema } from './BaseSchema';
+import { IBaseDocument, createBaseSchema } from '../../../lib/db/BaseSchema';
 
 export interface IAuditLog extends IBaseDocument {
   actorId?: string;

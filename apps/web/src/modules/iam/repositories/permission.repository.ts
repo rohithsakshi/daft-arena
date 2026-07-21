@@ -1,4 +1,4 @@
-import { BaseRepository } from './BaseRepository';
+import { BaseRepository } from '../../../lib/db/BaseRepository';
 import { PermissionModel, IPermission } from '../models/Permission';
 import { PermissionGroupModel, IPermissionGroup } from '../models/PermissionGroup';
 import { ClientSession } from 'mongoose';

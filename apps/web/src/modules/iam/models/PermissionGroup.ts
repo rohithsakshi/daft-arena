@@ -1,5 +1,5 @@
 import mongoose, { Model } from 'mongoose';
-import { IBaseDocument, createBaseSchema } from './BaseSchema';
+import { IBaseDocument, createBaseSchema } from '../../../lib/db/BaseSchema';
 
 export interface IPermissionGroup extends IBaseDocument {
   code: string;

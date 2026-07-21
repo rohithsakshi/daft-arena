@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { authService } from '../../../../../lib/container';
-import { withAuth } from '../../../../../modules/iam/guards/auth.guard';
+import { authService } from '../../../../lib/container';
+import { withAuth } from '../../../../modules/iam/guards/auth.guard';
 
-export const POST = withAuth(async (req, user) => {
+export const POST = withAuth(async (req: NextRequest, user: any) => {
   let token = '';
 
   const authHeader = req.headers.get('authorization');
@@ -11,7 +11,7 @@ export const POST = withAuth(async (req, user) => {
   } else {
     const cookieHeader = req.headers.get('cookie');
     if (cookieHeader) {
-      const cookies = Object.fromEntries(cookieHeader.split('; ').map(c => c.split('=')));
+      const cookies = Object.fromEntries(cookieHeader.split('; ').map((c: string) => c.split('=')));
       token = cookies['accessToken'] || '';
     }
   }
