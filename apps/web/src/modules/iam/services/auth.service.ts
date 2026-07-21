@@ -76,7 +76,7 @@ export class AuthenticationService {
       }
       
       return payload;
-    } catch (e) {
+    } catch (_) {
       return null;
     }
   }

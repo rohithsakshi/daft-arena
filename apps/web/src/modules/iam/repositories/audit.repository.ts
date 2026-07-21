@@ -12,6 +12,6 @@ export class AuditRepository extends BaseRepository<IAuditLog> {
       .sort({ timestamp: -1 })
       .limit(limit)
       .session(session || null)
-      .lean().exec() as Promise<IAuditLog[]>;
+      .lean().exec() as unknown as Promise<IAuditLog[]>;
   }
 }

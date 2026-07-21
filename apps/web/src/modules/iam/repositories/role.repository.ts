@@ -24,6 +24,6 @@ export class RoleRepository extends BaseRepository<IRole> {
     return this.model.find({ isDeleted: false })
       .populate('permissions')
       .session(session || null)
-      .lean().exec() as Promise<IRole[]>;
+      .lean().exec() as unknown as Promise<IRole[]>;
   }
 }

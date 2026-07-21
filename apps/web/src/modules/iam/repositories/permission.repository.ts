@@ -16,7 +16,7 @@ export class PermissionRepository extends BaseRepository<IPermission> {
     return this.model.find({ isDeleted: false })
       .populate('permissionGroupId')
       .session(session || null)
-      .lean().exec() as Promise<IPermission[]>;
+      .lean().exec() as unknown as Promise<IPermission[]>;
   }
 
   async createPermissionGroup(data: Partial<IPermissionGroup>, options?: { session?: ClientSession }): Promise<IPermissionGroup> {

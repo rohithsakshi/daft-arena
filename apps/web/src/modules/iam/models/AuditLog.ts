@@ -6,7 +6,7 @@ export interface IAuditLog extends IBaseDocument {
   targetId?: string;
   action: string;
   ipAddress?: string;
-  metadata?: any;
+  metadata?: Record<string, unknown>;
   timestamp: Date;
 }
 

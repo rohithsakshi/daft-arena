@@ -25,7 +25,7 @@ export const POST = withPermission('MANAGE_SPORTS', async (req: NextRequest, use
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: 'Validation failed', details: (error as z.ZodError).issues }, { status: 400 });
     }
-    const message = error instanceof Error ? error.message : 'Internal server error';
+    const message = error instanceof Error ? (error as Error).message : 'Internal server error';
     return NextResponse.json({ error: message }, { status: 500 });
   }
 });

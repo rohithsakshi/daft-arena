@@ -8,14 +8,14 @@ export class AuditService {
     targetId?: string;
     action: string;
     ipAddress?: string;
-    metadata?: any;
+    metadata?: Record<string, unknown>;
   }) {
     return this.auditRepository.create({
       actorId: params.actorId,
       targetId: params.targetId,
       action: params.action,
       ipAddress: params.ipAddress,
-      metadata: params.metadata ? JSON.stringify(params.metadata) : undefined,
+      metadata: params.metadata,
     });
   }
 }

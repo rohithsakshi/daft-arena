@@ -14,7 +14,7 @@ import { format } from 'date-fns';
 export default function TournamentDetailsPage() {
   const params = useParams();
   const queryClient = useQueryClient();
-  const id = params.id as string;
+  const id = params.tournamentId as string;
 
   const { data, isLoading } = useQuery({
     queryKey: ['tournament', id],
@@ -27,8 +27,8 @@ export default function TournamentDetailsPage() {
       toast.success("Tournament published successfully");
       queryClient.invalidateQueries({ queryKey: ['tournament', id] });
     },
-    onError: (error: any) => {
-      toast.error(error.message || "Failed to publish tournament");
+    onError: (error: unknown) => {
+      toast.error((error as Error).message || "Failed to publish tournament");
     }
   });
 

@@ -24,6 +24,6 @@ export const POST = withPermission('MANAGE_TOURNAMENTS', async (req: NextRequest
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: 'Validation Error', details: error.issues }, { status: 400 });
     }
-    return NextResponse.json({ error: error.message }, { status: error.statusCode || 500 });
+    return NextResponse.json({ error: (error as Error).message }, { status: (error as any).statusCode || 500 });
   }
 });

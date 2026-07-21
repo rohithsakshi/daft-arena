@@ -26,7 +26,7 @@ export class PermissionResolver {
     if (!role) return;
 
     // Add direct permissions
-    for (const p of role.permissions as any[]) {
+    for (const p of role.permissions as { code: string }[]) {
       permissions.add(p.code);
     }
 

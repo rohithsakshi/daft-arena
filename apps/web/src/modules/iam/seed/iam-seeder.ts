@@ -45,7 +45,7 @@ export async function seedIam() {
     if (!exists) {
       await PermissionModel.create({
         ...p,
-        permissionGroupId: group._id as any,
+        permissionGroupId: group._id as unknown as string,
       });
     }
   }
@@ -58,7 +58,7 @@ export async function seedIam() {
       code: 'SUPER_ADMIN_ROLE',
       name: 'Super Administrator',
       description: 'System Administrator with full permissions',
-      permissions: superAdminPerm ? [superAdminPerm._id as any] : [],
+      permissions: superAdminPerm ? [superAdminPerm._id as unknown as string] : [],
     });
   }
 
@@ -77,15 +77,15 @@ export async function seedIam() {
 
   // 6. Assign User to Role in Organization
   const existingMembership = await OrganizationMembershipModel.findOne({
-    userId: adminUser._id as any,
-    organizationId: org._id as any
+    userId: adminUser._id as unknown as string,
+    organizationId: org._id as unknown as string
   });
 
   if (!existingMembership) {
     await OrganizationMembershipModel.create({
-      userId: adminUser._id as any,
-      organizationId: org._id as any,
-      roleId: superAdminRole._id as any,
+      userId: adminUser._id as unknown as string,
+      organizationId: org._id as unknown as string,
+      roleId: superAdminRole._id as unknown as string,
     });
   }
 
