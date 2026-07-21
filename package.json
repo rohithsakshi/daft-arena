@@ -10,13 +10,20 @@
     "prepare": "husky"
   },
   "devDependencies": {
+    "@types/bcryptjs": "^3.0.0",
     "husky": "^9.1.5",
     "lint-staged": "^15.2.10",
     "prettier": "^3.3.3",
-    "typescript": "^5.5.4"
+    "typescript": "^5.5.4",
+    "vitest": "^4.1.10"
   },
   "engines": {
     "node": ">=18.17.0"
   },
-  "packageManager": "pnpm@9.9.0"
+  "packageManager": "pnpm@9.9.0",
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "mongoose": "^9.8.0",
+    "winston": "^3.19.0"
+  }
 }
