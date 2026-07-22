@@ -1,75 +1,60 @@
+import React from 'react';
 import Link from 'next/link';
-import { Button, buttonVariants } from '@/components/ui/button';
-import { Trophy, CalendarDays, Activity, ShieldCheck } from 'lucide-react';
+import Image from 'next/image';
+import { buttonVariants } from '@/components/ui/button';
 
 export default function LandingPage() {
   return (
-    <>
-      <header className="px-6 h-16 flex items-center justify-between border-b bg-background">
-        <div className="font-bold text-xl tracking-tighter">DAFT Arena</div>
-        <nav className="flex gap-4">
-          <Link href="/login" className={buttonVariants({ variant: "ghost" })}>Login</Link>
-          <Link href="/login" className={buttonVariants({ variant: "default" })}>Get Started</Link>
-        </nav>
-      </header>
-
-      <main className="flex-1">
-        <section className="w-full py-24 md:py-32 lg:py-48 flex items-center justify-center bg-muted/40">
-          <div className="container px-4 md:px-6 text-center space-y-8">
-            <h1 className="text-4xl font-extrabold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl text-foreground">
-              Enterprise Tournament Management
-            </h1>
-            <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl">
-              The ultimate platform for organizing, managing, and competing in sports tournaments at scale.
-            </p>
-            <div className="flex justify-center gap-4">
-              <Link href="/login" className={buttonVariants({ size: "lg" })}>Start Organizing</Link>
-              <Link href="#features" className={buttonVariants({ size: "lg", variant: "outline" })}>Learn More</Link>
-            </div>
-          </div>
-        </section>
-
-        <section id="features" className="w-full py-24 bg-background">
-          <div className="container px-4 md:px-6 mx-auto">
-            <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-4">
-              <div className="flex flex-col items-center space-y-4 text-center">
-                <div className="p-4 bg-primary/10 rounded-full">
-                  <Trophy className="h-6 w-6 text-primary" />
-                </div>
-                <h3 className="text-xl font-bold">Tournament Engine</h3>
-                <p className="text-muted-foreground text-sm">Automated brackets, seeding, and live scoring systems.</p>
-              </div>
-              <div className="flex flex-col items-center space-y-4 text-center">
-                <div className="p-4 bg-primary/10 rounded-full">
-                  <CalendarDays className="h-6 w-6 text-primary" />
-                </div>
-                <h3 className="text-xl font-bold">Smart Scheduling</h3>
-                <p className="text-muted-foreground text-sm">Intelligent court mapping and conflict resolution.</p>
-              </div>
-              <div className="flex flex-col items-center space-y-4 text-center">
-                <div className="p-4 bg-primary/10 rounded-full">
-                  <Activity className="h-6 w-6 text-primary" />
-                </div>
-                <h3 className="text-xl font-bold">Live Rankings</h3>
-                <p className="text-muted-foreground text-sm">Real-time stats and dynamic global rankings.</p>
-              </div>
-              <div className="flex flex-col items-center space-y-4 text-center">
-                <div className="p-4 bg-primary/10 rounded-full">
-                  <ShieldCheck className="h-6 w-6 text-primary" />
-                </div>
-                <h3 className="text-xl font-bold">Enterprise Security</h3>
-                <p className="text-muted-foreground text-sm">Role-based access control and strict IAM policies.</p>
-              </div>
-            </div>
-          </div>
-        </section>
-      </main>
-
-      <footer className="border-t py-12 bg-muted/20">
-        <div className="container px-4 md:px-6 mx-auto text-center text-sm text-muted-foreground">
-          &copy; {new Date().getFullYear()} DAFT Arena. All rights reserved.
+    <main className="relative min-h-screen w-full overflow-hidden bg-background flex">
+      {/* 
+        We use a 2-column layout on Desktop, and stack on Mobile.
+        The right side contains the official Hero artwork.
+      */}
+      <div className="flex-none flex flex-col justify-center px-8 md:px-16 lg:px-24 z-10 lg:w-[35%] max-w-2xl">
+        <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight mb-6 text-foreground">
+          Welcome to DAFT Arena
+        </h1>
+        <p className="text-xl md:text-2xl text-muted-foreground leading-relaxed mb-10">
+          The ultimate Tournament Execution System. Built for scale, designed for performance, engineered for champions.
+        </p>
+        <div className="flex flex-wrap gap-4">
+          <Link 
+            href="/capabilities" 
+            className={buttonVariants({ 
+              size: "lg", 
+              className: "h-14 px-8 text-lg bg-violet-600 hover:bg-violet-700 text-white border-0 shadow-[0_0_20px_rgba(124,58,237,0.3)] hover:shadow-[0_0_30px_rgba(124,58,237,0.5)] transition-all duration-300" 
+            })}
+          >
+            Login
+          </Link>
+          <Link 
+            href="/capabilities?mode=register" 
+            className={buttonVariants({ 
+              size: "lg", 
+              variant: "outline", 
+              className: "h-14 px-8 text-lg border-violet-500/50 text-violet-300 hover:bg-violet-600/10 hover:text-violet-200 hover:border-violet-400 bg-background/50 backdrop-blur-md transition-all duration-300" 
+            })}
+          >
+            Sign Up
+          </Link>
         </div>
-      </footer>
-    </>
+      </div>
+
+      {/* Right Side: Hero Artwork (hidden on mobile, absolute overlay, or true split depending on layout) */}
+      <div className="absolute inset-0 lg:static lg:flex-1 z-0 bg-black/10">
+        <div className="relative w-full h-full">
+          <Image
+            src="/Hero.png"
+            alt="DAFT Arena Hero"
+            fill
+            priority
+            className="object-cover object-center lg:object-right"
+          />
+          {/* Gradients to fade smoothly into the background color */}
+          <div className="absolute inset-0 bg-background/60 lg:bg-transparent" />
+          <div className="absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-background to-transparent hidden lg:block" />
+        </div>
+      </div>
+    </main>
   );
 }
