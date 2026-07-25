@@ -19,10 +19,10 @@ export const AuthService = {
   },
 
   getCurrentUser: async () => {
-    return fetchApi<{ data: any }>('/auth/me'); // Assuming an endpoint to fetch current user profile/permissions exists
+    return fetchApi<{ data: unknown }>('/auth/me'); // Assuming an endpoint to fetch current user profile/permissions exists
   },
   
-  register: async (data: any) => {
+  register: async (data: unknown) => {
     return fetchApi<{ token: string }>('/auth/register', {
       method: 'POST',
       body: JSON.stringify(data),

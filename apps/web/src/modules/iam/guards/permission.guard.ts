@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { withAuth } from './auth.guard';
 import { authorizationService } from '../../../lib/container';
 
-export function withPermission(permissionCode: string, handler: (req: NextRequest, user: any, ...args: any[]) => Promise<NextResponse | Response | void> | NextResponse | Response | void) {
+export function withPermission(permissionCode: string, handler: (req: NextRequest, user: unknown, ...args: unknown[]) => Promise<NextResponse | Response | void> | NextResponse | Response | void) {
   return withAuth(async (req, user, ...args) => {
     const orgId = req.headers.get('x-organization-id') || undefined;
     

@@ -11,7 +11,7 @@ export interface SortingDto {
 export interface FilteringDto {
   isActive?: boolean;
   isDeleted?: boolean;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export interface SearchDto {
@@ -31,7 +31,7 @@ export interface AuditDto {
   userId?: string;
   action: string;
   resource: string;
-  details?: any;
+  details?: unknown;
 }
 
 export interface ApprovalDto {

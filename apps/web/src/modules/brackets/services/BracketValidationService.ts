@@ -3,7 +3,7 @@ import { ISeed } from '../models/Seed';
 
 export class BracketValidationService {
   
-  validateBracketConfiguration(bracket: IBracket, rulePackage: any): string[] {
+  validateBracketConfiguration(bracket: IBracket, rulePackage: unknown): string[] {
     const errors: string[] = [];
     
     if (bracket.settings.participantsCount > rulePackage.maxPlayers) {

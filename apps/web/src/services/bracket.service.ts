@@ -2,7 +2,7 @@ import { fetchApi } from './api.client';
 import { IBracket } from '../modules/brackets/models/Bracket';
 
 export const BracketServiceAPI = {
-  createBracket: async (data: any): Promise<IBracket> => {
+  createBracket: async (data: unknown): Promise<IBracket> => {
     const res = await fetchApi<{ success: boolean; data: IBracket }>('/brackets', {
       method: 'POST',
       body: JSON.stringify(data),

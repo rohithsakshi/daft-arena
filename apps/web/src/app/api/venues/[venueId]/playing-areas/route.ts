@@ -24,6 +24,6 @@ export const POST = withPermission('MANAGE_VENUES', async (req: NextRequest, use
     return NextResponse.json({ data: area }, { status: 201 });
   } catch (error: unknown) {
     if (error instanceof z.ZodError) return NextResponse.json({ error: 'Validation Error', details: error.issues }, { status: 400 });
-    return NextResponse.json({ error: (error as Error).message }, { status: (error as any).statusCode || 500 });
+    return NextResponse.json({ error: (error as Error).message }, { status: (error as unknown).statusCode || 500 });
   }
 });

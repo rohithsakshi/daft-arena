@@ -21,7 +21,7 @@ export function useCreateBracket() {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: (data: any) => BracketServiceAPI.createBracket(data),
+    mutationFn: (data: unknown) => BracketServiceAPI.createBracket(data),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['brackets', data.eventId] });
     },

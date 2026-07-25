@@ -4,7 +4,7 @@ export interface ApiResponse<T = any> {
   data?: T;
   error?: string;
   message?: string;
-  details?: any;
+  details?: unknown;
   meta?: {
     page?: number;
     limit?: number;
@@ -17,13 +17,13 @@ export interface AuthenticatedRequest extends NextRequest {
   user?: {
     sub: string;
     email: string;
-    [key: string]: any;
+    [key: string]: unknown;
   };
 }
 
 export type AsyncRequestHandler = (
   req: AuthenticatedRequest,
-  context?: any
+  context?: unknown
 ) => Promise<NextResponse> | NextResponse;
 
 export interface IAuditInfo {
@@ -39,5 +39,5 @@ export type DeepPartial<T> = T extends object ? {
 export interface StandardFilter {
   isDeleted?: boolean;
   createdAt?: { $gte?: Date; $lte?: Date };
-  [key: string]: any;
+  [key: string]: unknown;
 }

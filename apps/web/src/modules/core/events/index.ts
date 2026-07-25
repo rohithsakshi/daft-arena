@@ -37,6 +37,6 @@ export interface BaseDomainEvent<T = any> {
   metadata?: {
     userId?: string;
     correlationId?: string;
-    [key: string]: any;
+    [key: string]: unknown;
   };
 }

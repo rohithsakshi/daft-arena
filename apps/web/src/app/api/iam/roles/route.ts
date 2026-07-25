@@ -14,7 +14,7 @@ export const POST = withPermission('MANAGE_ROLES', async (req: NextRequest) => {
     const body = await req.json();
     const data = RoleSchema.parse(body);
 
-    const role = await roleRepository.create(data as any);
+    const role = await roleRepository.create(data as unknown);
     return NextResponse.json({ data: role }, { status: 201 });
   } catch (error) {
     if (error instanceof z.ZodError) {

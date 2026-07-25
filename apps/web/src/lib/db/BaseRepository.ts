@@ -23,10 +23,10 @@ export interface PaginateOptions extends FindAllOptions {
 
 export class BaseRepository<T> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  constructor(protected readonly model: Model<any>) {}
+  constructor(protected readonly model: Model<unknown>) {}
 
   protected mapId(doc: Record<string, unknown> | null | undefined): T {
-    if (!doc) return doc as any;
+    if (!doc) return doc as unknown;
     if (doc._id && !doc.id) {
       doc.id = doc._id.toString();
     }

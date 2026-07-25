@@ -19,9 +19,9 @@ export const POST = withPermission('MANAGE_SPORTS', async (req: NextRequest, use
     // Validate request
     const data = CreateRulePackageSchema.parse({ ...body, sportId });
 
-    const rulePackage = await rulePackageService.createPackage(sportId, data as any, user.sub as string);
+    const rulePackage = await rulePackageService.createPackage(sportId, data as unknown, user.sub as string);
     return NextResponse.json({ data: rulePackage }, { status: 201 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: 'Validation failed', details: (error as z.ZodError).issues }, { status: 400 });
     }

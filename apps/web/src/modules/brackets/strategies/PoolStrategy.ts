@@ -6,13 +6,13 @@ export class PoolStrategy implements IBracketStrategy {
   async generateDraw(
     bracket: IBracket, 
     seeds: ISeed[], 
-    rulePackageContext: any
+    rulePackageContext: unknown
   ): Promise<DrawGenerationResult> {
     // Divides participants into multiple pools (Round Robin within)
     return { draw: {}, rounds: [], matches: [], progressionRules: [] };
   }
 
-  validateParticipantCount(count: number, rulePackageContext: any): boolean {
+  validateParticipantCount(count: number, rulePackageContext: unknown): boolean {
     return count >= 4;
   }
 }

@@ -26,6 +26,6 @@ export const PUT = withPermission('MANAGE_VENUES', async (req: NextRequest, user
   } catch (error: unknown) {
     if (error instanceof z.ZodError) return NextResponse.json({ error: 'Validation Error', details: error.issues }, { status: 400 });
     if (error instanceof NotFoundException) return NextResponse.json({ error: (error as Error).message }, { status: 404 });
-    return NextResponse.json({ error: (error as Error).message }, { status: (error as any).statusCode || 500 });
+    return NextResponse.json({ error: (error as Error).message }, { status: (error as unknown).statusCode || 500 });
   }
 });

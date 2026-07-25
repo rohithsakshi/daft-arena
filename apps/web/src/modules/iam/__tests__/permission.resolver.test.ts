@@ -3,9 +3,9 @@ import { PermissionResolver } from '../services/permission.resolver';
 
 describe('PermissionResolver', () => {
   let resolver: PermissionResolver;
-  let mockRoleRepo: any;
-  let mockPermRepo: any;
-  let mockOrgRepo: any;
+  let mockRoleRepo: unknown;
+  let mockPermRepo: unknown;
+  let mockOrgRepo: unknown;
 
   beforeEach(() => {
     mockRoleRepo = {

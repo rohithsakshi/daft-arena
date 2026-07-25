@@ -46,12 +46,12 @@ export default function CreateBracketClient({ tournamentId, eventId }: { tournam
     }
   });
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: unknown) => {
     try {
       const result = await createBracket.mutateAsync(data);
       toast.success("Bracket created successfully");
       router.push(`/tournaments/${tournamentId}/events/${eventId}/brackets/${result.id}`);
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast.error(error.message || "Failed to create bracket");
     }
   };

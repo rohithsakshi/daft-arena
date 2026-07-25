@@ -14,7 +14,7 @@ export interface IBaseDocument extends Omit<Document, 'id'> {
 const transformOptions = {
   virtuals: true,
   versionKey: false,
-  transform: function (doc: any, ret: any) {
+  transform: function (doc: unknown, ret: unknown) {
     ret.id = ret._id;
     delete ret._id;
     return ret;
@@ -29,7 +29,7 @@ export const BaseSchemaOptions = {
   toObject: transformOptions
 };
 
-export const createBaseSchema = (schemaDefinition: any, options = {}) => {
+export const createBaseSchema = (schemaDefinition: unknown, options = {}) => {
   const schema = new Schema(
     {
       ...schemaDefinition,

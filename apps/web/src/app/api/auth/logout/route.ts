@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { authService } from '../../../../lib/container';
 import { withAuth } from '../../../../modules/iam/guards/auth.guard';
 
-export const POST = withAuth(async (req: NextRequest, user: any) => {
+export const POST = withAuth(async (req: NextRequest, user: unknown) => {
   let token = '';
 
   const authHeader = req.headers.get('authorization');

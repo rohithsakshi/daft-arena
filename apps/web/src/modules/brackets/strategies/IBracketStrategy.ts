@@ -20,12 +20,12 @@ export interface IBracketStrategy {
   generateDraw(
     bracket: IBracket, 
     seeds: ISeed[], 
-    rulePackageContext: any // Defines max rounds, matches per day, etc.
+    rulePackageContext: unknown // Defines max rounds, matches per day, etc.
   ): Promise<DrawGenerationResult>;
 
   /**
    * Pre-flight check to determine if the given participants count
    * is supported by this strategy and rule package.
    */
-  validateParticipantCount(count: number, rulePackageContext: any): boolean;
+  validateParticipantCount(count: number, rulePackageContext: unknown): boolean;
 }

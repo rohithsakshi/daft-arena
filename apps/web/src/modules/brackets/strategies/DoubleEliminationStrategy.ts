@@ -6,7 +6,7 @@ export class DoubleEliminationStrategy implements IBracketStrategy {
   async generateDraw(
     bracket: IBracket, 
     seeds: ISeed[], 
-    rulePackageContext: any
+    rulePackageContext: unknown
   ): Promise<DrawGenerationResult> {
     return {
       draw: {},
@@ -16,7 +16,7 @@ export class DoubleEliminationStrategy implements IBracketStrategy {
     };
   }
 
-  validateParticipantCount(count: number, rulePackageContext: any): boolean {
+  validateParticipantCount(count: number, rulePackageContext: unknown): boolean {
     return true;
   }
 }

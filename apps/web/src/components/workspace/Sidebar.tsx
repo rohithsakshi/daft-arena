@@ -2,21 +2,35 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Trophy, Calendar, Users, Home, Settings, MapPin } from 'lucide-react';
+import { Trophy, Calendar, Users, Home, Settings, MapPin, Search, User, Medal, Bell, CreditCard, Activity } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { usePathname } from 'next/navigation';
 
-const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: Home },
-  { name: 'Tournaments', href: '/tournaments', icon: Trophy },
-  { name: 'Schedules', href: '/schedules', icon: Calendar },
-  { name: 'Participants', href: '/participants', icon: Users },
-  { name: 'Venues', href: '/venues', icon: MapPin },
-  { name: 'Settings', href: '/settings', icon: Settings },
+const adminNavigation = [
+  { name: 'Dashboard', href: '/workspace', icon: Home },
+  { name: 'Tournaments', href: '/workspace/tournaments', icon: Trophy },
+  { name: 'Schedules', href: '/workspace/schedules', icon: Calendar },
+  { name: 'Participants', href: '/workspace/participants', icon: Users },
+  { name: 'Venues', href: '/workspace/venues', icon: MapPin },
+  { name: 'Settings', href: '/workspace/settings', icon: Settings },
+];
+
+const playerNavigation = [
+  { name: 'Dashboard', href: '/workspace/player', icon: Home, exact: true },
+  { name: 'Discover Tournaments', href: '/workspace/player/tournaments', icon: Search },
+  { name: 'My Tournaments', href: '/workspace/player/my-tournaments', icon: Trophy },
+  { name: 'Matches', href: '/workspace/player/matches', icon: Calendar },
+  { name: 'Rankings', href: '/workspace/player/rankings', icon: Medal },
+  { name: 'Notifications', href: '/workspace/player/notifications', icon: Bell },
+  { name: 'Transactions', href: '/workspace/player/transactions', icon: CreditCard },
+  { name: 'Profile', href: '/workspace/player/profile', icon: User },
+  { name: 'Settings', href: '/workspace/player/settings', icon: Settings },
 ];
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const isPlayerMode = pathname.startsWith('/workspace/player');
+  const navigation = isPlayerMode ? playerNavigation : adminNavigation;
 
   return (
     <aside className="w-64 bg-card border-r border-border hidden md:flex flex-col">
@@ -27,7 +41,10 @@ export default function Sidebar() {
       </div>
       <nav className="flex-1 px-4 py-4 space-y-1 overflow-y-auto">
         {navigation.map((item) => {
-          const isActive = pathname.startsWith(item.href);
+          const isActive = 'exact' in item && item.exact 
+            ? pathname === item.href 
+            : pathname.startsWith(item.href);
+            
           return (
             <Link
               key={item.name}
@@ -49,11 +66,11 @@ export default function Sidebar() {
       <div className="p-4 border-t border-border">
         <div className="flex items-center">
           <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">
-            A
+            {isPlayerMode ? 'P' : 'A'}
           </div>
           <div className="ml-3">
-            <p className="text-sm font-medium">Admin User</p>
-            <p className="text-xs text-muted-foreground">Workspace Owner</p>
+            <p className="text-sm font-medium">{isPlayerMode ? 'Player User' : 'Admin User'}</p>
+            <p className="text-xs text-muted-foreground">{isPlayerMode ? 'Competitor' : 'Workspace Owner'}</p>
           </div>
         </div>
       </div>

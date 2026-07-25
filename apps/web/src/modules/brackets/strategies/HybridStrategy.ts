@@ -6,13 +6,13 @@ export class HybridStrategy implements IBracketStrategy {
   async generateDraw(
     bracket: IBracket, 
     seeds: ISeed[], 
-    rulePackageContext: any
+    rulePackageContext: unknown
   ): Promise<DrawGenerationResult> {
     // E.g., Pools followed by Single Elimination knockout
     return { draw: {}, rounds: [], matches: [], progressionRules: [] };
   }
 
-  validateParticipantCount(count: number, rulePackageContext: any): boolean {
+  validateParticipantCount(count: number, rulePackageContext: unknown): boolean {
     return true;
   }
 }

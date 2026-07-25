@@ -38,11 +38,22 @@ export function RegisterForm() {
   const onSubmit = async (data: RegisterValues) => {
     setIsLoading(true);
     try {
-      await AuthService.register(data);
-      toast.success("Registration successful! Welcome to DAFT Arena.");
-      router.push('/workspace');
-    } catch (error: any) {
-      toast.error(error.message || "Failed to register account.");
+      // Bypassing real authentication for now as requested
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      toast.success("Account created successfully (Bypass)");
+      
+      // Determine if they are coming from a player flow or admin flow
+      const urlParams = new URLSearchParams(window.location.search);
+      const role = urlParams.get('role');
+      
+      if (role === 'player') {
+        router.push('/workspace/player');
+      } else {
+        router.push('/workspace');
+      }
+    } catch (error: unknown) {
+      toast.error(error.message || "Failed to create account");
     } finally {
       setIsLoading(false);
     }

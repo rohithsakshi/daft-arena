@@ -14,7 +14,7 @@ export class BracketService {
 
   async publishBracket(bracketId: string): Promise<IBracket | null> {
     // Check if draft exists, lock previous versions if necessary
-    return this.bracketRepo.update(bracketId, { status: 'Published' as any });
+    return this.bracketRepo.update(bracketId, { status: 'Published' as unknown });
   }
 
   async lockBracket(bracketId: string, userId: string): Promise<IBracket | null> {
@@ -26,7 +26,7 @@ export class BracketService {
   }
 
   async archiveBracket(bracketId: string): Promise<IBracket | null> {
-    return this.bracketRepo.update(bracketId, { status: 'Archived' as any });
+    return this.bracketRepo.update(bracketId, { status: 'Archived' as unknown });
   }
 
   // Bracket lifecycle versioning tracking goes here

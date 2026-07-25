@@ -14,7 +14,7 @@ export class SeedingService {
     return [];
   }
 
-  async generateRankingSeeds(bracketId: string, participantIds: string[], rankings: any): Promise<ISeed[]> {
+  async generateRankingSeeds(bracketId: string, participantIds: string[], rankings: unknown): Promise<ISeed[]> {
     // Logic for ranking based seeding, keeping protected seeds
     return [];
   }

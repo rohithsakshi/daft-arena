@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { withAuth } from './auth.guard';
 import { organizationRepository } from '../../../lib/container';
 
-export function withRole(roleCode: string, handler: (req: NextRequest, user: any) => Promise<NextResponse> | NextResponse) {
+export function withRole(roleCode: string, handler: (req: NextRequest, user: unknown) => Promise<NextResponse> | NextResponse) {
   return withAuth(async (req, user) => {
     const orgId = req.headers.get('x-organization-id') || undefined;
     
@@ -13,7 +13,7 @@ export function withRole(roleCode: string, handler: (req: NextRequest, user: any
       : memberships;
 
     const hasRole = relevantMemberships.some(m => {
-      const role = m.roleId as any;
+      const role = m.roleId as unknown;
       return role.code === roleCode || role.code === 'SUPER_ADMIN';
     });
     

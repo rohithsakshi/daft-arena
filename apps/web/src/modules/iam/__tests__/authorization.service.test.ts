@@ -4,13 +4,13 @@ import { PermissionResolver } from '../services/permission.resolver';
 
 describe('AuthorizationService', () => {
   let authorizationService: AuthorizationService;
-  let mockPermissionResolver: any;
+  let mockPermissionResolver: unknown;
 
   beforeEach(() => {
     mockPermissionResolver = {
       getUserPermissions: vi.fn(),
     };
-    authorizationService = new AuthorizationService(mockPermissionResolver as any);
+    authorizationService = new AuthorizationService(mockPermissionResolver as unknown);
   });
 
   it('should return true if user has the exact permission', async () => {

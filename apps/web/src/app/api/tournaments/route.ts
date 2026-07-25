@@ -18,12 +18,12 @@ export const POST = withPermission('MANAGE_TOURNAMENTS', async (req: NextRequest
   try {
     const body = await req.json();
     const data = CreateTournamentSchema.parse(body);
-    const tournament = await tournamentService.createTournament(data as any, user.sub);
+    const tournament = await tournamentService.createTournament(data as unknown, user.sub);
     return NextResponse.json({ data: tournament }, { status: 201 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: 'Validation Error', details: error.issues }, { status: 400 });
     }
-    return NextResponse.json({ error: (error as Error).message }, { status: (error as any).statusCode || 500 });
+    return NextResponse.json({ error: (error as Error).message }, { status: (error as unknown).statusCode || 500 });
   }
 });

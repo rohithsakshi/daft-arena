@@ -14,7 +14,7 @@ export class DrawService {
     bracket: IBracket, 
     seeds: ISeed[], 
     strategy: IBracketStrategy, 
-    rulePackageContext: any
+    rulePackageContext: unknown
   ): Promise<string> { // Returns new Draw ID
     
     const isValid = strategy.validateParticipantCount(seeds.length, rulePackageContext);

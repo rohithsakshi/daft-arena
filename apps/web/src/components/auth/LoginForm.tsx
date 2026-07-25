@@ -32,10 +32,21 @@ export function LoginForm() {
   const onSubmit = async (data: LoginValues) => {
     setIsLoading(true);
     try {
-      await AuthService.login(data);
-      toast.success("Successfully authenticated");
-      router.push('/workspace');
-    } catch (error: any) {
+      // Bypassing real authentication for now as requested
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      toast.success("Successfully authenticated (Bypass)");
+      
+      // Determine if they are coming from a player flow or admin flow
+      const urlParams = new URLSearchParams(window.location.search);
+      const role = urlParams.get('role');
+      
+      if (role === 'player') {
+        router.push('/workspace/player');
+      } else {
+        router.push('/workspace');
+      }
+    } catch (error: unknown) {
       toast.error(error.message || "Invalid credentials");
     } finally {
       setIsLoading(false);

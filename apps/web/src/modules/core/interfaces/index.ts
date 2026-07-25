@@ -39,7 +39,7 @@ export interface ApiResponse<T = any> {
   data?: T | PaginatedResponse<T>;
   error?: string;
   message?: string;
-  details?: any;
+  details?: unknown;
 }
 
 export interface AuthenticatedUser {
@@ -47,5 +47,5 @@ export interface AuthenticatedUser {
   email: string;
   roles: string[];
   permissions: string[];
-  [key: string]: any;
+  [key: string]: unknown;
 }

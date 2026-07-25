@@ -22,7 +22,7 @@ export default function CreateTournamentPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = React.useState(false);
 
-  const form = useForm<any>({
+  const form = useForm<unknown>({
     resolver: zodResolver(CreateTournamentSchema),
     defaultValues: {
       name: '',
@@ -49,13 +49,13 @@ export default function CreateTournamentPage() {
     },
   });
 
-  async function onSubmit(data: any) {
+  async function onSubmit(data: unknown) {
     setIsLoading(true);
     try {
       const response = await TournamentService.create(data);
       toast.success("Tournament created successfully as Draft");
       router.push(`/tournaments/${response.data._id}`);
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast.error(error.message || "Failed to create tournament");
     } finally {
       setIsLoading(false);

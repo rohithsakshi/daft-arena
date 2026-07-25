@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
     const newBracket = await bracketService.createBracket(validatedData);
     
     return NextResponse.json({ success: true, data: newBracket }, { status: 201 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     return NextResponse.json({ success: false, error: error.message }, { status: 400 });
   }
 }
@@ -32,7 +32,7 @@ export async function GET(req: NextRequest) {
     
     // Call repository to fetch brackets by eventId
     return NextResponse.json({ success: true, data: [] }, { status: 200 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }

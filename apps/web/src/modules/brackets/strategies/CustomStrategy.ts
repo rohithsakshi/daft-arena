@@ -6,13 +6,13 @@ export class CustomStrategy implements IBracketStrategy {
   async generateDraw(
     bracket: IBracket, 
     seeds: ISeed[], 
-    rulePackageContext: any
+    rulePackageContext: unknown
   ): Promise<DrawGenerationResult> {
     // Fully manual or externally defined draw
     return { draw: {}, rounds: [], matches: [], progressionRules: [] };
   }
 
-  validateParticipantCount(count: number, rulePackageContext: any): boolean {
+  validateParticipantCount(count: number, rulePackageContext: unknown): boolean {
     return true;
   }
 }

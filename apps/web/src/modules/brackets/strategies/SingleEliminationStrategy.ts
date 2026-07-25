@@ -6,7 +6,7 @@ export class SingleEliminationStrategy implements IBracketStrategy {
   async generateDraw(
     bracket: IBracket, 
     seeds: ISeed[], 
-    rulePackageContext: any
+    rulePackageContext: unknown
   ): Promise<DrawGenerationResult> {
     // Implementation for generating a Single Elimination Draw
     // including creating matches, rounds, and mapping ProgressionRules (Winner -> Next Match)
@@ -18,7 +18,7 @@ export class SingleEliminationStrategy implements IBracketStrategy {
     };
   }
 
-  validateParticipantCount(count: number, rulePackageContext: any): boolean {
+  validateParticipantCount(count: number, rulePackageContext: unknown): boolean {
     // Logic to validate powers of 2 or support for byes
     return true; 
   }
