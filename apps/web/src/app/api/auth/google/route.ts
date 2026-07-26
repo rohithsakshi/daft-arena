@@ -19,6 +19,21 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: 'No credential provided' }, { status: 400 });
     }
 
+    const ipAddress = request.headers.get('x-forwarded-for') || '127.0.0.1';
+    const userAgent = request.headers.get('user-agent') || 'Unknown';
+
+    // Verify Audience
+    const tokenInfoResponse = await fetch(`https://oauth2.googleapis.com/tokeninfo?access_token=${credential}`);
+    if (!tokenInfoResponse.ok) {
+      return NextResponse.json({ success: false, error: 'Invalid Google token' }, { status: 400 });
+    }
+    
+    const tokenInfo = await tokenInfoResponse.json();
+    if (tokenInfo.aud !== config.GOOGLE_CLIENT_ID) {
+      await auditService.logAction({ action: 'GOOGLE_INVALID_AUDIENCE', ipAddress, metadata: { aud: tokenInfo.aud } });
+      return NextResponse.json({ success: false, error: 'Invalid audience' }, { status: 401 });
+    }
+
     // Fetch user info using access token
     const userInfoResponse = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
       headers: { Authorization: `Bearer ${credential}` }
@@ -36,13 +51,15 @@ export async function POST(request: Request) {
 
     const { email, sub: googleId, name, picture, email_verified } = payload;
 
+    if (email_verified !== true) {
+      await auditService.logAction({ action: 'GOOGLE_EMAIL_NOT_VERIFIED', ipAddress, metadata: { email } });
+      return NextResponse.json({ success: false, error: 'Google account email is not verified.' }, { status: 403 });
+    }
+
     // Initialize services
     const userRepository = new UserRepository();
     const sessionRepository = new SessionRepository();
     const authService = new AuthenticationService(userRepository, sessionRepository, auditService);
-
-    const ipAddress = request.headers.get('x-forwarded-for') || '127.0.0.1';
-    const userAgent = request.headers.get('user-agent') || 'Unknown';
 
     const result = await authService.googleLogin(
       {
