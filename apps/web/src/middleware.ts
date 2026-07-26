@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { verifyToken } from './lib/auth/jwt';
 
-const publicRoutes = ['/', '/auth/login', '/auth/register', '/auth/forgot-password', '/api/health', '/api/auth/login', '/api/auth/register'];
+const publicRoutes = ['/', '/login', '/register', '/auth/forgot-password', '/api/health', '/api/auth/login', '/api/auth/register'];
 const adminRoles = ['SuperAdmin', 'TournamentAdmin', 'Finance'];
 
 export async function middleware(request: NextRequest) {
@@ -22,7 +22,7 @@ export async function middleware(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     }
     // Otherwise redirect to login
-    const loginUrl = new URL('/auth/login', request.url);
+    const loginUrl = new URL('/login', request.url);
     loginUrl.searchParams.set('callbackUrl', pathname);
     return NextResponse.redirect(loginUrl);
   }
@@ -33,7 +33,7 @@ export async function middleware(request: NextRequest) {
     if (pathname.startsWith('/api/')) {
       return NextResponse.json({ success: false, error: 'Invalid or expired token' }, { status: 401 });
     }
-    const loginUrl = new URL('/auth/login', request.url);
+    const loginUrl = new URL('/login', request.url);
     loginUrl.searchParams.set('error', 'session_expired');
     return NextResponse.redirect(loginUrl);
   }

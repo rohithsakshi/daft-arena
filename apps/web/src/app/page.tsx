@@ -20,7 +20,7 @@ export default function LandingPage() {
         </p>
         <div className="flex flex-wrap gap-4">
           <Link 
-            href="/capabilities" 
+            href="/login" 
             className={buttonVariants({ 
               size: "lg", 
               className: "h-14 px-8 text-lg bg-violet-600 hover:bg-violet-700 text-white border-0 shadow-[0_0_20px_rgba(124,58,237,0.3)] hover:shadow-[0_0_30px_rgba(124,58,237,0.5)] transition-all duration-300" 
@@ -29,7 +29,7 @@ export default function LandingPage() {
             Login
           </Link>
           <Link 
-            href="/capabilities?mode=register" 
+            href="/register" 
             className={buttonVariants({ 
               size: "lg", 
               variant: "outline", 
