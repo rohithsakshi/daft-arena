@@ -25,7 +25,7 @@ export default async function AchievementsPage() {
 
       <CareerStatistics
         stats={profile.stats}
-        medals={profile.medals}
+        medals={profile.stats?.medals || { gold: 0, silver: 0, bronze: 0 }}
         winStreak={4}
       />
     </div>

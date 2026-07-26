@@ -51,19 +51,19 @@ export function PlayerProfileCard({ profile, className }: PlayerProfileCardProps
           </div>
           {/* Medals */}
           <div className="flex items-center gap-2 mt-1">
-            {profile.medals.gold > 0 && (
+            {profile.stats?.medals?.gold > 0 && (
               <span className="flex items-center gap-1 text-sm font-bold text-amber-400">
-                <Medal className="w-4 h-4" />{profile.medals.gold}
+                <Medal className="w-4 h-4" />{profile.stats.medals.gold}
               </span>
             )}
-            {profile.medals.silver > 0 && (
+            {profile.stats?.medals?.silver > 0 && (
               <span className="flex items-center gap-1 text-sm font-bold text-slate-300">
-                <Medal className="w-4 h-4" />{profile.medals.silver}
+                <Medal className="w-4 h-4" />{profile.stats.medals.silver}
               </span>
             )}
-            {profile.medals.bronze > 0 && (
+            {profile.stats?.medals?.bronze > 0 && (
               <span className="flex items-center gap-1 text-sm font-bold text-amber-700">
-                <Medal className="w-4 h-4" />{profile.medals.bronze}
+                <Medal className="w-4 h-4" />{profile.stats.medals.bronze}
               </span>
             )}
           </div>
@@ -99,22 +99,22 @@ export function PlayerProfileCard({ profile, className }: PlayerProfileCardProps
             <span className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1 flex items-center gap-1">
               <Activity className="w-3 h-3" /> Win Ratio
             </span>
-            <span className="text-2xl font-black text-emerald-400">{profile.stats.winRatio}%</span>
+            <span className="text-2xl font-black text-emerald-400">{profile.stats?.winRatio || 0}%</span>
           </div>
           <div className="flex flex-col">
             <span className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1 flex items-center gap-1">
               <Trophy className="w-3 h-3" /> Matches
             </span>
             <span className="text-2xl font-black text-foreground">
-              {profile.stats.matchesWon}
-              <span className="text-sm font-normal text-muted-foreground">/{profile.stats.matchesPlayed}</span>
+              {profile.stats?.matchesWon || 0}
+              <span className="text-sm font-normal text-muted-foreground">/{profile.stats?.matchesPlayed || 0}</span>
             </span>
           </div>
           <div className="flex flex-col">
             <span className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1 flex items-center gap-1">
               <Medal className="w-3 h-3 text-amber-400" /> Titles
             </span>
-            <span className="text-2xl font-black text-amber-400">{profile.stats.tournamentsWon}</span>
+            <span className="text-2xl font-black text-amber-400">{profile.stats?.tournamentsWon || 0}</span>
           </div>
         </div>
       </div>

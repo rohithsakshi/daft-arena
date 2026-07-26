@@ -1,46 +1,32 @@
 import mongoose from 'mongoose';
 
-const MONGODB_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/daft_arena';
+let isConnected = false;
 
-if (!MONGODB_URI) {
-  throw new Error('Please define the MONGO_URI environment variable inside .env');
-}
+export const connectToDatabase = async () => {
+  mongoose.set('strictQuery', true);
 
-/**
- * Global is used here to maintain a cached connection across hot reloads
- * in development. This prevents connections growing exponentially
- * during API Route usage.
- */
-let cached = (global as any).mongoose;
-
-if (!cached) {
-  cached = (global as any).mongoose = { conn: null, promise: null };
-}
-
-async function connectToDatabase() {
-  if (cached.conn) {
-    return cached.conn;
+  if (isConnected) {
+    console.log('MongoDB is already connected');
+    return;
   }
 
-  if (!cached.promise) {
-    const opts = {
-      bufferCommands: false,
-    };
+  const uri = process.env.MONGO_URI || process.env.MONGODB_URI;
 
-    cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
-      console.log("MongoDB successfully connected");
-      return mongoose;
-    });
+  if (!uri) {
+    console.error('FATAL ERROR: MONGO_URI or MONGODB_URI environment variable is missing.');
+    throw new Error('Database connection failed: Missing connection string.');
   }
-  
+
   try {
-    cached.conn = await cached.promise;
-  } catch (e) {
-    cached.promise = null;
-    throw e;
+    await mongoose.connect(uri, { 
+      serverSelectionTimeoutMS: 5000, // Fail gracefully after 5s if DB is unreachable
+    });
+    isConnected = true;
+    console.log('MongoDB connected successfully');
+  } catch (error) {
+    console.error('FATAL ERROR: Failed to connect to MongoDB.', error);
+    throw new Error('Database connection failed.');
   }
-
-  return cached.conn;
-}
+};
 
 export default connectToDatabase;

@@ -79,7 +79,7 @@ export function UpcomingMatchCard({ match, className }: UpcomingMatchCardProps) 
             {getInitials(match.opponentName)}
           </div>
           <span className="text-xs font-semibold text-foreground truncate max-w-[80px] text-center">
-            {match.opponentName.split(' ')[0]}
+            {match?.opponentName?.split(' ')[0] || 'TBD'}
           </span>
           {isCompleted && match.result && (
             <span className={cn(

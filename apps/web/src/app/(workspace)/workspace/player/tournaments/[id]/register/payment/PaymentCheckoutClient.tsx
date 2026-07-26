@@ -58,14 +58,10 @@ export function PaymentCheckoutClient({ tournamentId }: { tournamentId: string }
 
       // 2. Submit payment and generate invoice/transaction mocks
       const { invoice, transaction } = await PlayerService.processPayment(
-        registration.id,
-        finalBreakdown.baseAmount,
-        finalBreakdown.discountAmount,
-        finalBreakdown.taxAmount,
+        draft.tournamentId,
         finalBreakdown.totalAmount,
-        draft.currency,
-        finalBreakdown.couponCode,
-        method
+        finalBreakdown.utr || 'MOCK_UTR',
+        finalBreakdown.screenshotUrl || ''
       );
 
       // 3. Save confirmations in sessionStorage

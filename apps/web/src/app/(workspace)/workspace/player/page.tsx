@@ -51,12 +51,10 @@ export default async function PlayerDashboardPage() {
               <span className="text-xs font-semibold text-emerald-400 uppercase tracking-wider">Active Player</span>
             </div>
             <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-foreground">
-              Welcome back, {profile.fullName.split(' ')[0]} 👋
+              Welcome back, {profile?.fullName?.split(' ')[0] || 'Player'} 👋
             </h1>
-            <p className="text-muted-foreground mt-1 text-sm md:text-base">
-              {upcomingMatches.length > 0
-                ? `You have ${upcomingMatches.length} upcoming match${upcomingMatches.length > 1 ? 'es' : ''}.`
-                : 'Your DAFT Arena player hub.'}
+            <p className="text-muted-foreground mt-1 text-lg">
+              Here's what's happening with your tournaments and matches today.
             </p>
           </div>
           <Link
@@ -65,10 +63,10 @@ export default async function PlayerDashboardPage() {
             aria-label="View my profile"
           >
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-600 to-purple-700 flex items-center justify-center text-sm font-black text-white shadow-lg">
-              {profile.fullName.split(' ').map(n => n[0]).join('').slice(0, 2)}
+              {profile?.fullName ? profile.fullName.split(' ').map(n => n[0]).join('').slice(0, 2) : 'P'}
             </div>
             <div className="hidden sm:block text-left">
-              <p className="text-sm font-semibold text-foreground">{profile.fullName}</p>
+              <p className="text-2xl font-bold text-foreground">{profile?.stats?.winRatio || '0'}%</p>
               <p className="text-xs text-muted-foreground">View profile</p>
             </div>
             <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-violet-400 group-hover:translate-x-0.5 transition-all" />
@@ -80,22 +78,22 @@ export default async function PlayerDashboardPage() {
       <DashboardGrid cols={4}>
         <StatisticWidget
           title="Win Ratio"
-          value={`${profile.stats.winRatio}%`}
+          value={`${profile?.stats?.winRatio || 0}%`}
           icon={Target}
           iconColorClass="text-emerald-400 bg-emerald-500/10 border-emerald-500/20"
           trend={{ value: 5.2, label: 'vs last month' }}
         />
         <StatisticWidget
           title="Matches Played"
-          value={profile.stats.matchesPlayed}
-          subtitle={`${profile.stats.matchesWon} wins`}
+          value={profile?.stats?.matchesPlayed || 0}
+          subtitle={`${profile?.stats?.matchesWon || 0} wins`}
           icon={Trophy}
           iconColorClass="text-violet-400 bg-violet-500/10 border-violet-500/20"
         />
         <StatisticWidget
           title="Titles Won"
-          value={profile.stats.tournamentsWon}
-          subtitle={`of ${profile.stats.tournamentsEntered} entered`}
+          value={profile?.stats?.tournamentsWon || 0}
+          subtitle={`of ${profile?.stats?.tournamentsEntered || 0} entered`}
           icon={Medal}
           iconColorClass="text-amber-400 bg-amber-500/10 border-amber-500/20"
         />
