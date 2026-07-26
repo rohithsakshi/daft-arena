@@ -18,6 +18,8 @@ const envSchema = z.object({
   SUPER_ADMIN_NAME: z.string().min(1),
   SUPER_ADMIN_EMAIL: z.string().email(),
   SUPER_ADMIN_PASSWORD: z.string().min(1),
+  GOOGLE_CLIENT_ID: z.string().min(1),
+  GOOGLE_CLIENT_SECRET: z.string().min(1),
 });
 
 const _env = envSchema.safeParse(process.env);
@@ -44,4 +46,6 @@ export const config = _env.success ? _env.data : {
   SUPER_ADMIN_NAME: process.env.SUPER_ADMIN_NAME || '',
   SUPER_ADMIN_EMAIL: process.env.SUPER_ADMIN_EMAIL || '',
   SUPER_ADMIN_PASSWORD: process.env.SUPER_ADMIN_PASSWORD || '',
+  GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID || '',
+  GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET || '',
 };

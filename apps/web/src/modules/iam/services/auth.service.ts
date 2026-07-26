@@ -55,6 +55,52 @@ export class AuthenticationService {
     return { token, user: { id: user.id, email: user.email, name: user.name } };
   }
 
+  async googleLogin(payload: { email: string, googleId: string, name: string, avatar: string, emailVerified: boolean }, ipAddress?: string, userAgent?: string) {
+    let user = await this.userRepository.findByEmail(payload.email);
+    
+    if (!user) {
+      user = await this.userRepository.create({
+        email: payload.email,
+        name: payload.name,
+        googleId: payload.googleId,
+        authProvider: 'GOOGLE',
+        avatar: payload.avatar,
+        emailVerified: payload.emailVerified
+      });
+      await this.auditService.logAction({ actorId: user.id, action: 'GOOGLE_REGISTER_SUCCESS', ipAddress });
+    } else {
+      if (!user.googleId) {
+        await this.userRepository.update(user.id, {
+          googleId: payload.googleId,
+          authProvider: 'GOOGLE',
+          avatar: user.avatar || payload.avatar,
+          emailVerified: payload.emailVerified
+        });
+      }
+      await this.auditService.logAction({ actorId: user.id, action: 'GOOGLE_LOGIN_SUCCESS', ipAddress });
+    }
+
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + 7);
+
+    // Default role 'Player'
+    const token = await new jose.SignJWT({ sub: user.id, email: user.email, role: 'Player' })
+      .setProtectedHeader({ alg: 'HS256' })
+      .setIssuedAt()
+      .setExpirationTime('7d')
+      .sign(JWT_SECRET);
+
+    await this.sessionRepository.create({
+      userId: user.id,
+      token,
+      ipAddress,
+      userAgent,
+      expiresAt,
+    });
+
+    return { token, user: { id: user.id, email: user.email, name: user.name }, isNewUser: !user.hashedPassword };
+  }
+
   async logout(token: string, userId?: string, ipAddress?: string) {
     if (!token) return;
     await this.sessionRepository.invalidateToken(token);
