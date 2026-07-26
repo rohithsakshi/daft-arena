@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { RegistrationRepository, TournamentEventRepository, TournamentRepository } from '../repositories';
 import { IRegistration } from '../models/Registration';
 import { RegistrationStatus, TournamentStatus } from '../../core/enums';

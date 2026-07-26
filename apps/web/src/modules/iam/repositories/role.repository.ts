@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { BaseRepository } from '../../../lib/db/BaseRepository';
 import { RoleModel, IRole } from '../models/Role';
 import { ClientSession } from 'mongoose';

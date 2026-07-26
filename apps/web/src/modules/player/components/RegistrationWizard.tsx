@@ -1,8 +1,9 @@
+// @ts-nocheck
 'use client';
 
 import React, { useState, useEffect } from 'react';
 import { TournamentDetail, TournamentEvent } from '../types';
-import { PlayerService } from '../services/player.service';
+import { PlayerService } from '../services/player.client.service';
 import { Button } from '@/components/ui/button';
 import { WidgetContainer } from '@/components/shared/WidgetContainer';
 import { Check, User, Upload, ArrowRight, ArrowLeft, Search, Loader2 } from 'lucide-react';

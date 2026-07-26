@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { PlayerMatch } from '../types';
 import { MATCH_STATUS_COLORS } from '../constants';

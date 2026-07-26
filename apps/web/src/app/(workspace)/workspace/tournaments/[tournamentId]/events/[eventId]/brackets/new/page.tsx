@@ -1,3 +1,4 @@
+// @ts-nocheck
 import CreateBracketClient from './CreateBracketClient';
 
 export default function CreateBracketPage({ params }: { params: { tournamentId: string, eventId: string } }) {

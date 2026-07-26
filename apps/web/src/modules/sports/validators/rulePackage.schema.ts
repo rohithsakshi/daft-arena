@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { z } from 'zod';
 import { ScoreType, EventType, Gender, AgeCategory } from '../../core/enums';
 

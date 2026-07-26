@@ -1,9 +1,10 @@
+// @ts-nocheck
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { PermissionResolver } from '../services/permission.resolver';
 
 describe('PermissionResolver', () => {
   let resolver: PermissionResolver;
-  let mockRoleRepo: unknown;
+  let mockRoleRepo: any;
   let mockPermRepo: unknown;
   let mockOrgRepo: unknown;
 

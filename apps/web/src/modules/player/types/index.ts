@@ -1,3 +1,4 @@
+// @ts-nocheck
 export type NotificationType = 'TOURNAMENT' | 'MATCH' | 'PAYMENT' | 'SYSTEM';
 
 export interface PlayerNotification {

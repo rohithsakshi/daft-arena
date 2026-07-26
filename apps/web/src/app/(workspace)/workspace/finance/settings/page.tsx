@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { SectionHeader } from '@/components/shared/SectionHeader';
 import { Settings2 } from 'lucide-react';

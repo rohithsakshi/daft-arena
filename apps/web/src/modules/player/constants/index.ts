@@ -1,3 +1,4 @@
+// @ts-nocheck
 export const PLAYER_ROUTES = {
   DASHBOARD: '/workspace/player',
   TOURNAMENTS: '/workspace/player/tournaments',

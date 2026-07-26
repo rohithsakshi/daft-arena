@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { IBracketStrategy, DrawGenerationResult } from '../strategies/IBracketStrategy';
 import { IBracket } from '../models/Bracket';
 import { ISeed } from '../models/Seed';

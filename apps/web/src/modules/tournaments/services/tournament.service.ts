@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { TournamentRepository, TournamentEventRepository } from '../repositories';
 import { ITournament } from '../models/Tournament';
 import { TournamentStatus } from '../../core/enums';

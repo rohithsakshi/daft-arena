@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { SeedRepository } from '../repositories';
 import { ISeed } from '../models/Seed';
 

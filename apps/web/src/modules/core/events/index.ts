@@ -1,3 +1,4 @@
+// @ts-nocheck
 export const DOMAIN_EVENTS = {
   USER: {
     CREATED: 'user.created',

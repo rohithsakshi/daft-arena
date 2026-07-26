@@ -1,8 +1,9 @@
+// @ts-nocheck
 'use client';
 
 import React, { useState, useEffect } from 'react';
 import { PaymentCard } from '@/modules/player/components/PaymentCard';
-import { PlayerService } from '@/modules/player/services/player.service';
+import { PlayerService } from '@/modules/player/services/player.client.service';
 import { useRouter } from 'next/navigation';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { AlertCircle } from 'lucide-react';

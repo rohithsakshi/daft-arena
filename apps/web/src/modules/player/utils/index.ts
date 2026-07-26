@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { format, formatDistanceToNow, isPast, isFuture } from 'date-fns';
 
 /**

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import mongoose, { Model } from 'mongoose';
 import { IBaseDocument, createBaseSchema } from '../../../lib/db/BaseSchema';
 

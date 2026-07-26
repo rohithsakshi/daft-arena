@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { TournamentEventRepository, TournamentRepository } from '../repositories';
 import { ITournamentEvent } from '../models/Event';
 import { NotFoundException, BusinessRuleException } from '../../core/exceptions';

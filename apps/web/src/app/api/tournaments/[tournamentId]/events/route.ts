@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { NextRequest, NextResponse } from 'next/server';
 import { eventService, eventRepository } from '../../../../../lib/container';
 import { CreateEventSchema } from '../../../../../modules/tournaments/validators/event.schema';

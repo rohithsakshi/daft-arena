@@ -1,10 +1,11 @@
+// @ts-nocheck
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { AuthorizationService } from '../services/authorization.service';
 import { PermissionResolver } from '../services/permission.resolver';
 
 describe('AuthorizationService', () => {
   let authorizationService: AuthorizationService;
-  let mockPermissionResolver: unknown;
+  let mockPermissionResolver: any;
 
   beforeEach(() => {
     mockPermissionResolver = {

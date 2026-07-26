@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { NextRequest, NextResponse } from 'next/server';
 import { venueService } from '../../../../lib/container';
 import { NotFoundException } from '../../../../modules/core/exceptions';

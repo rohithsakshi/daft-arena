@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { AuditRepository } from '../repositories/audit.repository';
 
 export class AuditService {

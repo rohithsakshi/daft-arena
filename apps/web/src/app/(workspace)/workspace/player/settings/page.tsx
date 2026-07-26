@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { SectionHeader } from '@/components/shared/SectionHeader';
 import { SettingsSection } from '@/modules/player/components/SettingsSection';

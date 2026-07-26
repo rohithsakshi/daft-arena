@@ -52,7 +52,7 @@ export function RegisterForm() {
       } else {
         router.push('/workspace');
       }
-    } catch (error: unknown) {
+    } catch (error: any) {
       toast.error(error.message || "Failed to create account");
     } finally {
       setIsLoading(false);

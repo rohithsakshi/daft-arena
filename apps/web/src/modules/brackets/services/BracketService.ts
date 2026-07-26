@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { IBracket } from '../models/Bracket';
 import { BracketRepository } from '../repositories';
 

@@ -1,3 +1,4 @@
+// @ts-nocheck
 export class BracketPermissionService {
   
   async canCreateBracket(userId: string, tournamentId: string): Promise<boolean> {

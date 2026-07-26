@@ -7,7 +7,8 @@ import { cn } from '@/lib/utils';
 import { usePathname } from 'next/navigation';
 
 const adminNavigation = [
-  { name: 'Dashboard', href: '/workspace', icon: Home },
+  { name: 'Dashboard', href: '/workspace', icon: Home, exact: true },
+  { name: 'Operations', href: '/workspace/operations', icon: Activity },
   { name: 'Tournaments', href: '/workspace/tournaments', icon: Trophy },
   { name: 'Schedules', href: '/workspace/schedules', icon: Calendar },
   { name: 'Participants', href: '/workspace/participants', icon: Users },

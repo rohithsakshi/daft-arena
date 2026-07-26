@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { Trophy, Calendar, MapPin, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';

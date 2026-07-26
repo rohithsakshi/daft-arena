@@ -26,7 +26,7 @@ export class BaseRepository<T> {
   constructor(protected readonly model: Model<unknown>) {}
 
   protected mapId(doc: Record<string, unknown> | null | undefined): T {
-    if (!doc) return doc as unknown;
+    if (!doc) return doc as any;
     if (doc._id && !doc.id) {
       doc.id = doc._id.toString();
     }

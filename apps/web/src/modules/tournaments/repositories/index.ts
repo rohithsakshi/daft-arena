@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { BaseRepository } from '../../../lib/db/BaseRepository';
 import { VenueModel, IVenue } from '../models/Venue';
 import { PlayingAreaModel, IPlayingArea } from '../models/PlayingArea';

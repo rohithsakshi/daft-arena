@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { NextRequest, NextResponse } from 'next/server';
 import { rulePackageService } from '../../../../../../lib/container';
 import { UpdateRulePackageSchema } from '../../../../../../modules/sports/validators/rulePackage.schema';

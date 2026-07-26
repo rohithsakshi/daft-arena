@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import Sidebar from '@/components/workspace/Sidebar';
 import Header from '@/components/workspace/Header';

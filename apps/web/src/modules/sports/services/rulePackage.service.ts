@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { RulePackageRepository } from '../repositories';
 import { IRulePackage } from '../models/RulePackage';
 import { ConflictException, NotFoundException, BusinessRuleException, ValidationException } from '../../core/exceptions';

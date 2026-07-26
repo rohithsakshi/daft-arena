@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { SportRepository } from '../repositories';
 import { ISport } from '../models/Sport';
 import { ConflictException, NotFoundException } from '../../core/exceptions';

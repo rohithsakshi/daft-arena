@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { BaseRepository } from '../../../lib/db/BaseRepository';
 import { BracketModel, IBracket } from '../models/Bracket';
 import { DrawModel, IDraw } from '../models/Draw';

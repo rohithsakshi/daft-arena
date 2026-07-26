@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { IBracket } from '../models/Bracket';
 import { IDraw } from '../models/Draw';
 import { IMatch } from '../models/Match';

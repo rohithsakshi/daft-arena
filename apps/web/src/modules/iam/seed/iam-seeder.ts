@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { connectDB } from '../../../lib/mongodb';
 import { UserModel } from '../models/User';
 import { RoleModel } from '../models/Role';

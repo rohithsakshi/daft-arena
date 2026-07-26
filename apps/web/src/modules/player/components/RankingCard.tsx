@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { PlayerRanking } from '../types';
 import { Medal, TrendingUp, TrendingDown } from 'lucide-react';

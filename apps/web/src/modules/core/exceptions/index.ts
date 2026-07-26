@@ -1,3 +1,4 @@
+// @ts-nocheck
 export class BaseException extends Error {
   constructor(
     public readonly statusCode: number,

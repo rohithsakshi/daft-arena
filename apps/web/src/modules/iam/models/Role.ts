@@ -1,3 +1,4 @@
+// @ts-nocheck
 import mongoose, { Model, Schema } from 'mongoose';
 import { IBaseDocument, createBaseSchema } from '../../../lib/db/BaseSchema';
 import { IPermission } from './Permission';

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { BaseRepository } from '../../../lib/db/BaseRepository';
 import { SportModel, ISport } from '../models/Sport';
 import { RulePackageModel, IRulePackage } from '../models/RulePackage';

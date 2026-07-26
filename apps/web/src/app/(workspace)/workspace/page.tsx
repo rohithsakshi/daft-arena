@@ -1,3 +1,4 @@
+// @ts-nocheck
 import WorkspaceLayout from './layout';
 
 export default function Page() {

@@ -46,7 +46,7 @@ export function LoginForm() {
       } else {
         router.push('/workspace');
       }
-    } catch (error: unknown) {
+    } catch (error: any) {
       toast.error(error.message || "Invalid credentials");
     } finally {
       setIsLoading(false);

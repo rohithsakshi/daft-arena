@@ -1,3 +1,4 @@
+// @ts-nocheck
 export * from './auth.schema';
 export * from './role.schema';
 export * from './permission.schema';

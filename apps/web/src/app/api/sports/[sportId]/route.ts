@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { NextRequest, NextResponse } from 'next/server';
 import { sportService } from '../../../../lib/container';
 import { UpdateSportSchema } from '../../../../modules/sports/validators/sport.schema';

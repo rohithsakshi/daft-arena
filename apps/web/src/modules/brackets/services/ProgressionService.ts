@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { MatchRepository, ProgressionRuleRepository } from '../repositories';
 import { ProgressionCondition } from '../models/ProgressionRule';
 

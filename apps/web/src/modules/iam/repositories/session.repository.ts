@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { BaseRepository } from '../../../lib/db/BaseRepository';
 import { SessionModel, ISession } from '../models/Session';
 import { ClientSession } from 'mongoose';

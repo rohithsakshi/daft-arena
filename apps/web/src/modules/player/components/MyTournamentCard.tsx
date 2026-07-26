@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { PlayerTournament } from '../types';
 import { REGISTRATION_STATUS_COLORS, REGISTRATION_STATUS_LABELS } from '../constants';

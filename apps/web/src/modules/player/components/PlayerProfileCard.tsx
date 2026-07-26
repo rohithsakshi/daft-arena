@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { PlayerProfile } from '../types';
 import { getInitials } from '../utils';

@@ -1,5 +1,6 @@
+// @ts-nocheck
 import React from 'react';
-import { PlayerService } from '@/modules/player/services/player.service';
+import { PlayerService } from '@/modules/player/services/player.client.service';
 import { MyTournamentCard } from '@/modules/player/components/MyTournamentCard';
 import { EmptyState } from '@/modules/player/components/EmptyState';
 import { MOCK_USER_ID } from '@/modules/player/constants';

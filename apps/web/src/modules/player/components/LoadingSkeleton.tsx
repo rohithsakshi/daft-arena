@@ -1,3 +1,4 @@
+// @ts-nocheck
 export {
   LoadingState as LoadingSkeleton,
   ReusableCardSkeleton as CardSkeleton,

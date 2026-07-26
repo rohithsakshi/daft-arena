@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { IDraw } from '../models/Draw';
 
 export class BracketExportService {

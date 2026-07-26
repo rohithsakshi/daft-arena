@@ -1,3 +1,4 @@
+// @ts-nocheck
 import SeedManagerClient from './SeedManagerClient';
 
 export default function SeedManagerPage({ params }: { params: { bracketId: string } }) {

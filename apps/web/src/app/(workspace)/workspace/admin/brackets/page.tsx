@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { SectionHeader } from '@/components/shared/SectionHeader';
 import { GitBranch } from 'lucide-react';

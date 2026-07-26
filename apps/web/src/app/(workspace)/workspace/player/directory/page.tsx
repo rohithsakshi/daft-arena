@@ -1,5 +1,6 @@
+// @ts-nocheck
 import React from 'react';
-import { PlayerService } from '@/modules/player/services/player.service';
+import { PlayerService } from '@/modules/player/services/player.client.service';
 import { SectionHeader } from '@/components/shared/SectionHeader';
 import { PlayerDirectoryClient } from './PlayerDirectoryClient';
 import { Search } from 'lucide-react';

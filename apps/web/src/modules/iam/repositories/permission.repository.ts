@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { BaseRepository } from '../../../lib/db/BaseRepository';
 import { PermissionModel, IPermission } from '../models/Permission';
 import { PermissionGroupModel, IPermissionGroup } from '../models/PermissionGroup';

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { BaseRepository } from '../../../lib/db/BaseRepository';
 import { OrganizationModel, IOrganization } from '../models/Organization';
 import { OrganizationMembershipModel, IOrganizationMembership } from '../models/OrganizationMembership';

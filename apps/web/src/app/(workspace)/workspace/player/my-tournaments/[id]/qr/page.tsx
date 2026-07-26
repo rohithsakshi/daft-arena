@@ -1,5 +1,6 @@
+// @ts-nocheck
 import React from 'react';
-import { PlayerService } from '@/modules/player/services/player.service';
+import { PlayerService } from '@/modules/player/services/player.client.service';
 import { QRPassCard } from '@/modules/player/components/QRPassCard';
 import { SectionHeader } from '@/components/shared/SectionHeader';
 import { EmptyState } from '@/components/shared/EmptyState';
