@@ -6,7 +6,9 @@ import { LoginDto } from '../dtos';
 import * as bcrypt from 'bcryptjs';
 import * as jose from 'jose';
 
-const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET || 'fallback-secret-key-do-not-use-in-prod');
+import { config } from '../../../lib/config';
+
+const JWT_SECRET = new TextEncoder().encode(config.JWT_SECRET);
 
 export class AuthenticationService {
   constructor(

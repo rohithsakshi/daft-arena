@@ -1,7 +1,7 @@
 // @ts-nocheck
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { WidgetContainer } from '@/components/shared/WidgetContainer';
 import { Button } from '@/components/ui/button';
 import { Tag, Sparkles, CreditCard, ShieldCheck, Loader2 } from 'lucide-react';
@@ -27,6 +27,23 @@ export function PaymentCard({ baseFee, currency, onPaymentSubmit }: PaymentCardP
   const [discountAmount, setDiscountAmount] = useState(0);
   const [paymentMethod, setPaymentMethod] = useState<'CARD' | 'UPI' | 'NETBANKING'>('CARD');
   const [isProcessing, setIsProcessing] = useState(false);
+  const [upiSettings, setUpiSettings] = useState<any>(null);
+  const [loadingSettings, setLoadingSettings] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/settings/upi')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.enabled) {
+          setUpiSettings(data.settings);
+        }
+        setLoadingSettings(false);
+      })
+      .catch((err) => {
+        console.error('Failed to load UPI settings', err);
+        setLoadingSettings(false);
+      });
+  }, []);
 
   const taxAmount = Math.round(baseFee * 0.05 * 100) / 100; // 5% tax
 
@@ -94,6 +111,12 @@ export function PaymentCard({ baseFee, currency, onPaymentSubmit }: PaymentCardP
     }, 1500);
   };
 
+  const availableMethods = [
+    { id: 'CARD', label: 'Credit Card' },
+    ...(upiSettings ? [{ id: 'UPI', label: 'UPI QR' }] : []),
+    { id: 'NETBANKING', label: 'Net Banking' }
+  ];
+
   return (
     <WidgetContainer className="p-6 max-w-md mx-auto space-y-6">
       <div>
@@ -151,37 +174,42 @@ export function PaymentCard({ baseFee, currency, onPaymentSubmit }: PaymentCardP
       {/* Payment methods selectors */}
       <div className="space-y-2">
         <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Payment Method</p>
-        <div className="grid grid-cols-3 gap-2">
-          {[
-            { id: 'CARD', label: 'Credit Card' },
-            { id: 'UPI', label: 'UPI QR' },
-            { id: 'NETBANKING', label: 'Net Banking' }
-          ].map((m) => (
-            <div
-              key={m.id}
-              onClick={() => setPaymentMethod(m.id as unknown)}
-              className={cn(
-                'p-3 rounded-lg border text-center cursor-pointer transition-all flex flex-col items-center justify-center gap-1',
-                paymentMethod === m.id
-                  ? 'border-violet-500 bg-violet-500/5 text-violet-400'
-                  : 'border-white/5 bg-black/10 text-muted-foreground hover:bg-white/5'
-              )}
-            >
-              <CreditCard className="w-4 h-4" />
-              <span className="text-[10px] font-semibold">{m.label}</span>
-            </div>
-          ))}
-        </div>
+        {loadingSettings ? (
+          <div className="flex justify-center p-4"><Loader2 className="w-4 h-4 animate-spin text-muted-foreground" /></div>
+        ) : (
+          <div className="grid grid-cols-3 gap-2">
+            {availableMethods.map((m) => (
+              <div
+                key={m.id}
+                onClick={() => setPaymentMethod(m.id as any)}
+                className={cn(
+                  'p-3 rounded-lg border text-center cursor-pointer transition-all flex flex-col items-center justify-center gap-1',
+                  paymentMethod === m.id
+                    ? 'border-violet-500 bg-violet-500/5 text-violet-400'
+                    : 'border-white/5 bg-black/10 text-muted-foreground hover:bg-white/5'
+                )}
+              >
+                <CreditCard className="w-4 h-4" />
+                <span className="text-[10px] font-semibold">{m.label}</span>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
-      {paymentMethod === 'UPI' && (
+      {paymentMethod === 'UPI' && upiSettings && (
         <div className="p-4 rounded-xl border border-violet-500/20 bg-violet-500/5 space-y-4">
-          <div className="text-center space-y-1">
-            <p className="text-xs text-muted-foreground">Scan QR to pay using any UPI app</p>
-            <div className="w-32 h-32 bg-white rounded-xl mx-auto flex items-center justify-center">
-              <span className="text-xs text-black font-bold">QR_PLACEHOLDER</span>
-            </div>
-            <p className="text-xs font-mono bg-black/40 py-1 px-2 rounded-lg inline-block border border-white/10">daftarena@upi</p>
+          <div className="text-center space-y-2">
+            <p className="text-xs text-muted-foreground">{upiSettings.paymentInstructions || 'Scan QR to pay using any UPI app'}</p>
+            {upiSettings.qrImageUrl ? (
+              <img src={upiSettings.qrImageUrl} alt="UPI QR" className="w-32 h-32 mx-auto rounded-xl object-contain bg-white p-1" />
+            ) : (
+              <div className="w-32 h-32 bg-white rounded-xl mx-auto flex items-center justify-center">
+                <span className="text-xs text-black font-bold">QR_PLACEHOLDER</span>
+              </div>
+            )}
+            <p className="text-xs font-mono bg-black/40 py-1 px-2 rounded-lg inline-block border border-white/10">{upiSettings.upiId}</p>
+            <p className="text-[10px] text-muted-foreground">{upiSettings.accountName}</p>
           </div>
           <div className="space-y-3">
             <div>
@@ -212,7 +240,7 @@ export function PaymentCard({ baseFee, currency, onPaymentSubmit }: PaymentCardP
       {/* CTA Button */}
       <Button
         onClick={handleCheckout}
-        disabled={isProcessing || isUploading}
+        disabled={isProcessing || isUploading || loadingSettings}
         className="w-full h-11 bg-violet-600 hover:bg-violet-700 text-white font-semibold rounded-xl shadow-lg shadow-violet-500/20 gap-2"
       >
         {isProcessing ? (

@@ -1,20 +1,21 @@
 import nodemailer from 'nodemailer';
+import { config } from '../config';
 
 export class EmailService {
     private static transporter = nodemailer.createTransport({
-        host: process.env.SMTP_HOST || 'smtp.ethereal.email',
-        port: parseInt(process.env.SMTP_PORT || '587'),
-        secure: process.env.SMTP_SECURE === 'true',
+        host: config.SMTP_HOST,
+        port: parseInt(config.SMTP_PORT),
+        secure: parseInt(config.SMTP_PORT) === 465,
         auth: {
-            user: process.env.SMTP_USER,
-            pass: process.env.SMTP_PASS,
+            user: config.SMTP_USER,
+            pass: config.SMTP_PASS,
         },
     });
 
     static async send(to: string, subject: string, html: string) {
         try {
             await this.transporter.sendMail({
-                from: process.env.SMTP_FROM || '"DAFT Arena" <no-reply@daftarena.com>',
+                from: config.SMTP_FROM,
                 to,
                 subject,
                 html,

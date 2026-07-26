@@ -1,8 +1,7 @@
 import { SignJWT, jwtVerify } from 'jose';
+import { config } from '@/lib/config';
 
-const JWT_SECRET = new TextEncoder().encode(
-  process.env.JWT_SECRET || 'default-super-secret-key-change-in-production-daft-arena'
-);
+const JWT_SECRET = new TextEncoder().encode(config.JWT_SECRET);
 
 export interface JWTPayload {
   sub: string;
