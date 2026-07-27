@@ -7,6 +7,7 @@
     "dev": "pnpm -r run dev",
     "lint": "pnpm -r run lint",
     "test": "pnpm -r run test",
+    "seed:users": "tsx apps/web/scripts/seed-users.ts",
     "prepare": "husky"
   },
   "devDependencies": {
