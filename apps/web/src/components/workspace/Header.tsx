@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Bell, Search, Moon, Sun, ChevronDown } from 'lucide-react';
+import { Bell, Search, Moon, Sun, ChevronDown, Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useTheme } from 'next-themes';
 import Link from 'next/link';
@@ -22,6 +22,12 @@ export default function Header() {
   return (
     <header className="h-16 bg-card/80 backdrop-blur-md border-b border-border flex items-center justify-between px-4 sm:px-6 sticky top-0 z-40">
       <div className="flex items-center flex-1">
+        <button 
+          className="md:hidden mr-4 p-1 text-muted-foreground hover:text-foreground"
+          onClick={() => document.dispatchEvent(new Event('toggle-mobile-menu'))}
+        >
+          <Menu className="w-6 h-6" />
+        </button>
         <div className="max-w-md w-full relative hidden sm:block">
           <button
             className="w-full bg-muted/50 border border-border rounded-lg pl-9 pr-16 py-2 text-sm text-left text-muted-foreground hover:bg-muted/80 transition-colors cursor-pointer flex items-center gap-2"

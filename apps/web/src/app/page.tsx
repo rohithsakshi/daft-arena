@@ -21,7 +21,7 @@ export default function LandingPage() {
           <span className="text-xs font-semibold text-violet-400 tracking-wide">Enterprise Sports Platform</span>
         </div>
 
-        <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight mb-6 text-foreground leading-[1.1]">
+        <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight mb-6 text-foreground leading-[1.1]">
           Welcome to{' '}
           <span className="bg-clip-text text-transparent bg-gradient-to-r from-violet-500 via-purple-500 to-pink-500">
             DAFT Arena

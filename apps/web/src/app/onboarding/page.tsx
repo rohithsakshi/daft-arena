@@ -90,7 +90,7 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="bg-card/50 backdrop-blur-md border border-border/50 rounded-2xl p-8 shadow-2xl">
+    <div className="bg-card/50 backdrop-blur-md border border-border/50 rounded-2xl p-6 md:p-8 shadow-2xl">
       <div className="flex justify-between items-center mb-8">
         <h2 className="text-2xl font-bold text-foreground">
           {step === 1 ? 'Complete your Profile' : 'Customize your Experience'}
