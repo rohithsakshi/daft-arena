@@ -17,17 +17,28 @@ export async function register() {
       const existingAdmin = await UserModel.findOne({ email: config.SUPER_ADMIN_EMAIL });
 
       if (existingAdmin) {
+        let needsSave = false;
         if (existingAdmin.systemRole !== 'SUPERADMIN') {
-          // Repair: user exists with wrong role — update it idempotently
           existingAdmin.systemRole = 'SUPERADMIN';
           existingAdmin.onboardingCompleted = true;
           existingAdmin.emailVerified = true;
+          needsSave = true;
+        }
+
+        // Self-heal the password if it was changed in the environment
+        const isPasswordValid = await bcrypt.compare(config.SUPER_ADMIN_PASSWORD, existingAdmin.hashedPassword || '');
+        if (!isPasswordValid) {
+          existingAdmin.hashedPassword = await bcrypt.hash(config.SUPER_ADMIN_PASSWORD, 10);
+          needsSave = true;
+        }
+
+        if (needsSave) {
           await existingAdmin.save();
           console.log(`[BOOTSTRAP] ✅ Super Admin repaired`);
           console.log(`[BOOTSTRAP] Email:    ${config.SUPER_ADMIN_EMAIL}`);
           console.log(`[BOOTSTRAP] Role:     SUPERADMIN`);
           console.log(`[BOOTSTRAP] Database: ${config.MONGODB_URI?.split('@').pop() ?? 'connected'}`);
-          console.log(`[BOOTSTRAP] Result:   ROLE_REPAIRED`);
+          console.log(`[BOOTSTRAP] Result:   REPAIRED`);
         } else {
           console.log(`[BOOTSTRAP] ✅ Super Admin verified`);
           console.log(`[BOOTSTRAP] Email:    ${config.SUPER_ADMIN_EMAIL}`);
