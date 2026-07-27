@@ -130,17 +130,35 @@ export default function OnboardingPage() {
 
         {step === 2 && (
           <div className="space-y-6">
-            <div className="space-y-2">
+            <div className="space-y-3">
               <Label htmlFor="sport">Primary Sports</Label>
-              <Select
-                isMulti
-                name="sport"
-                options={SPORT_OPTIONS}
-                className="text-black"
-                value={formData.sport}
-                onChange={(selected) => setFormData({ ...formData, sport: selected as any[] })}
-                placeholder="Select your sports..."
-              />
+              <div className="grid grid-cols-2 gap-3">
+                {SPORT_OPTIONS.map((option) => {
+                  const isSelected = formData.sport.some((s: any) => s.value === option.value);
+                  return (
+                    <label 
+                      key={option.value} 
+                      className={`flex items-center space-x-3 p-3 rounded-lg border cursor-pointer transition-all ${
+                        isSelected ? 'border-violet-500 bg-violet-500/10' : 'border-border/50 bg-background/50 hover:bg-white/5'
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        className="w-4 h-4 rounded border-gray-300 text-violet-600 focus:ring-violet-500 bg-black"
+                        checked={isSelected}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setFormData({ ...formData, sport: [...formData.sport, option] });
+                          } else {
+                            setFormData({ ...formData, sport: formData.sport.filter((s: any) => s.value !== option.value) });
+                          }
+                        }}
+                      />
+                      <span className="text-sm font-medium text-foreground">{option.label}</span>
+                    </label>
+                  );
+                })}
+              </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="bio">Bio / Short Description (Optional)</Label>

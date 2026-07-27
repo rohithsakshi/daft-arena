@@ -5,10 +5,14 @@ import { SessionRepository } from '@/modules/iam/repositories/session.repository
 import * as jose from 'jose';
 import { config } from '@/lib/config';
 
+import connectToDatabase from '@/lib/db/mongoose';
+
 const JWT_SECRET = new TextEncoder().encode(config.JWT_SECRET);
 
 export async function POST(req: NextRequest) {
   try {
+    await connectToDatabase();
+    
     const token = req.cookies.get('daft_token')?.value;
     if (!token) return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
 
