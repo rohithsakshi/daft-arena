@@ -165,41 +165,43 @@ export function RegisterForm() {
           </div>
         </div>
 
-        <div className="space-y-1.5">
-          <Label htmlFor="password" className="text-xs font-semibold text-foreground/80">Password</Label>
-          <div className="relative">
-            <Input
-              id="password"
-              type={showPassword ? 'text' : 'password'}
-              placeholder="At least 8 characters"
-              className="h-11 bg-background/50 border-white/10 focus-visible:ring-violet-500 focus-visible:border-violet-500 rounded-lg placeholder:text-muted-foreground/40 transition-all pr-10"
-              {...form.register('password')}
-            />
-            <button
-              type="button"
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-violet-400 transition-colors"
-              onClick={() => setShowPassword(!showPassword)}
-            >
-              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-            </button>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-1.5">
+            <Label htmlFor="password" className="text-xs font-semibold text-foreground/80">Password</Label>
+            <div className="relative">
+              <Input
+                id="password"
+                type={showPassword ? 'text' : 'password'}
+                placeholder="At least 8 chars"
+                className="h-11 bg-background/50 border-white/10 focus-visible:ring-violet-500 focus-visible:border-violet-500 rounded-lg placeholder:text-muted-foreground/40 transition-all pr-10"
+                {...form.register('password')}
+              />
+              <button
+                type="button"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-violet-400 transition-colors"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
+            {form.formState.errors.password && (
+              <p className="text-xs text-destructive mt-1">{form.formState.errors.password.message}</p>
+            )}
           </div>
-          {form.formState.errors.password && (
-            <p className="text-xs text-destructive mt-1">{form.formState.errors.password.message}</p>
-          )}
-        </div>
 
-        <div className="space-y-1.5">
-          <Label htmlFor="confirmPassword" className="text-xs font-semibold text-foreground/80">Confirm Password</Label>
-          <Input
-            id="confirmPassword"
-            type={showPassword ? 'text' : 'password'}
-            placeholder="Repeat your password"
-            className="h-11 bg-background/50 border-white/10 focus-visible:ring-violet-500 focus-visible:border-violet-500 rounded-lg placeholder:text-muted-foreground/40 transition-all"
-            {...form.register('confirmPassword')}
-          />
-          {form.formState.errors.confirmPassword && (
-            <p className="text-xs text-destructive mt-1">{form.formState.errors.confirmPassword.message}</p>
-          )}
+          <div className="space-y-1.5">
+            <Label htmlFor="confirmPassword" className="text-xs font-semibold text-foreground/80">Confirm Password</Label>
+            <Input
+              id="confirmPassword"
+              type={showPassword ? 'text' : 'password'}
+              placeholder="Repeat password"
+              className="h-11 bg-background/50 border-white/10 focus-visible:ring-violet-500 focus-visible:border-violet-500 rounded-lg placeholder:text-muted-foreground/40 transition-all"
+              {...form.register('confirmPassword')}
+            />
+            {form.formState.errors.confirmPassword && (
+              <p className="text-xs text-destructive mt-1">{form.formState.errors.confirmPassword.message}</p>
+            )}
+          </div>
         </div>
 
         <Button
