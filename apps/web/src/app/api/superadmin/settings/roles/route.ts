@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectToDatabase from '@/lib/db/mongoose';
 import { PlatformSettingsModel } from '@/modules/settings/models/PlatformSettings';
-import { verifyAuth } from '@/lib/auth/jwt';
+import { verifyToken } from '@/lib/auth/jwt';
 
 export async function PATCH(req: NextRequest) {
   try {
@@ -10,7 +10,7 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     }
 
-    const payload = await verifyAuth(authHeader);
+    const payload = await verifyToken(authHeader);
     if (!payload || payload.role !== 'SUPERADMIN') {
       return NextResponse.json({ success: false, error: 'Forbidden' }, { status: 403 });
     }
