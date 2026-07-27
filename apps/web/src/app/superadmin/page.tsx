@@ -20,7 +20,7 @@ export default async function SuperAdminDashboard() {
 
   const metrics = [
     { label: 'Active Organizations', value: orgCount.toString(), change: '+2', trend: 'up', icon: Building2, color: 'text-blue-500', bg: 'bg-blue-500/10' },
-    { label: 'Total MRR', value: '$2,450', change: '+$450', trend: 'up', icon: CreditCard, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
+    { label: 'Total MRR', value: '₹24,500', change: '+₹4,500', trend: 'up', icon: CreditCard, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
     { label: 'Active Licenses', value: licenseCount.toString(), change: '0', trend: 'neutral', icon: BadgeCheck, color: 'text-violet-500', bg: 'bg-violet-500/10' },
     { label: 'Platform Users', value: userCount.toString(), change: '+124', trend: 'up', icon: Users, color: 'text-rose-500', bg: 'bg-rose-500/10' },
   ];
