@@ -78,7 +78,12 @@ const DEMO_ROLES = [
   },
 ];
 
-export default function DemoPage() {
+import { PlatformSettingsService } from '@/modules/settings/services/PlatformSettingsService';
+
+export default async function DemoPage() {
+  const enabledRoles = await PlatformSettingsService.getEnabledRoles();
+  const visibleRoles = DEMO_ROLES.filter(r => enabledRoles.includes(r.id.toUpperCase()));
+
   return (
     <main className="min-h-screen bg-background relative overflow-hidden py-24 px-6 md:px-12">
       {/* Background Ornaments */}
@@ -103,7 +108,7 @@ export default function DemoPage() {
 
         {/* Role Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {DEMO_ROLES.map((role) => {
+          {visibleRoles.map((role) => {
             const Icon = role.icon;
             return (
               <Link

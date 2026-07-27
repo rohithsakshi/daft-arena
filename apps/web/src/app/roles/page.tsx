@@ -117,7 +117,12 @@ const ROLES = [
   }
 ];
 
-export default function RolesPage() {
+import { PlatformSettingsService } from '@/modules/settings/services/PlatformSettingsService';
+
+export default async function RolesPage() {
+  const enabledRoles = await PlatformSettingsService.getEnabledRoles();
+  const visibleRoles = ROLES.filter(r => enabledRoles.includes(r.id));
+
   return (
     <main className="min-h-screen bg-background relative overflow-hidden py-24 px-6 md:px-12">
       {/* Background Ornaments */}
@@ -136,7 +141,7 @@ export default function RolesPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {ROLES.map((role) => {
+          {visibleRoles.map((role) => {
             const Icon = role.icon;
             return (
               <form key={role.id} action={selectRoleAction.bind(null, role.id)} className="h-full">

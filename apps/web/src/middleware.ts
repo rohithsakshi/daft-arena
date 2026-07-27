@@ -77,6 +77,26 @@ export async function middleware(request: NextRequest) {
   // 7. Role-based workspace protection
   const role = (payload.role as string)?.toUpperCase();
 
+  // 7.1. Feature Flag Protection
+  // Exclude super admins from feature flag lockouts so they can re-enable roles
+  if (role !== 'SUPERADMIN' && (pathname.startsWith('/workspace') || pathname.startsWith('/api/'))) {
+    try {
+      const settingsRes = await fetch(new URL('/api/settings/roles', request.url));
+      if (settingsRes.ok) {
+        const { data: enabledRoles } = await settingsRes.json();
+        if (Array.isArray(enabledRoles) && !enabledRoles.includes(role)) {
+          if (pathname.startsWith('/api/')) {
+            return NextResponse.json({ success: false, error: 'Role temporarily unavailable' }, { status: 403 });
+          }
+          return NextResponse.redirect(new URL('/unavailable', request.url));
+        }
+      }
+    } catch (error) {
+      // Fail open if settings API is unreachable from edge to prevent complete lockout
+      console.error('Feature flag check failed:', error);
+    }
+  }
+
   // Players can only access /workspace/player
   if (pathname.startsWith('/workspace/player') && role !== 'PLAYER') {
     return NextResponse.redirect(new URL('/workspace', request.url));
