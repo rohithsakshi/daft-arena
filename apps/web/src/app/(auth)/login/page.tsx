@@ -49,18 +49,18 @@ function LoginContent() {
   };
 
   return (
-    <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-center min-h-[600px] w-full h-[85vh] max-w-7xl mx-auto">
+    <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-center min-h-[600px] w-full min-h-[85vh] py-8 max-w-7xl mx-auto">
       {/* Fixed Hero Image Side */}
       <div className="hidden xl:block h-full">
         <HeroCard />
       </div>
       
       {/* Dynamic Content Side */}
-      <div className="h-full flex flex-col pt-4 pb-12 relative overflow-hidden">
+      <div className="h-full flex flex-col justify-center relative pt-2 pb-6">
         
         {/* Optional Portal Header */}
         {roleDisplay && (
-          <div className="mb-4 text-center">
+          <div className="mb-3 text-center">
             <span className="inline-block px-4 py-1.5 rounded-full bg-violet-600/10 border border-violet-500/20 text-violet-400 font-medium text-sm">
               {roleDisplay} Portal
             </span>
@@ -68,7 +68,7 @@ function LoginContent() {
         )}
 
         {/* Tab Switcher */}
-        <div className="flex items-center justify-center space-x-2 mb-6 bg-card/50 p-1.5 rounded-xl border border-border backdrop-blur-md self-center">
+        <div className="flex items-center justify-center space-x-2 mb-4 bg-card/50 p-1.5 rounded-xl border border-border backdrop-blur-md self-center">
           <button
             onClick={() => handleTabChange('login')}
             className={cn(
@@ -94,7 +94,7 @@ function LoginContent() {
         </div>
 
         {/* Tab Content */}
-        <div className="flex-1 relative min-h-0">
+        <div className="flex-1 relative">
           <AnimatePresence mode="wait">
             {activeTab === 'login' && (
               <motion.div
@@ -103,7 +103,7 @@ function LoginContent() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.2 }}
-                className="h-full overflow-y-auto"
+                className="h-full"
               >
                 <LoginForm />
               </motion.div>
@@ -116,7 +116,7 @@ function LoginContent() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.2 }}
-                className="h-full overflow-y-auto pb-6"
+                className="h-full"
               >
                 <RegisterForm />
               </motion.div>
