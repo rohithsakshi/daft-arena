@@ -119,7 +119,7 @@ export function RegisterForm() {
   };
 
   return (
-    <div className="h-full flex flex-col justify-center p-5 md:p-7 rounded-2xl border border-white/5 bg-card/60 backdrop-blur-xl shadow-2xl">
+    <div className="h-auto min-h-full flex flex-col justify-center p-5 md:p-7 rounded-2xl border border-white/5 bg-card/60 backdrop-blur-xl shadow-2xl">
       <div className="mb-6">
         <h2 className="text-2xl font-bold tracking-tight mb-1 text-foreground">Create Account</h2>
         <p className="text-muted-foreground text-sm">Join DAFT Arena — set up your profile in minutes</p>
