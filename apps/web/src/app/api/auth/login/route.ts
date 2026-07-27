@@ -83,6 +83,7 @@ export async function POST(req: NextRequest) {
             email: user.email,
             name: user.name,
             systemRole: user.systemRole,
+            onboardingCompleted: user.onboardingCompleted ?? false,
           },
         },
       },

@@ -57,7 +57,7 @@ export class AuthenticationService {
 
     await this.auditService.logAction({ actorId: user.id, action: 'LOGIN', ipAddress });
 
-    return { token, user: { id: user.id, email: user.email, name: user.name, systemRole: user.systemRole } };
+    return { token, user: { id: user.id, email: user.email, name: user.name, systemRole: user.systemRole, onboardingCompleted: user.onboardingCompleted ?? false } };
   }
 
   async googleLogin(
@@ -114,7 +114,7 @@ export class AuthenticationService {
       expiresAt,
     });
 
-    return { token, user: { id: user.id, email: user.email, name: user.name, systemRole: user.systemRole }, isNewUser: !user.hashedPassword };
+    return { token, user: { id: user.id, email: user.email, name: user.name, systemRole: user.systemRole, onboardingCompleted: user.onboardingCompleted ?? false }, isNewUser: !user.hashedPassword };
   }
 
   async logout(token: string, userId?: string, ipAddress?: string) {
