@@ -107,7 +107,7 @@ const ROLES = [
     bg: 'bg-teal-500/10'
   },
   {
-    id: 'ADMIN',
+    id: 'TOURNAMENT_ADMIN',
     title: 'Administrator',
     description: 'System administration and platform support.',
     icon: Settings,

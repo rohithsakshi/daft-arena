@@ -7,7 +7,7 @@ import { verifyToken } from '@/lib/auth/jwt';
  * Workspace root — performs a server-side role-based redirect.
  * Players → /workspace/player
  * Sponsors → /workspace/sponsor  
- * Admins → /workspace/admin
+ * Admins → /workspace/tournament-admin
  * Everyone else → /workspace/tournaments (organizer default)
  */
 export default async function WorkspaceRootPage() {
@@ -31,7 +31,7 @@ export default async function WorkspaceRootPage() {
 
   if (role === 'PLAYER') redirect('/workspace/player');
   if (role === 'SPONSOR') redirect('/workspace/sponsor');
-  if (role === 'ADMIN' || role === 'SUPERADMIN') redirect('/workspace/admin');
+  if (role === 'TOURNAMENT_ADMIN' || role === 'SUPERADMIN') redirect('/workspace/tournament-admin');
 
   // Default for Organizer, Club, Academy, Coach, Referee, Federation, Finance
   redirect('/workspace/tournaments');

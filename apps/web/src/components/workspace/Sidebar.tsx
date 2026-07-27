@@ -51,19 +51,19 @@ const sponsorNavigation: NavItem[] = [
 ];
 
 const adminNavigation: NavItem[] = [
-  { name: 'Dashboard', href: '/workspace/admin', icon: Home, exact: true },
+  { name: 'Dashboard', href: '/workspace/tournament-admin', icon: Home, exact: true },
   { name: 'Tournaments', href: '/workspace/tournaments', icon: Trophy },
   { name: 'Operations', href: '/workspace/operations', icon: Activity },
   { name: 'Organizations', href: '/workspace/organizations', icon: Shield },
   { name: 'Finance', href: '/workspace/finance', icon: CreditCard },
-  { name: 'Settings', href: '/workspace/admin/settings', icon: Settings },
+  { name: 'Settings', href: '/workspace/tournament-admin/settings', icon: Settings },
 ];
 
 function getNavigation(role: string): NavItem[] {
   const r = role?.toUpperCase();
   if (r === 'PLAYER') return playerNavigation;
   if (r === 'SPONSOR') return sponsorNavigation;
-  if (r === 'ADMIN' || r === 'SUPERADMIN') return adminNavigation;
+  if (r === 'TOURNAMENT_ADMIN' || r === 'SUPERADMIN') return adminNavigation;
   return organizerNavigation;
 }
 
@@ -71,7 +71,7 @@ function getRoleLabel(role: string): string {
   const r = role?.toUpperCase();
   if (r === 'PLAYER') return 'Competitor';
   if (r === 'SPONSOR') return 'Sponsor Partner';
-  if (r === 'ADMIN') return 'Administrator';
+  if (r === 'TOURNAMENT_ADMIN') return 'Administrator';
   if (r === 'SUPERADMIN') return 'Super Admin';
   if (r === 'ORGANIZER') return 'Tournament Organizer';
   if (r === 'FINANCE') return 'Finance Officer';

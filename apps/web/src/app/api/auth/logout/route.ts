@@ -6,7 +6,7 @@ export async function POST() {
   
   // Clear HttpOnly cookie
   response.cookies.set({
-    name: 'token',
+    name: 'daft_token',
     value: '',
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',

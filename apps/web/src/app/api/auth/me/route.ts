@@ -5,7 +5,7 @@ import { UserRepository } from '@/modules/iam/repositories/user.repository';
 
 export async function GET(req: NextRequest) {
   try {
-    const token = req.cookies.get('token')?.value;
+    const token = req.cookies.get('daft_token')?.value;
     if (!token) {
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     }

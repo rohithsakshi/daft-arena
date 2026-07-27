@@ -51,7 +51,7 @@ const DEMO_ROLES = [
     color: 'text-slate-500',
     bg: 'bg-slate-500/10',
     border: 'border-slate-500/20',
-    href: '/workspace/admin',
+    href: '/workspace/tournament-admin',
     features: ['User management', 'Financial reports', 'System settings', 'Audit logs'],
   },
   {

@@ -9,10 +9,10 @@ export class PlatformSettingsService {
       if (settings && settings.enabledRoles) {
         return settings.enabledRoles;
       }
-      return ['PLAYER', 'SPONSOR', 'ADMIN'];
+      return ['PLAYER', 'SPONSOR', 'TOURNAMENT_ADMIN'];
     } catch (error) {
       console.error('Failed to fetch platform settings', error);
-      return ['PLAYER', 'SPONSOR', 'ADMIN'];
+      return ['PLAYER', 'SPONSOR', 'TOURNAMENT_ADMIN'];
     }
   }
 

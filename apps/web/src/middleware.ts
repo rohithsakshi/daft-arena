@@ -3,7 +3,7 @@ import type { NextRequest } from 'next/server';
 import { verifyToken } from './lib/auth/jwt';
 
 // Routes that never need authentication
-const PUBLIC_PAGE_ROUTES = ['/', '/login', '/register', '/roles', '/demo'];
+const PUBLIC_PAGE_ROUTES = ['/', '/login', '/superadminlogin', '/register', '/roles', '/demo'];
 const PUBLIC_API_PREFIXES = [
   '/api/health',
   '/api/auth/login',
@@ -11,9 +11,8 @@ const PUBLIC_API_PREFIXES = [
   '/api/auth/google',
   '/api/auth/logout',
   '/api/auth/me',
+  '/api/superadmin/login',
 ];
-
-const ADMIN_ROLES = ['SuperAdmin', 'TournamentAdmin', 'Finance', 'ADMIN', 'ORGANIZER', 'FINANCE'];
 
 function isPublicApiRoute(pathname: string) {
   return PUBLIC_API_PREFIXES.some((prefix) => pathname.startsWith(prefix));
@@ -32,7 +31,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // 2. Allow public page routes (exact match)
+  // 2. Allow public page routes
   if (PUBLIC_PAGE_ROUTES.includes(pathname)) {
     return NextResponse.next();
   }
@@ -42,8 +41,33 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // 4. Check for token
-  const token = request.cookies.get('token')?.value;
+  // --- STRICT DAFT LABS SUPER ADMIN ROUTING ---
+  if (pathname.startsWith('/superadmin') || pathname.startsWith('/api/superadmin')) {
+    const superAdminToken = request.cookies.get('daft_superadmin_token')?.value;
+
+    if (!superAdminToken) {
+      if (pathname.startsWith('/api/')) {
+        return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+      }
+      return NextResponse.redirect(new URL('/superadminlogin', request.url));
+    }
+
+    const payload = await verifyToken(superAdminToken);
+    if (!payload || (payload.role !== 'SUPERADMIN' && payload.role !== 'SUPER_ADMIN')) {
+      if (pathname.startsWith('/api/')) {
+        return NextResponse.json({ success: false, error: 'Invalid or expired superadmin token' }, { status: 401 });
+      }
+      return NextResponse.redirect(new URL('/superadminlogin?error=session_expired', request.url));
+    }
+
+    const response = NextResponse.next();
+    response.headers.set('x-user-id', String(payload.sub ?? ''));
+    response.headers.set('x-user-role', String(payload.role ?? ''));
+    return applySecurityHeaders(response);
+  }
+
+  // --- CUSTOMER ORGANIZATION ROUTING ---
+  const token = request.cookies.get('daft_token')?.value;
 
   if (!token) {
     if (pathname.startsWith('/api/')) {
@@ -54,7 +78,6 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  // 5. Verify token
   const payload = await verifyToken(token);
   if (!payload) {
     if (pathname.startsWith('/api/')) {
@@ -65,7 +88,12 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  // 6. Onboarding protection — let the onboarding API and onboarding pages through
+  // Prevent superadmin tokens from being used in customer workspaces
+  if (payload.role === 'SUPERADMIN' || payload.role === 'SUPER_ADMIN') {
+    return NextResponse.redirect(new URL('/superadmin', request.url));
+  }
+
+  // Onboarding protection
   const isOnboardingPath = pathname.startsWith('/onboarding') || pathname.startsWith('/api/user/onboarding');
   if (!payload.onboardingCompleted && !isOnboardingPath) {
     if (pathname.startsWith('/api/')) {
@@ -74,12 +102,11 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/onboarding', request.url));
   }
 
-  // 7. Role-based workspace protection
+  // Role-based workspace protection
   const role = (payload.role as string)?.toUpperCase();
 
-  // 7.1. Feature Flag Protection
-  // Exclude super admins from feature flag lockouts so they can re-enable roles
-  if (role !== 'SUPERADMIN' && (pathname.startsWith('/workspace') || pathname.startsWith('/api/'))) {
+  // Feature Flag Protection (Exclude super admins)
+  if (pathname.startsWith('/workspace') || pathname.startsWith('/api/')) {
     try {
       const settingsRes = await fetch(new URL('/api/settings/roles', request.url));
       if (settingsRes.ok) {
@@ -92,46 +119,36 @@ export async function middleware(request: NextRequest) {
         }
       }
     } catch (error) {
-      // Fail open if settings API is unreachable from edge to prevent complete lockout
       console.error('Feature flag check failed:', error);
     }
   }
 
-  // Players can only access /workspace/player
+  // Workspace specific routing
   if (pathname.startsWith('/workspace/player') && role !== 'PLAYER') {
     return NextResponse.redirect(new URL('/workspace', request.url));
   }
 
-  // Non-admin/non-player roles (Sponsor, Club, etc.) accessing admin workspace  
-  if (
-    pathname.startsWith('/workspace/admin') &&
-    role !== 'SUPERADMIN' &&
-    role !== 'ADMIN'
-  ) {
+  if (pathname.startsWith('/workspace/tournament-admin') && role !== 'TOURNAMENT_ADMIN') {
     return NextResponse.redirect(new URL('/workspace', request.url));
   }
 
-  // Players trying to access generic workspace (redirect to their workspace)
-  if (
-    pathname === '/workspace' &&
-    role === 'PLAYER'
-  ) {
+  if (pathname === '/workspace' && role === 'PLAYER') {
     return NextResponse.redirect(new URL('/workspace/player', request.url));
   }
 
-  // 8. Build response with security headers and user context
   const response = NextResponse.next();
   response.headers.set('x-user-id', String(payload.sub ?? ''));
   response.headers.set('x-user-role', String(payload.role ?? ''));
+  return applySecurityHeaders(response);
+}
 
-  // Security Headers
+function applySecurityHeaders(response: NextResponse) {
   response.headers.set('X-DNS-Prefetch-Control', 'on');
   response.headers.set('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
   response.headers.set('X-XSS-Protection', '1; mode=block');
   response.headers.set('X-Frame-Options', 'SAMEORIGIN');
   response.headers.set('X-Content-Type-Options', 'nosniff');
   response.headers.set('Referrer-Policy', 'origin-when-cross-origin');
-
   return response;
 }
 

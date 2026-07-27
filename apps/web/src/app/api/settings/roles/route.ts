@@ -9,27 +9,27 @@ export async function GET() {
     let settings = await PlatformSettingsModel.findOne();
     if (!settings) {
       settings = await PlatformSettingsModel.create({
-        enabledRoles: ['PLAYER', 'SPONSOR', 'ADMIN']
+        enabledRoles: ['PLAYER', 'SPONSOR', 'TOURNAMENT_ADMIN']
       });
     }
     return NextResponse.json({ success: true, data: settings.enabledRoles }, { status: 200 });
   } catch (error) {
     console.error('Error fetching platform settings:', error);
     // Fallback to default safely to prevent blocking the app
-    return NextResponse.json({ success: true, data: ['PLAYER', 'SPONSOR', 'ADMIN'] }, { status: 200 });
+    return NextResponse.json({ success: true, data: ['PLAYER', 'SPONSOR', 'TOURNAMENT_ADMIN'] }, { status: 200 });
   }
 }
 
 export async function POST(req: NextRequest) {
   try {
-    const token = req.cookies.get('token')?.value;
+    const token = req.cookies.get('daft_token')?.value;
     if (!token) return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     
     const payload = await verifyToken(token);
     if (!payload) return NextResponse.json({ success: false, error: 'Invalid token' }, { status: 401 });
     
     const role = (payload.role as string)?.toUpperCase();
-    if (role !== 'ADMIN' && role !== 'SUPERADMIN') {
+    if (role !== 'TOURNAMENT_ADMIN' && role !== 'SUPERADMIN') {
       return NextResponse.json({ success: false, error: 'Forbidden' }, { status: 403 });
     }
 

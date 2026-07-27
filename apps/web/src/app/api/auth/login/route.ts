@@ -76,7 +76,7 @@ export async function POST(req: NextRequest) {
     );
 
     response.cookies.set({
-      name: 'token',
+      name: 'daft_token',
       value: token,
       httpOnly: true,
       secure: config.NODE_ENV === 'production',

@@ -8,7 +8,7 @@ export interface IPlatformSettings extends IBaseDocument {
 const PlatformSettingsSchema = createBaseSchema({
   enabledRoles: { 
     type: [String], 
-    default: ['PLAYER', 'SPONSOR', 'ADMIN'] 
+    default: ['PLAYER', 'SPONSOR', 'TOURNAMENT_ADMIN'] 
   }
 });
 

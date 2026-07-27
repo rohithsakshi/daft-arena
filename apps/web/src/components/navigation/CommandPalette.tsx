@@ -26,7 +26,7 @@ const QUICK_LINKS: SearchResult[] = [
   { id: 'finance', label: 'Finance', href: '/workspace/finance', icon: CreditCard, category: 'Navigation' },
   { id: 'operations', label: 'Operations', href: '/workspace/operations', icon: MapPin, category: 'Navigation' },
   { id: 'organizations', label: 'Organizations', href: '/workspace/organizations/demo-club', icon: Shield, category: 'Navigation' },
-  { id: 'settings', label: 'Settings', href: '/workspace/admin/settings', icon: Settings, category: 'Navigation' },
+  { id: 'settings', label: 'Settings', href: '/workspace/tournament-admin/settings', icon: Settings, category: 'Navigation' },
   { id: 'new-tournament', label: 'Create Tournament', description: 'Start a new tournament', href: '/workspace/tournaments/new', icon: Trophy, category: 'Actions' },
   { id: 'profile', label: 'My Profile', href: '/workspace/player/profile', icon: User, category: 'Actions' },
   { id: 'documents', label: 'Documents', href: '/workspace/player/documents', icon: FileText, category: 'Actions' },

@@ -15,7 +15,7 @@ export function withAuth(handler: (req: NextRequest, user: any, ...args: any[]) 
       const cookieHeader = req.headers.get('cookie');
       if (cookieHeader) {
         const cookies = Object.fromEntries(cookieHeader.split('; ').map(c => c.split('=')));
-        token = cookies['accessToken'] || '';
+        token = cookies['daft_token'] || '';
       }
     }
 

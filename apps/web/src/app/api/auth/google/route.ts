@@ -87,7 +87,7 @@ export async function POST(request: Request) {
 
     // Set HTTP-only cookie
     response.cookies.set({
-      name: 'token',
+      name: 'daft_token',
       value: result.token,
       httpOnly: true,
       secure: config.NODE_ENV === 'production',

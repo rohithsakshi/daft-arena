@@ -14,7 +14,7 @@ const ALL_ROLES = [
   { id: 'DISTRICT_ASSOC', name: 'District Association' },
   { id: 'STATE_ASSOC', name: 'State Association' },
   { id: 'NATIONAL_FED', name: 'National Federation' },
-  { id: 'ADMIN', name: 'Administrator' }
+  { id: 'TOURNAMENT_ADMIN', name: 'Administrator' }
 ];
 
 export function RoleToggles({ initialEnabled }: { initialEnabled: string[] }) {

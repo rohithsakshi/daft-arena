@@ -9,7 +9,7 @@ const JWT_SECRET = new TextEncoder().encode(config.JWT_SECRET);
 
 export async function POST(req: NextRequest) {
   try {
-    const token = req.cookies.get('token')?.value;
+    const token = req.cookies.get('daft_token')?.value;
     if (!token) return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
 
     const payload = await verifyToken(token);
@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
     const response = NextResponse.json({ success: true });
     
     response.cookies.set({
-      name: 'token',
+      name: 'daft_token',
       value: newToken,
       httpOnly: true,
       secure: config.NODE_ENV === 'production',
