@@ -1,25 +1,58 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
+import Select from 'react-select';
+
+const SPORT_OPTIONS = [
+  { value: 'Badminton', label: 'Badminton' },
+  { value: 'Tennis', label: 'Tennis' },
+  { value: 'Pickleball', label: 'Pickleball' },
+  { value: 'Table Tennis', label: 'Table Tennis' }
+];
 
 export default function OnboardingPage() {
   const router = useRouter();
   const [step, setStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
+  const [isFetching, setIsFetching] = useState(true);
+  
   const [formData, setFormData] = useState({
     phone: '',
     location: '',
-    sport: 'Badminton',
+    sport: [] as any[],
     bio: ''
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  useEffect(() => {
+    async function fetchUser() {
+      try {
+        const res = await fetch('/api/auth/me');
+        if (res.ok) {
+          const { data } = await res.json();
+          setFormData(prev => ({
+            ...prev,
+            phone: data?.phone || '',
+          }));
+          if (data?.phone) {
+            setStep(2); // Auto advance to step 2 if phone is already set (from registration)
+          }
+        }
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setIsFetching(false);
+      }
+    }
+    fetchUser();
+  }, []);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
@@ -34,7 +67,10 @@ export default function OnboardingPage() {
       const res = await fetch('/api/user/onboarding', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        body: JSON.stringify({
+          ...formData,
+          sport: formData.sport.map(s => s.value)
+        })
       });
 
       if (!res.ok) throw new Error('Failed to save profile');
@@ -48,6 +84,10 @@ export default function OnboardingPage() {
       setIsLoading(false);
     }
   };
+
+  if (isFetching) {
+    return <div className="flex h-[300px] items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-violet-500" /></div>;
+  }
 
   return (
     <div className="bg-card/50 backdrop-blur-md border border-border/50 rounded-2xl p-8 shadow-2xl">
@@ -82,7 +122,6 @@ export default function OnboardingPage() {
                 placeholder="New York, NY" 
                 value={formData.location} 
                 onChange={handleChange} 
-                required 
                 className="h-12 bg-background/50"
               />
             </div>
@@ -92,19 +131,16 @@ export default function OnboardingPage() {
         {step === 2 && (
           <div className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="sport">Primary Sport</Label>
-              <select 
-                id="sport" 
-                name="sport" 
-                value={formData.sport} 
-                onChange={handleChange} 
-                className="flex h-12 w-full items-center justify-between rounded-md border border-input bg-background/50 px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                <option value="Badminton">Badminton</option>
-                <option value="Tennis">Tennis</option>
-                <option value="Pickleball">Pickleball</option>
-                <option value="Table Tennis">Table Tennis</option>
-              </select>
+              <Label htmlFor="sport">Primary Sports</Label>
+              <Select
+                isMulti
+                name="sport"
+                options={SPORT_OPTIONS}
+                className="text-black"
+                value={formData.sport}
+                onChange={(selected) => setFormData({ ...formData, sport: selected as any[] })}
+                placeholder="Select your sports..."
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="bio">Bio / Short Description (Optional)</Label>
@@ -122,14 +158,14 @@ export default function OnboardingPage() {
 
         <div className="flex justify-between mt-10 pt-6 border-t border-border/50">
           {step > 1 ? (
-            <Button type="button" variant="outline" onClick={handleBack} disabled={isLoading} className="h-12 px-6">
+            <Button type="button" variant="outline" onClick={handleBack} disabled={isLoading} className="h-12 px-6 text-white">
               Back
             </Button>
           ) : (
             <div />
           )}
           
-          <Button type="submit" disabled={isLoading} className="h-12 px-8 bg-violet-600 hover:bg-violet-700 text-white">
+          <Button type="submit" disabled={isLoading} className="h-12 px-8 bg-violet-600 hover:bg-violet-700 text-white border-none">
             {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : (step === 1 ? 'Next Step' : 'Complete Setup')}
           </Button>
         </div>
@@ -137,3 +173,4 @@ export default function OnboardingPage() {
     </div>
   );
 }
+

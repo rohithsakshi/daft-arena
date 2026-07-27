@@ -32,7 +32,8 @@ export async function POST(req: NextRequest) {
       name,
       hashedPassword,
       systemRole: pendingRole,
-      onboardingCompleted: false
+      onboardingCompleted: false,
+      phone: body.phone || ''
     });
 
     const res = NextResponse.json({ 

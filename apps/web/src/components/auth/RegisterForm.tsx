@@ -77,6 +77,7 @@ export function RegisterForm() {
           name: data.fullName,
           email: data.email,
           password: data.password,
+          phone: data.phone || '',
         }),
       });
 

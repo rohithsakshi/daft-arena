@@ -49,7 +49,7 @@ function LoginContent() {
   };
 
   return (
-    <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 min-h-[600px] w-full h-[85vh] max-w-7xl mx-auto">
+    <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-center min-h-[600px] w-full h-[85vh] max-w-7xl mx-auto">
       {/* Fixed Hero Image Side */}
       <div className="hidden xl:block h-full">
         <HeroCard />
