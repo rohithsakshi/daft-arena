@@ -43,7 +43,7 @@ export default function LandingPage() {
             Get Started Free
           </Link>
           <Link
-            href="/login"
+            href="/roles?intent=login"
             className={buttonVariants({
               size: 'lg',
               variant: 'outline',

@@ -119,7 +119,10 @@ const ROLES = [
 
 import { PlatformSettingsService } from '@/modules/settings/services/PlatformSettingsService';
 
-export default async function RolesPage() {
+export default async function RolesPage(props: { searchParams: Promise<{ intent?: string }> }) {
+  const searchParams = await props.searchParams;
+  const intent = searchParams?.intent === 'login' ? 'login' : 'register';
+
   const enabledRoles = await PlatformSettingsService.getEnabledRoles();
   const visibleRoles = ROLES.filter(r => enabledRoles.includes(r.id));
 
@@ -133,7 +136,7 @@ export default async function RolesPage() {
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
           <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-foreground mb-4">
-            Choose Your Experience
+            {intent === 'login' ? 'Sign In as...' : 'Choose Your Experience'}
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Select the role that best describes you to personalize your DAFT Arena experience.
@@ -144,7 +147,7 @@ export default async function RolesPage() {
           {visibleRoles.map((role) => {
             const Icon = role.icon;
             return (
-              <form key={role.id} action={selectRoleAction.bind(null, role.id)} className="h-full">
+              <form key={role.id} action={selectRoleAction.bind(null, role.id, intent)} className="h-full">
                 <button 
                   type="submit" 
                   className="w-full text-left h-full bg-card/50 backdrop-blur-md border border-border/50 hover:border-violet-500/50 rounded-2xl p-6 transition-all duration-300 hover:shadow-[0_0_30px_rgba(124,58,237,0.1)] hover:-translate-y-1 flex flex-col group cursor-pointer"

@@ -27,10 +27,13 @@ function LoginContent() {
     }
   }, [searchParams]);
 
-  const activeRole = searchParams.get('role');
-  const roleDisplay = activeRole === 'admin' ? 'Administrator' : 
-                      activeRole === 'sponsor' ? 'Sponsor' : 
-                      activeRole === 'player' ? 'Player' : null;
+  const activeRole = searchParams.get('role')?.toUpperCase();
+  const roleDisplay = activeRole === 'TOURNAMENT_ADMIN' ? 'Tournament Administrator' : 
+                      activeRole === 'SPONSOR' ? 'Sponsor' : 
+                      activeRole === 'PLAYER' ? 'Player' : 
+                      activeRole === 'ORGANIZER' ? 'Tournament Organizer' :
+                      activeRole === 'CLUB' ? 'Club Manager' :
+                      activeRole === 'ACADEMY' ? 'Academy' : null;
 
   const handleTabChange = (tab: Tab) => {
     setActiveTab(tab);

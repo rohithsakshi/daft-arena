@@ -3,7 +3,7 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
-export async function selectRoleAction(role: string) {
+export async function selectRoleAction(role: string, intent: 'login' | 'register' = 'register') {
   const cookieStore = await cookies();
   cookieStore.set('daft_pending_role', role, {
     httpOnly: true,
@@ -13,5 +13,9 @@ export async function selectRoleAction(role: string) {
     path: '/',
   });
   
-  redirect('/register');
+  if (intent === 'login') {
+    redirect(`/login?role=${role}`);
+  } else {
+    redirect('/register');
+  }
 }
