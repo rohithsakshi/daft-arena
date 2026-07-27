@@ -8,7 +8,7 @@ async function checkAdmin() {
   const token = cookieStore.get('daft_arena_session')?.value;
   if (!token) return null;
   const payload = await verifyToken(token);
-  if (!payload || payload.role !== 'SUPER_ADMIN') return null; // Or any logic to check admin
+  if (!payload || (payload.role !== 'SUPERADMIN' && payload.role !== 'SUPER_ADMIN')) return null; // Or any logic to check admin
   return payload;
 }
 

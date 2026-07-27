@@ -3,36 +3,59 @@ import { config } from '@/lib/config';
 export async function register() {
   if (process.env.NEXT_RUNTIME === 'nodejs') {
     const dbConnect = (await import('@/lib/db/mongoose')).default;
-    const { UserRepository } = await import('@/modules/iam/repositories/user.repository');
     const bcrypt = await import('bcryptjs');
-
-    await dbConnect();
-    const userRepo = new UserRepository();
 
     if (!config.SUPER_ADMIN_EMAIL || !config.SUPER_ADMIN_PASSWORD) {
       console.log('[BOOTSTRAP] Super Admin credentials not found in environment. Skipping bootstrap.');
       return;
     }
 
-    const existingAdmin = await userRepo.findByEmail(config.SUPER_ADMIN_EMAIL);
-    
-    if (existingAdmin) {
-      console.log(`[BOOTSTRAP] Super Admin (${config.SUPER_ADMIN_EMAIL}) already exists. Skipping.`);
-    } else {
-      console.log(`[BOOTSTRAP] Super Admin not found. Creating...`);
-      const hashedPassword = await bcrypt.hash(config.SUPER_ADMIN_PASSWORD, 10);
-      
-      // We assume User model has create method or we can use mongoose model directly.
-      // Since userRepo might not expose raw creation easily without DTOs, let's use the Mongoose model directly for bootstrap.
+    try {
+      await dbConnect();
       const UserModel = (await import('@/modules/iam/models/User')).UserModel;
-      
-      await UserModel.create({
-        name: config.SUPER_ADMIN_NAME || 'Super Admin',
-        email: config.SUPER_ADMIN_EMAIL,
-        hashedPassword,
-      });
 
-      console.log(`[BOOTSTRAP] Super Admin successfully created.`);
+      const existingAdmin = await UserModel.findOne({ email: config.SUPER_ADMIN_EMAIL });
+
+      if (existingAdmin) {
+        if (existingAdmin.systemRole !== 'SUPERADMIN') {
+          // Repair: user exists with wrong role — update it idempotently
+          existingAdmin.systemRole = 'SUPERADMIN';
+          existingAdmin.onboardingCompleted = true;
+          existingAdmin.emailVerified = true;
+          await existingAdmin.save();
+          console.log(`[BOOTSTRAP] ✅ Super Admin repaired`);
+          console.log(`[BOOTSTRAP] Email:    ${config.SUPER_ADMIN_EMAIL}`);
+          console.log(`[BOOTSTRAP] Role:     SUPERADMIN`);
+          console.log(`[BOOTSTRAP] Database: ${config.MONGODB_URI?.split('@').pop() ?? 'connected'}`);
+          console.log(`[BOOTSTRAP] Result:   ROLE_REPAIRED`);
+        } else {
+          console.log(`[BOOTSTRAP] ✅ Super Admin verified`);
+          console.log(`[BOOTSTRAP] Email:    ${config.SUPER_ADMIN_EMAIL}`);
+          console.log(`[BOOTSTRAP] Role:     SUPERADMIN`);
+          console.log(`[BOOTSTRAP] Database: ${config.MONGODB_URI?.split('@').pop() ?? 'connected'}`);
+          console.log(`[BOOTSTRAP] Result:   ALREADY_EXISTS_OK`);
+        }
+      } else {
+        // Create fresh super admin
+        const hashedPassword = await bcrypt.hash(config.SUPER_ADMIN_PASSWORD, 10);
+        await UserModel.create({
+          name: config.SUPER_ADMIN_NAME || 'DAFT Labs',
+          email: config.SUPER_ADMIN_EMAIL,
+          hashedPassword,
+          systemRole: 'SUPERADMIN',
+          onboardingCompleted: true,
+          emailVerified: true,
+          authProvider: 'LOCAL',
+        });
+
+        console.log(`[BOOTSTRAP] ✅ Super Admin created`);
+        console.log(`[BOOTSTRAP] Email:    ${config.SUPER_ADMIN_EMAIL}`);
+        console.log(`[BOOTSTRAP] Role:     SUPERADMIN`);
+        console.log(`[BOOTSTRAP] Database: ${config.MONGODB_URI?.split('@').pop() ?? 'connected'}`);
+        console.log(`[BOOTSTRAP] Result:   CREATED`);
+      }
+    } catch (err) {
+      console.error('[BOOTSTRAP] ❌ Failed to bootstrap Super Admin:', err);
     }
   }
 }

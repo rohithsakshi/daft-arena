@@ -12,6 +12,9 @@ const PUBLIC_API_PREFIXES = [
   '/api/auth/logout',
   '/api/auth/me',
   '/api/superadmin/login',
+  '/api/superadmin/health',
+  '/api/superadmin/seed',
+  '/api/purchase-requests',
 ];
 
 function isPublicApiRoute(pathname: string) {
