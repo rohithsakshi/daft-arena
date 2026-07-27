@@ -36,7 +36,12 @@ export class AuthenticationService {
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 7); // 7 days
 
-    const token = await new jose.SignJWT({ sub: user.id, email: user.email })
+    const token = await new jose.SignJWT({ 
+      sub: user.id, 
+      email: user.email,
+      role: user.systemRole || 'PLAYER',
+      onboardingCompleted: user.onboardingCompleted || false
+    })
       .setProtectedHeader({ alg: 'HS256' })
       .setIssuedAt()
       .setExpirationTime('7d')
@@ -52,10 +57,15 @@ export class AuthenticationService {
 
     await this.auditService.logAction({ actorId: user.id, action: 'LOGIN', ipAddress });
 
-    return { token, user: { id: user.id, email: user.email, name: user.name } };
+    return { token, user: { id: user.id, email: user.email, name: user.name, systemRole: user.systemRole } };
   }
 
-  async googleLogin(payload: { email: string, googleId: string, name: string, avatar: string, emailVerified: boolean }, ipAddress?: string, userAgent?: string) {
+  async googleLogin(
+    payload: { email: string, googleId: string, name: string, avatar: string, emailVerified: boolean }, 
+    systemRole: string,
+    ipAddress?: string, 
+    userAgent?: string
+  ) {
     let user = await this.userRepository.findByEmail(payload.email);
     
     if (!user) {
@@ -65,7 +75,9 @@ export class AuthenticationService {
         googleId: payload.googleId,
         authProvider: 'GOOGLE',
         avatar: payload.avatar,
-        emailVerified: payload.emailVerified
+        emailVerified: payload.emailVerified,
+        systemRole: systemRole || 'PLAYER',
+        onboardingCompleted: false
       });
       await this.auditService.logAction({ actorId: user.id, action: 'GOOGLE_REGISTER_SUCCESS', ipAddress });
     } else {
@@ -83,8 +95,12 @@ export class AuthenticationService {
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 7);
 
-    // Default role 'Player'
-    const token = await new jose.SignJWT({ sub: user.id, email: user.email, role: 'Player' })
+    const token = await new jose.SignJWT({ 
+      sub: user.id, 
+      email: user.email, 
+      role: user.systemRole || 'PLAYER',
+      onboardingCompleted: user.onboardingCompleted || false
+    })
       .setProtectedHeader({ alg: 'HS256' })
       .setIssuedAt()
       .setExpirationTime('7d')
@@ -98,7 +114,7 @@ export class AuthenticationService {
       expiresAt,
     });
 
-    return { token, user: { id: user.id, email: user.email, name: user.name }, isNewUser: !user.hashedPassword };
+    return { token, user: { id: user.id, email: user.email, name: user.name, systemRole: user.systemRole }, isNewUser: !user.hashedPassword };
   }
 
   async logout(token: string, userId?: string, ipAddress?: string) {

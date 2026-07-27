@@ -1,38 +1,38 @@
 // @ts-nocheck
-import WorkspaceLayout from './layout';
+import { redirect } from 'next/navigation';
+import { cookies } from 'next/headers';
+import { verifyToken } from '@/lib/auth/jwt';
 
-export default function Page() {
-  return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-      {/* Widget Layout Structure */}
-      <div className="col-span-2 rounded-xl border bg-card text-card-foreground shadow">
-        <div className="p-6 flex flex-row items-center space-y-0 pb-2">
-          <h3 className="tracking-tight text-lg font-semibold">Active Tournaments</h3>
-        </div>
-        <div className="p-6 pt-0">
-          <div className="h-[200px] bg-muted/20 rounded-md border flex items-center justify-center text-muted-foreground text-sm">
-            Interactive Widget Render Area
-          </div>
-        </div>
-      </div>
+/**
+ * Workspace root — performs a server-side role-based redirect.
+ * Players → /workspace/player
+ * Sponsors → /workspace/sponsor  
+ * Admins → /workspace/admin
+ * Everyone else → /workspace/tournaments (organizer default)
+ */
+export default async function WorkspaceRootPage() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get('token')?.value;
 
-      <div className="rounded-xl border bg-card text-card-foreground shadow">
-        <div className="p-6 flex flex-row items-center space-y-0 pb-2">
-          <h3 className="tracking-tight text-lg font-semibold">Recent Activity</h3>
-        </div>
-        <div className="p-6 pt-0">
-          <div className="space-y-4">
-             {/* Feed items */}
-             <div className="flex items-center gap-4">
-               <div className="h-2 w-2 rounded-full bg-primary" />
-               <div className="space-y-1">
-                 <p className="text-sm font-medium leading-none">Match Completed</p>
-                 <p className="text-sm text-muted-foreground">Team A def. Team B</p>
-               </div>
-             </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+  if (!token) {
+    redirect('/login');
+  }
+
+  const payload = await verifyToken(token);
+  if (!payload) {
+    redirect('/login?error=session_expired');
+  }
+
+  if (!payload.onboardingCompleted) {
+    redirect('/onboarding');
+  }
+
+  const role = String(payload.role ?? '').toUpperCase();
+
+  if (role === 'PLAYER') redirect('/workspace/player');
+  if (role === 'SPONSOR') redirect('/workspace/sponsor');
+  if (role === 'ADMIN' || role === 'SUPERADMIN') redirect('/workspace/admin');
+
+  // Default for Organizer, Club, Academy, Coach, Referee, Federation, Finance
+  redirect('/workspace/tournaments');
 }

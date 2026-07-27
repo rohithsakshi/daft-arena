@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
 import { OAuth2Client } from 'google-auth-library';
 import { AuthenticationService } from '@/modules/iam/services/auth.service';
 import { UserRepository } from '@/modules/iam/repositories/user.repository';
@@ -62,6 +63,10 @@ export async function POST(request: Request) {
     const sessionRepository = new SessionRepository();
     const authService = new AuthenticationService(userRepository, sessionRepository, auditService);
 
+    // Read pending role
+    const cookieStore = await cookies();
+    const pendingRole = cookieStore.get('daft_pending_role')?.value || 'PLAYER';
+
     const result = await authService.googleLogin(
       {
         email,
@@ -70,6 +75,7 @@ export async function POST(request: Request) {
         avatar: picture || '',
         emailVerified: email_verified || false,
       },
+      pendingRole,
       ipAddress,
       userAgent
     );
@@ -89,6 +95,9 @@ export async function POST(request: Request) {
       path: '/',
       maxAge: 7 * 24 * 60 * 60, // 7 days
     });
+
+    // Clear pending role
+    response.cookies.delete('daft_pending_role');
 
     return response;
   } catch (error: any) {

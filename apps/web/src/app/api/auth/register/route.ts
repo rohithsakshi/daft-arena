@@ -25,16 +25,25 @@ export async function POST(req: NextRequest) {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
+    const pendingRole = req.cookies.get('daft_pending_role')?.value || 'PLAYER';
+
     const newUser = await userRepo.create({
       email,
       name,
       hashedPassword,
+      systemRole: pendingRole,
+      onboardingCompleted: false
     });
 
-    return NextResponse.json({ 
+    const res = NextResponse.json({ 
       success: true, 
-      data: { id: newUser.id, email: newUser.email, name: newUser.name } 
+      data: { id: newUser.id, email: newUser.email, name: newUser.name, systemRole: newUser.systemRole } 
     }, { status: 201 });
+
+    // Clear the pending role cookie
+    res.cookies.delete('daft_pending_role');
+
+    return res;
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }

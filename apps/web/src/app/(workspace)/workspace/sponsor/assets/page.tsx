@@ -24,7 +24,7 @@ export default async function SponsorBrandingAssetsPage() {
 
       <WidgetContainer className="p-12 text-center flex flex-col items-center justify-center border-dashed bg-card/10">
         <div className="w-16 h-16 rounded-full bg-blue-500/10 flex items-center justify-center mb-4">
-          <Image className="w-8 h-8 text-blue-400 opacity-80" />
+          <Image className="w-8 h-8 text-blue-400 opacity-80" aria-hidden="true" />
         </div>
         <h3 className="text-sm font-bold text-foreground mb-1">Branding Assets Module</h3>
         <p className="text-xs text-muted-foreground max-w-sm mx-auto">

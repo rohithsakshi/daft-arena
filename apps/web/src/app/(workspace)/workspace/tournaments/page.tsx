@@ -27,7 +27,7 @@ export default function TournamentsPage() {
       accessorKey: 'name',
       header: 'Name',
       cell: ({ row }) => (
-        <Link href={`/tournaments/${row.original._id}`} className="font-medium hover:underline text-primary">
+        <Link href={`/workspace/tournaments/${row.original._id}`} className="font-medium hover:underline text-primary">
           {row.getValue('name')}
         </Link>
       ),
@@ -62,7 +62,7 @@ export default function TournamentsPage() {
           <h2 className="text-3xl font-bold tracking-tight">Tournaments</h2>
           <p className="text-muted-foreground">Manage all tournaments across the platform.</p>
         </div>
-        <Link href="/tournaments/new" className={buttonVariants({ variant: "default" })}>
+        <Link href="/workspace/tournaments/new" className={buttonVariants({ variant: "default" })}>
           <Plus className="mr-2 h-4 w-4" /> Create Tournament
         </Link>
       </div>
