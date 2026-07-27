@@ -21,6 +21,7 @@ export interface ITenant extends IBaseDocument {
     theme?: string;
     features: string[];
   };
+  setupCompleted?: boolean;
 }
 
 const TenantSchema = createBaseSchema({
@@ -47,6 +48,7 @@ const TenantSchema = createBaseSchema({
     theme: { type: String, default: 'light' },
     features: [{ type: String }],
   },
+  setupCompleted: { type: Boolean, default: false },
 });
 
 

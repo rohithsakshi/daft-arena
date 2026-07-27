@@ -4,12 +4,25 @@ import {
   CreditCard, HardDrive, Cpu, ShieldAlert, BadgeCheck, Timer
 } from 'lucide-react';
 
-export default function SuperAdminDashboard() {
+import connectToDatabase from '@/lib/db/mongoose';
+import { TenantModel } from '@/modules/tenant/models/TenantModel';
+import { UserModel } from '@/modules/iam/models/User';
+import { LicenseModel } from '@/modules/tenant/models/LicenseModel';
+
+export const dynamic = 'force-dynamic';
+
+export default async function SuperAdminDashboard() {
+  await connectToDatabase();
+  
+  const orgCount = await TenantModel.countDocuments({ status: 'ACTIVE' });
+  const userCount = await UserModel.countDocuments();
+  const licenseCount = await LicenseModel.countDocuments({ isActive: true });
+
   const metrics = [
-    { label: 'Active Organizations', value: '14', change: '+2', trend: 'up', icon: Building2, color: 'text-blue-500', bg: 'bg-blue-500/10' },
+    { label: 'Active Organizations', value: orgCount.toString(), change: '+2', trend: 'up', icon: Building2, color: 'text-blue-500', bg: 'bg-blue-500/10' },
     { label: 'Total MRR', value: '$2,450', change: '+$450', trend: 'up', icon: CreditCard, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
-    { label: 'Active Licenses', value: '12', change: '0', trend: 'neutral', icon: BadgeCheck, color: 'text-violet-500', bg: 'bg-violet-500/10' },
-    { label: 'Platform Users', value: '1,204', change: '+124', trend: 'up', icon: Users, color: 'text-rose-500', bg: 'bg-rose-500/10' },
+    { label: 'Active Licenses', value: licenseCount.toString(), change: '0', trend: 'neutral', icon: BadgeCheck, color: 'text-violet-500', bg: 'bg-violet-500/10' },
+    { label: 'Platform Users', value: userCount.toString(), change: '+124', trend: 'up', icon: Users, color: 'text-rose-500', bg: 'bg-rose-500/10' },
   ];
 
   const systems = [

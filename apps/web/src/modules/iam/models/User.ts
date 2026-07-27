@@ -13,6 +13,10 @@ export interface IUser extends IBaseDocument {
   systemRole?: string;
   onboardingCompleted?: boolean;
   tenantId?: string | any;
+  sports?: string[];
+  phone?: string;
+  location?: string;
+  bio?: string;
 }
 
 const UserSchema = createBaseSchema({
@@ -25,7 +29,11 @@ const UserSchema = createBaseSchema({
   emailVerified: { type: Boolean, default: false },
   systemRole: { type: String, default: 'PLAYER' },
   onboardingCompleted: { type: Boolean, default: false },
-  tenantId: { type: mongoose.Schema.Types.ObjectId, ref: 'Tenant' }
+  tenantId: { type: mongoose.Schema.Types.ObjectId, ref: 'Tenant' },
+  sports: { type: [String], default: [] },
+  phone: { type: String },
+  location: { type: String },
+  bio: { type: String }
 });
 
 export const UserModel: Model<IUser> = mongoose.models.User || mongoose.model<IUser>('User', UserSchema);

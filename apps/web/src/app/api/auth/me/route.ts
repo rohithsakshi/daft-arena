@@ -33,6 +33,10 @@ export async function GET(req: NextRequest) {
         avatar: user.avatar,
         onboardingCompleted: user.onboardingCompleted ?? false,
         authProvider: user.authProvider,
+        sports: (user as any).sports || [],
+        phone: (user as any).phone || '',
+        location: (user as any).location || '',
+        bio: (user as any).bio || '',
       },
     });
   } catch (error: any) {

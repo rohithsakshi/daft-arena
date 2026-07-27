@@ -27,7 +27,10 @@ export async function POST(req: NextRequest) {
     // Update user
     await userRepo.update(user.id as string, {
       onboardingCompleted: true,
-      // In a real app we might have a nested profile object for phone/location/sport/bio
+      phone,
+      location,
+      bio,
+      sports: Array.isArray(sport) ? sport : (sport ? [sport] : [])
     });
 
     // Re-issue JWT with onboardingCompleted = true

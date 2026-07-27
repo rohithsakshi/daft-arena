@@ -40,11 +40,25 @@ export async function POST(req: NextRequest) {
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 7);
 
+    let tenantStatus = 'ACTIVE';
+    let tenantSetupCompleted = true;
+
+    if ((user as any).tenantId) {
+      const { TenantModel } = await import('../../../../modules/tenant/models/TenantModel');
+      const tenant = await TenantModel.findById((user as any).tenantId).select('status setupCompleted');
+      if (tenant) {
+        tenantStatus = tenant.status;
+        tenantSetupCompleted = tenant.setupCompleted ?? false;
+      }
+    }
+
     const token = await new jose.SignJWT({
       sub: String(user.id || (user as any)._id),
       email: user.email,
       role: user.systemRole || 'PLAYER',
       onboardingCompleted: user.onboardingCompleted ?? false,
+      tenantStatus,
+      tenantSetupCompleted
     })
       .setProtectedHeader({ alg: 'HS256' })
       .setIssuedAt()

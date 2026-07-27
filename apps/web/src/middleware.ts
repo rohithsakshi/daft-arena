@@ -124,6 +124,19 @@ export async function middleware(request: NextRequest) {
   }
 
   // Workspace specific routing
+  if (payload.tenantStatus === 'SUSPENDED') {
+    if (pathname.startsWith('/api/')) {
+      return NextResponse.json({ success: false, error: 'Account Suspended' }, { status: 403 });
+    }
+    return NextResponse.redirect(new URL('/suspended', request.url));
+  }
+
+  if (role === 'TOURNAMENT_ADMIN' && payload.tenantSetupCompleted === false) {
+    if (!pathname.startsWith('/workspace/tournament-admin/setup') && !pathname.startsWith('/api/organizations/setup')) {
+      return NextResponse.redirect(new URL('/workspace/tournament-admin/setup', request.url));
+    }
+  }
+
   if (pathname.startsWith('/workspace/player') && role !== 'PLAYER') {
     return NextResponse.redirect(new URL('/workspace', request.url));
   }
