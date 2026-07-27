@@ -12,7 +12,7 @@ import { verifyToken } from '@/lib/auth/jwt';
  */
 export default async function WorkspaceRootPage() {
   const cookieStore = await cookies();
-  const token = cookieStore.get('token')?.value;
+  const token = cookieStore.get('daft_token')?.value;
 
   if (!token) {
     redirect('/login');
