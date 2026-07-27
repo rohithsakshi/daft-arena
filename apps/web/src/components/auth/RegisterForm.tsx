@@ -43,7 +43,10 @@ export function RegisterForm() {
         const res = await fetch('/api/auth/google', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ credential: tokenResponse.access_token }),
+          body: JSON.stringify({ 
+            credential: tokenResponse.access_token,
+            portalRole: searchParams.get('role')
+          }),
         });
         const data = await res.json();
 
@@ -90,7 +93,11 @@ export function RegisterForm() {
       const loginRes = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: data.email, password: data.password }),
+        body: JSON.stringify({ 
+          email: data.email, 
+          password: data.password,
+          portalRole: searchParams.get('role')
+        }),
       });
 
       const loginResult = await loginRes.json();

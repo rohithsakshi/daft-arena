@@ -17,7 +17,7 @@ export class AuthenticationService {
     private auditService: AuditService
   ) {}
 
-  async login(dto: LoginDto, ipAddress?: string, userAgent?: string) {
+  async login(dto: LoginDto, ipAddress?: string, userAgent?: string, expectedRole?: string) {
     const user = await this.userRepository.findByEmail(dto.email);
     
     // Mitigate timing attacks by always hashing, even if user doesn't exist
@@ -31,6 +31,11 @@ export class AuthenticationService {
     if (!user || !isValidPassword) {
       await this.auditService.logAction({ action: 'FAILED_LOGIN', metadata: { email: dto.email, reason: 'invalid_credentials' }, ipAddress });
       throw new Error('Invalid credentials');
+    }
+
+    if (expectedRole && user.systemRole && user.systemRole !== expectedRole.toUpperCase() && user.systemRole !== 'SUPERADMIN') {
+      await this.auditService.logAction({ action: 'FAILED_LOGIN', metadata: { email: dto.email, reason: 'wrong_portal' }, ipAddress });
+      throw new Error('You might have entered the wrong portal. Your account does not match this portal.');
     }
 
     const expiresAt = new Date();
@@ -64,7 +69,8 @@ export class AuthenticationService {
     payload: { email: string, googleId: string, name: string, avatar: string, emailVerified: boolean }, 
     systemRole: string,
     ipAddress?: string, 
-    userAgent?: string
+    userAgent?: string,
+    expectedRole?: string
   ) {
     let user = await this.userRepository.findByEmail(payload.email);
     
@@ -81,6 +87,10 @@ export class AuthenticationService {
       });
       await this.auditService.logAction({ actorId: user.id, action: 'GOOGLE_REGISTER_SUCCESS', ipAddress });
     } else {
+      if (expectedRole && user.systemRole && user.systemRole !== expectedRole.toUpperCase() && user.systemRole !== 'SUPERADMIN') {
+        throw new Error('You might have entered the wrong portal. Your account does not match this portal.');
+      }
+      
       if (!user.googleId) {
         await this.userRepository.update(user.id, {
           googleId: payload.googleId,

@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
     await connectToDatabase();
 
     const body = await req.json();
-    const { email, password } = body;
+    const { email, password, portalRole } = body;
 
     if (!email || !password) {
       return NextResponse.json(
@@ -32,6 +32,10 @@ export async function POST(req: NextRequest) {
 
     if (!user || !user.hashedPassword || !isMatch) {
       return NextResponse.json({ success: false, error: 'Invalid credentials' }, { status: 401 });
+    }
+
+    if (portalRole && user.systemRole && user.systemRole !== portalRole.toUpperCase() && user.systemRole !== 'SUPERADMIN') {
+      return NextResponse.json({ success: false, error: 'You might have entered the wrong portal.' }, { status: 403 });
     }
 
     const ipAddress = req.headers.get('x-forwarded-for') || '127.0.0.1';

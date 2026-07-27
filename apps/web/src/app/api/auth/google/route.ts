@@ -14,7 +14,7 @@ export async function POST(request: Request) {
   try {
     await connectToDatabase();
     
-    const { credential } = await request.json();
+    const { credential, portalRole } = await request.json();
 
     if (!credential) {
       return NextResponse.json({ success: false, error: 'No credential provided' }, { status: 400 });
@@ -63,9 +63,9 @@ export async function POST(request: Request) {
     const sessionRepository = new SessionRepository();
     const authService = new AuthenticationService(userRepository, sessionRepository, auditService);
 
-    // Read pending role
+    // Use portalRole or pending role
     const cookieStore = await cookies();
-    const pendingRole = cookieStore.get('daft_pending_role')?.value || 'PLAYER';
+    const pendingRole = portalRole || cookieStore.get('daft_pending_role')?.value || 'PLAYER';
 
     const result = await authService.googleLogin(
       {
@@ -77,7 +77,8 @@ export async function POST(request: Request) {
       },
       pendingRole,
       ipAddress,
-      userAgent
+      userAgent,
+      portalRole
     );
 
     const response = NextResponse.json({
