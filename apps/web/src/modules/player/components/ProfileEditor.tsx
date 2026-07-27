@@ -9,6 +9,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Save, User, Heart, Shield, ShieldAlert, FileText, Loader2, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+const SPORT_OPTIONS = [
+  { value: 'Badminton', label: 'Badminton' },
+  { value: 'Tennis', label: 'Tennis' },
+  { value: 'Pickleball', label: 'Pickleball' },
+  { value: 'Table Tennis', label: 'Table Tennis' }
+];
+
 interface ProfileEditorProps {
   profile: PlayerProfile;
   onSave: (updatedProfile: Partial<PlayerProfile>) => Promise<void>;
@@ -30,6 +37,7 @@ export function ProfileEditor({ profile, onSave, className }: ProfileEditorProps
   const [phone, setPhone] = useState(profile.phone || '');
   const [clubName, setClubName] = useState(profile.clubName || '');
   const [coachName, setCoachName] = useState(profile.coachName || '');
+  const [sports, setSports] = useState<string[]>(profile.sports || []);
 
   const [medical, setMedical] = useState<MedicalDetails>({
     bloodGroup: profile.medicalDetails?.bloodGroup || 'O+',
@@ -57,7 +65,8 @@ export function ProfileEditor({ profile, onSave, className }: ProfileEditorProps
         email,
         phone,
         clubName,
-        coachName
+        coachName,
+        sports
       });
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 2000);
@@ -161,6 +170,25 @@ export function ProfileEditor({ profile, onSave, className }: ProfileEditorProps
               />
             </div>
           </div>
+
+          <div className="pt-2 pb-1">
+            <label className="block text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-2">Primary Sports</label>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {SPORT_OPTIONS.map((option) => {
+                const isSelected = sports.includes(option.value);
+                return (
+                  <label key={option.value} className={cn("flex items-center space-x-3 p-2.5 rounded-xl border cursor-pointer transition-all", isSelected ? 'border-violet-500 bg-violet-500/10' : 'border-white/10 bg-black/25 hover:bg-white/5')}>
+                    <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-violet-600 focus:ring-violet-500 bg-black" checked={isSelected} onChange={(e) => {
+                      if (e.target.checked) setSports([...sports, option.value]);
+                      else setSports(sports.filter(s => s !== option.value));
+                    }} />
+                    <span className="text-xs font-medium text-foreground">{option.label}</span>
+                  </label>
+                )
+              })}
+            </div>
+          </div>
+
           <div>
             <label className="block text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1.5">Bio / Description</label>
             <textarea

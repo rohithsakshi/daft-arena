@@ -84,6 +84,7 @@ export interface PlayerProfile {
   coachName?: string;
   achievements?: ProfileAchievement[];
   documents?: ProfileDocument[];
+  sports?: string[];
   security?: {
     twoFactorEnabled: boolean;
   };
