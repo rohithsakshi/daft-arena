@@ -29,8 +29,9 @@ export async function POST(request: Request) {
     }
     
     const tokenInfo = await tokenInfoResponse.json();
-    if (tokenInfo.aud !== config.GOOGLE_CLIENT_ID) {
-      await auditService.logAction({ action: 'GOOGLE_INVALID_AUDIENCE', ipAddress, metadata: { aud: tokenInfo.aud } });
+    const clientId = config.GOOGLE_CLIENT_ID?.trim();
+    if (tokenInfo?.aud !== clientId && tokenInfo?.azp !== clientId) {
+      await auditService.logAction({ action: 'GOOGLE_INVALID_AUDIENCE', ipAddress, metadata: { aud: tokenInfo?.aud, azp: tokenInfo?.azp } });
       return NextResponse.json({ success: false, error: 'Invalid audience' }, { status: 401 });
     }
 
