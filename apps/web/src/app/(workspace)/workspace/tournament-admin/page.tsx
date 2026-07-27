@@ -6,7 +6,10 @@ import connectToDatabase from '@/lib/db/mongoose';
 import { TournamentModel } from '@/modules/tournaments/models/Tournament';
 import { UserModel } from '@/modules/iam/models/User';
 import { TenantModel } from '@/modules/tenant/models/TenantModel';
+import { RegistrationModel } from '@/modules/tournaments/models/Registration';
+import { RegistrationStatus } from '@/modules/core/enums';
 import { headers } from 'next/headers';
+import Link from 'next/link';
 
 export const metadata = {
   title: 'Tournament Admin Dashboard | DAFT Arena',
@@ -31,14 +34,33 @@ export default async function AdminAdministratorDashboardPage() {
 
   if (tenantId) {
     tenant = await TenantModel.findById(tenantId);
-    tournamentCount = await TournamentModel.countDocuments({ tenantId });
-    // Simulate pending approvals based on users linked to tenant
-    playerApprovals = await UserModel.countDocuments({ tenantId, systemRole: 'PLAYER' });
+    
+    // Fetch all tournaments under this tenant to count registrations
+    const tournaments = await TournamentModel.find({ organizationId: tenantId }).select('_id');
+    const tournamentIds = tournaments.map(t => t._id);
+    
+    tournamentCount = tournamentIds.length;
+    // Simulate active players count from approved registrations
+    playerApprovals = await RegistrationModel.countDocuments({ tournamentId: { $in: tournamentIds }, status: RegistrationStatus.Approved });
+    
+    const pendingCount = await RegistrationModel.countDocuments({ tournamentId: { $in: tournamentIds }, status: RegistrationStatus.Pending });
     
     if (tenant?.expiryDate) {
       daysRemaining = Math.ceil((new Date(tenant.expiryDate).getTime() - new Date().getTime()) / (1000 * 3600 * 24));
     }
+  } else {
+    // If no tenantId is mapped yet, let's just get global tournament counts for the seeded admin user
+    const tournaments = await TournamentModel.find({}).select('_id');
+    const tournamentIds = tournaments.map(t => t._id);
+    tournamentCount = tournamentIds.length;
+    playerApprovals = await RegistrationModel.countDocuments({ status: RegistrationStatus.Approved });
+    
+    const pendingCount = await RegistrationModel.countDocuments({ status: RegistrationStatus.Pending });
   }
+
+  const pendingApprovalsCount = tenantId 
+    ? await RegistrationModel.countDocuments({ tournamentId: { $in: (await TournamentModel.find({ organizationId: tenantId }).select('_id')).map(t => t._id) }, status: RegistrationStatus.Pending })
+    : await RegistrationModel.countDocuments({ status: RegistrationStatus.Pending });
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500 pb-10 max-w-6xl">
@@ -81,7 +103,7 @@ export default async function AdminAdministratorDashboardPage() {
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Pending Approvals</p>
-              <h4 className="text-2xl font-bold">0</h4>
+              <h4 className="text-2xl font-bold">{pendingApprovalsCount}</h4>
             </div>
           </div>
         </WidgetContainer>
@@ -108,12 +130,12 @@ export default async function AdminAdministratorDashboardPage() {
           Manage your organization, create tournaments, or process payments directly from your command center.
         </p>
         <div className="flex gap-4">
-          <button className="px-6 py-2 bg-violet-500 hover:bg-violet-600 text-white font-medium rounded-xl transition-colors">
+          <Link href="/workspace/tournaments/new" className="px-6 py-2 bg-violet-500 hover:bg-violet-600 text-white font-medium rounded-xl transition-colors">
             Create Tournament
-          </button>
-          <button className="px-6 py-2 bg-zinc-800 hover:bg-zinc-700 text-white font-medium rounded-xl transition-colors">
-            View Analytics
-          </button>
+          </Link>
+          <Link href="/workspace/tournaments" className="px-6 py-2 bg-zinc-800 hover:bg-zinc-700 text-white font-medium rounded-xl transition-colors">
+            View Tournaments
+          </Link>
         </div>
       </WidgetContainer>
     </div>

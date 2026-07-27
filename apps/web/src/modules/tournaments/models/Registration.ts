@@ -21,6 +21,8 @@ export interface IRegistration extends IBaseDocument {
   // Payment status could be tracked here or in a Finance module.
   // For Tournament Engine, we just track if they are confirmed.
   paymentStatus: 'Pending' | 'Paid' | 'Waived' | 'Failed';
+  paymentProofUrl?: string;
+  paymentUtr?: string;
   
   // History of status changes
   auditLog: {
@@ -45,6 +47,8 @@ const RegistrationSchema = createBaseSchema({
   notes: { type: String },
   
   paymentStatus: { type: String, enum: ['Pending', 'Paid', 'Waived', 'Failed'], default: 'Pending' },
+  paymentProofUrl: { type: String },
+  paymentUtr: { type: String },
   
   auditLog: [{
     status: { type: String, enum: Object.values(RegistrationStatus), required: true },

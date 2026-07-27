@@ -1,128 +1,138 @@
-// @ts-nocheck
-import React from 'react';
-import { PlayerService } from '@/modules/player/services/player.client.service';
-import { MyTournamentCard } from '@/modules/player/components/MyTournamentCard';
-import { EmptyState } from '@/modules/player/components/EmptyState';
-import { MOCK_USER_ID } from '@/modules/player/constants';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { SectionHeader } from '@/components/shared/SectionHeader';
-import { DashboardGrid } from '@/components/shared/DashboardGrid';
-import { DataList } from '@/components/shared/DataList';
-import { Trophy, Search } from 'lucide-react';
-import Link from 'next/link';
+'use client';
 
-export const metadata = {
-  title: 'My Tournaments | DAFT Arena',
-  description: 'Manage your tournament registrations and history.',
+import * as React from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { SectionHeader } from '@/components/shared/SectionHeader';
+import { WidgetContainer } from '@/components/shared/WidgetContainer';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { EmptyState } from '@/components/shared/EmptyState';
+import { Trophy, Search, ExternalLink, Clock, CheckCircle2, XCircle } from 'lucide-react';
+import Link from 'next/link';
+import { format } from 'date-fns';
+import { Input } from '@/components/ui/input';
+
+const STATUS_ICON: Record<string, any> = {
+  Approved: CheckCircle2,
+  Pending: Clock,
+  Rejected: XCircle,
+};
+const STATUS_COLOR: Record<string, string> = {
+  Approved: 'text-emerald-400',
+  Pending: 'text-amber-400',
+  Rejected: 'text-red-400',
 };
 
-export default async function MyTournamentsPage() {
-  const tournaments = await PlayerService.getMyTournaments(MOCK_USER_ID);
+export default function MyTournamentsPage() {
+  const [search, setSearch] = React.useState('');
+  const [filter, setFilter] = React.useState('All');
 
-  const upcoming = tournaments.filter(
-    (t) => t.status === 'REGISTERED' || t.status === 'PENDING_PAYMENT'
-  );
-  const completed = tournaments.filter((t) => t.status === 'COMPLETED');
-  const cancelled = tournaments.filter((t) => t.status === 'CANCELLED');
+  const { data, isLoading } = useQuery({
+    queryKey: ['my-registrations'],
+    queryFn: async () => {
+      const res = await fetch('/api/player/registrations');
+      if (!res.ok) return { data: [] };
+      return res.json();
+    },
+  });
 
-  const TabGrid = ({ items }: { items: typeof tournaments }) => (
-    <DataList
-      items={items}
-      gridCols={3}
-      layout="grid"
-      emptyTitle="No tournaments here"
-      emptyDescription="Nothing to show for this filter."
-      emptyIcon={Trophy}
-      renderItem={(t) => (
-        <MyTournamentCard key={t.id} tournament={t} />
-      )}
-    />
-  );
+  const registrations: any[] = (data?.data || []).filter((r: any) => {
+    const matchSearch = !search ||
+      r.tournamentId?.name?.toLowerCase().includes(search.toLowerCase()) ||
+      r.eventId?.name?.toLowerCase().includes(search.toLowerCase());
+    const matchFilter = filter === 'All' || r.status === filter;
+    return matchSearch && matchFilter;
+  });
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500 pb-10">
-      {/* Header */}
-      <SectionHeader
-        title="My Tournaments"
-        description="Manage your registrations and review your history."
-        icon={Trophy}
-        titleSize="xl"
-        action={
-          <div className="flex items-center gap-4">
-            <div className="text-right">
-              <p className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-fuchsia-400">
-                {tournaments.length}
-              </p>
-              <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Total Entries</p>
-            </div>
-            <Link
-              href="/workspace/player/tournaments"
-              className="flex items-center gap-2 h-10 px-4 bg-violet-600 hover:bg-violet-700 text-white rounded-xl text-sm font-semibold shadow-lg shadow-violet-500/20 transition-colors"
-              aria-label="Find new tournaments"
-            >
-              <Search className="w-4 h-4" />
-              Find More
-            </Link>
-          </div>
-        }
-      />
+    <div className="space-y-6 animate-in fade-in duration-500 pb-10">
+      <div className="flex items-center justify-between">
+        <SectionHeader
+          title="My Tournaments"
+          description="All your tournament registrations."
+          icon={Trophy}
+        />
+      </div>
 
-      {/* Pending payment alert */}
-      {tournaments.some((t) => t.status === 'PENDING_PAYMENT') && (
-        <div className="flex items-start gap-3 p-4 rounded-xl border border-amber-500/30 bg-amber-500/10 text-sm">
-          <div className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-1.5 flex-shrink-0 animate-pulse" />
-          <div>
-            <p className="font-semibold text-amber-400 mb-0.5">Payment Required</p>
-            <p className="text-amber-400/80 text-xs">
-              You have {tournaments.filter((t) => t.status === 'PENDING_PAYMENT').length} registration(s) pending payment.
-              Complete payment to confirm your spot.
-            </p>
-          </div>
+      <div className="flex items-center gap-3">
+        <div className="relative flex-1 max-w-sm">
+          <Search className="absolute left-2.5 top-2.5 w-4 h-4 text-muted-foreground" />
+          <Input className="pl-9" placeholder="Search tournaments..." value={search} onChange={e => setSearch(e.target.value)} />
+        </div>
+        <div className="flex gap-1">
+          {['All', 'Pending', 'Approved', 'Rejected'].map(f => (
+            <Button key={f} size="sm" variant={filter === f ? 'default' : 'outline'} onClick={() => setFilter(f)}>
+              {f}
+            </Button>
+          ))}
+        </div>
+      </div>
+
+      {isLoading ? (
+        <div className="text-center py-12 text-muted-foreground">Loading...</div>
+      ) : registrations.length === 0 ? (
+        <EmptyState
+          icon={Trophy}
+          title="No registrations yet"
+          description="Browse available tournaments and register to participate."
+          action={
+            <Button render={<Link href="/workspace/player/tournaments" />}>
+              <Search className="w-4 h-4 mr-2" /> Find Tournaments
+            </Button>
+          }
+        />
+      ) : (
+        <div className="space-y-4">
+          {registrations.map((reg: any) => {
+            const Icon = STATUS_ICON[reg.status] || Clock;
+            const colorClass = STATUS_COLOR[reg.status] || 'text-muted-foreground';
+            const tournament = reg.tournamentId;
+            return (
+              <WidgetContainer key={reg._id} className="p-5">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex items-start gap-3">
+                    <div className={`p-2 rounded-lg bg-white/5 ${colorClass}`}>
+                      <Icon className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <p className="font-semibold">{tournament?.name || 'Unknown Tournament'}</p>
+                      <p className="text-sm text-muted-foreground">{reg.eventId?.name || '—'}</p>
+                      <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
+                        <span>Registered: {reg.createdAt ? format(new Date(reg.createdAt), 'PP') : '—'}</span>
+                        {reg.paymentUtr && <span>UTR: {reg.paymentUtr}</span>}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <Badge variant={reg.status === 'Approved' ? 'default' : 'secondary'}>{reg.status}</Badge>
+                    {tournament?.slug && (
+                      <Button size="sm" variant="ghost" render={<Link href={`/tournaments/${tournament.slug}`} target="_blank" />}>
+                        <ExternalLink className="w-4 h-4" />
+                      </Button>
+                    )}
+                  </div>
+                </div>
+
+                {reg.status === 'Pending' && (
+                  <div className="mt-4 p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg text-sm text-amber-300">
+                    ⏳ Your payment screenshot is being reviewed. You'll be notified once approved.
+                  </div>
+                )}
+                {reg.status === 'Rejected' && (
+                  <div className="mt-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-sm text-red-300">
+                    ❌ Your registration was rejected. {reg.notes && `Reason: ${reg.notes}`}
+                  </div>
+                )}
+                {reg.status === 'Approved' && reg.paymentProofUrl && (
+                  <div className="mt-3 text-xs text-emerald-400">
+                    ✅ Payment verified. You are confirmed for this tournament.
+                  </div>
+                )}
+              </WidgetContainer>
+            );
+          })}
         </div>
       )}
-
-      {/* Tabs */}
-      <Tabs defaultValue="all" className="w-full">
-        <TabsList className="bg-card/60 backdrop-blur-md border border-white/5 mb-6 h-10">
-          <TabsTrigger value="all" className="text-xs font-semibold">
-            All
-            <span className="ml-1.5 text-[10px] bg-white/10 px-1.5 py-0.5 rounded-md">
-              {tournaments.length}
-            </span>
-          </TabsTrigger>
-          <TabsTrigger value="upcoming" className="text-xs font-semibold">
-            Active
-            <span className="ml-1.5 text-[10px] bg-violet-500/20 text-violet-400 px-1.5 py-0.5 rounded-md">
-              {upcoming.length}
-            </span>
-          </TabsTrigger>
-          <TabsTrigger value="completed" className="text-xs font-semibold">
-            Completed
-            <span className="ml-1.5 text-[10px] bg-white/10 px-1.5 py-0.5 rounded-md">
-              {completed.length}
-            </span>
-          </TabsTrigger>
-          <TabsTrigger value="cancelled" className="text-xs font-semibold">
-            Cancelled
-            <span className="ml-1.5 text-[10px] bg-white/10 px-1.5 py-0.5 rounded-md">
-              {cancelled.length}
-            </span>
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="all" className="mt-0">
-          <TabGrid items={tournaments} />
-        </TabsContent>
-        <TabsContent value="upcoming" className="mt-0">
-          <TabGrid items={upcoming} />
-        </TabsContent>
-        <TabsContent value="completed" className="mt-0">
-          <TabGrid items={completed} />
-        </TabsContent>
-        <TabsContent value="cancelled" className="mt-0">
-          <TabGrid items={cancelled} />
-        </TabsContent>
-      </Tabs>
     </div>
   );
 }

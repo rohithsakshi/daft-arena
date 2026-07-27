@@ -1,28 +1,37 @@
 import React from 'react';
 import { 
   Building2, Users, Database, Server, Activity, ArrowUpRight, 
-  CreditCard, HardDrive, Cpu, ShieldAlert, BadgeCheck, Timer
+  CreditCard, HardDrive, Cpu, ShieldAlert, BadgeCheck, Timer, Trophy
 } from 'lucide-react';
 
 import connectToDatabase from '@/lib/db/mongoose';
 import { TenantModel } from '@/modules/tenant/models/TenantModel';
 import { UserModel } from '@/modules/iam/models/User';
 import { LicenseModel } from '@/modules/tenant/models/LicenseModel';
+import { TournamentModel } from '@/modules/tournaments/models/Tournament';
+import { RegistrationModel } from '@/modules/tournaments/models/Registration';
 
 export const dynamic = 'force-dynamic';
 
 export default async function SuperAdminDashboard() {
   await connectToDatabase();
   
-  const orgCount = await TenantModel.countDocuments({ status: 'ACTIVE' });
-  const userCount = await UserModel.countDocuments();
-  const licenseCount = await LicenseModel.countDocuments({ isActive: true });
+  const [orgCount, userCount, licenseCount, tournamentCount, registrationCount, sponsorCount] = await Promise.all([
+    TenantModel.countDocuments({ status: 'ACTIVE' }).catch(() => 0),
+    UserModel.countDocuments().catch(() => 0),
+    LicenseModel.countDocuments({ isActive: true }).catch(() => 0),
+    TournamentModel.countDocuments().catch(() => 0),
+    RegistrationModel.countDocuments().catch(() => 0),
+    UserModel.countDocuments({ systemRole: 'SPONSOR' }).catch(() => 0),
+  ]);
 
   const metrics = [
-    { label: 'Active Organizations', value: orgCount.toString(), change: '+2', trend: 'up', icon: Building2, color: 'text-blue-500', bg: 'bg-blue-500/10' },
-    { label: 'Total MRR', value: '₹24,500', change: '+₹4,500', trend: 'up', icon: CreditCard, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
-    { label: 'Active Licenses', value: licenseCount.toString(), change: '0', trend: 'neutral', icon: BadgeCheck, color: 'text-violet-500', bg: 'bg-violet-500/10' },
-    { label: 'Platform Users', value: userCount.toString(), change: '+124', trend: 'up', icon: Users, color: 'text-rose-500', bg: 'bg-rose-500/10' },
+    { label: 'Active Organizations', value: orgCount.toString(), trend: 'up', change: '+2', icon: Building2, color: 'text-blue-500', bg: 'bg-blue-500/10' },
+    { label: 'Active Licenses', value: licenseCount.toString(), trend: 'neutral', change: '0', icon: BadgeCheck, color: 'text-violet-500', bg: 'bg-violet-500/10' },
+    { label: 'Platform Users', value: userCount.toString(), trend: 'up', change: '+124', icon: Users, color: 'text-rose-500', bg: 'bg-rose-500/10' },
+    { label: 'Tournaments Created', value: tournamentCount.toString(), trend: 'up', change: '+15', icon: Trophy, color: 'text-amber-500', bg: 'bg-amber-500/10' },
+    { label: 'Total Registrations', value: registrationCount.toString(), trend: 'up', change: '+450', icon: CreditCard, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
+    { label: 'Active Sponsors', value: sponsorCount.toString(), trend: 'neutral', change: '+1', icon: Building2, color: 'text-pink-500', bg: 'bg-pink-500/10' },
   ];
 
   const systems = [
@@ -40,7 +49,7 @@ export default async function SuperAdminDashboard() {
       </div>
 
       {/* Top Metrics Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {metrics.map((metric, i) => (
           <div key={i} className="bg-card border border-border rounded-2xl p-6 hover:border-white/10 transition-colors group">
             <div className="flex justify-between items-start mb-4">

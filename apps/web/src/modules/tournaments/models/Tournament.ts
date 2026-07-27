@@ -42,6 +42,14 @@ export interface ITournament extends IBaseDocument {
     url: string;
     type: 'Rulebook' | 'Prospectus' | 'Circular' | 'Schedule' | 'Other';
   }[];
+  
+  // Payment Configuration
+  paymentConfiguration?: {
+    upiId?: string;
+    accountName?: string;
+    qrCodeUrl?: string;
+    instructions?: string;
+  };
 }
 
 const TournamentSchema = createBaseSchema({
@@ -81,7 +89,14 @@ const TournamentSchema = createBaseSchema({
     title: { type: String, required: true },
     url: { type: String, required: true },
     type: { type: String, enum: ['Rulebook', 'Prospectus', 'Circular', 'Schedule', 'Other'], required: true }
-  }]
+  }],
+  
+  paymentConfiguration: {
+    upiId: { type: String },
+    accountName: { type: String },
+    qrCodeUrl: { type: String },
+    instructions: { type: String }
+  }
 });
 
 export const TournamentModel: Model<ITournament> = mongoose.models.Tournament || mongoose.model<ITournament>('Tournament', TournamentSchema);

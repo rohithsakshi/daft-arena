@@ -1,11 +1,11 @@
 // @ts-nocheck
 import React from 'react';
-import { PlayerService } from '@/modules/player/services/player.client.service';
-import { UpcomingMatchCard } from '@/modules/player/components/UpcomingMatchCard';
-import { MyTournamentCard } from '@/modules/player/components/MyTournamentCard';
-import { QuickActionCard } from '@/modules/player/components/QuickActionCard';
 import { EmptyState } from '@/modules/player/components/EmptyState';
-import { MOCK_USER_ID } from '@/modules/player/constants';
+import connectToDatabase from '@/lib/db/mongoose';
+import { UserModel } from '@/modules/iam/models/User';
+import { RegistrationModel } from '@/modules/tournaments/models/Registration';
+import { NotificationModel } from '@/modules/notifications/models/Notification';
+import { headers } from 'next/headers';
 import { SectionHeader } from '@/components/shared/SectionHeader';
 import { DashboardGrid } from '@/components/shared/DashboardGrid';
 import { StatisticWidget } from '@/components/shared/StatisticWidget';
@@ -22,17 +22,30 @@ export const metadata = {
 };
 
 export default async function PlayerDashboardPage() {
-  const [profile, matches, tournaments] = await Promise.all([
-    PlayerService.getProfile(MOCK_USER_ID),
-    PlayerService.getMyMatches(MOCK_USER_ID),
-    PlayerService.getMyTournaments(MOCK_USER_ID),
+  await connectToDatabase();
+  
+  const headersList = await headers();
+  const userId = headersList.get('x-user-id');
+  if (!userId) {
+    return <div className="p-10 text-center">Unauthorized. Please log in.</div>;
+  }
+
+  const [profile, registrations, unreadNotificationCount] = await Promise.all([
+    UserModel.findById(userId).lean(),
+    RegistrationModel.find({ participantIds: userId }).populate('tournamentId').populate('eventId').lean(),
+    NotificationModel.countDocuments({ targetUserId: userId, status: 'UNREAD' })
   ]);
 
-  const upcomingMatches = matches.filter((m) => m.status === 'UPCOMING');
-  const activeRegistrations = tournaments.filter(
-    (t) => t.status === 'REGISTERED' || t.status === 'PENDING_PAYMENT'
+  const activeRegistrations = registrations.filter(
+    (r) => r.status === 'Approved' || r.status === 'Pending'
   );
-  const unreadNotificationCount = 2; // from mock data
+  
+  // Real stats can be retrieved if we track them in Player Profile
+  const matchesPlayed = profile?.stats?.matchesPlayed || 0;
+  const matchesWon = profile?.stats?.matchesWon || 0;
+  const winRatio = matchesPlayed > 0 ? Math.round((matchesWon / matchesPlayed) * 100) : 0;
+  
+  const upcomingMatches: any[] = []; // Implement real Match query when MatchModel is wired
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500 pb-10">
@@ -51,7 +64,7 @@ export default async function PlayerDashboardPage() {
               <span className="text-xs font-semibold text-emerald-400 uppercase tracking-wider">Active Player</span>
             </div>
             <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-foreground">
-              Welcome back, {profile?.fullName?.split(' ')[0] || 'Player'} 👋
+              Welcome back, {profile?.name?.split(' ')[0] || profile?.firstName || 'Player'} 👋
             </h1>
             <p className="text-muted-foreground mt-1 text-lg">
               Here's what's happening with your tournaments and matches today.
@@ -63,10 +76,10 @@ export default async function PlayerDashboardPage() {
             aria-label="View my profile"
           >
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-600 to-purple-700 flex items-center justify-center text-sm font-black text-white shadow-lg">
-              {profile?.fullName ? profile.fullName.split(' ').map(n => n[0]).join('').slice(0, 2) : 'P'}
+              {profile?.name ? profile.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2) : 'P'}
             </div>
             <div className="hidden sm:block text-left">
-              <p className="text-2xl font-bold text-foreground">{profile?.stats?.winRatio || '0'}%</p>
+              <p className="text-2xl font-bold text-foreground">{winRatio}%</p>
               <p className="text-xs text-muted-foreground">View profile</p>
             </div>
             <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-violet-400 group-hover:translate-x-0.5 transition-all" />
@@ -78,22 +91,21 @@ export default async function PlayerDashboardPage() {
       <DashboardGrid cols={4}>
         <StatisticWidget
           title="Win Ratio"
-          value={`${profile?.stats?.winRatio || 0}%`}
+          value={`${winRatio}%`}
           icon={Target}
           iconColorClass="text-emerald-400 bg-emerald-500/10 border-emerald-500/20"
-          trend={{ value: 5.2, label: 'vs last month' }}
         />
         <StatisticWidget
           title="Matches Played"
-          value={profile?.stats?.matchesPlayed || 0}
-          subtitle={`${profile?.stats?.matchesWon || 0} wins`}
+          value={matchesPlayed}
+          subtitle={`${matchesWon} wins`}
           icon={Trophy}
           iconColorClass="text-violet-400 bg-violet-500/10 border-violet-500/20"
         />
         <StatisticWidget
           title="Titles Won"
           value={profile?.stats?.tournamentsWon || 0}
-          subtitle={`of ${profile?.stats?.tournamentsEntered || 0} entered`}
+          subtitle={`of ${registrations.length} entered`}
           icon={Medal}
           iconColorClass="text-amber-400 bg-amber-500/10 border-amber-500/20"
         />
@@ -131,7 +143,9 @@ export default async function PlayerDashboardPage() {
             {upcomingMatches.length > 0 ? (
               <DashboardGrid cols={2}>
                 {upcomingMatches.slice(0, 2).map((match: any) => (
-                  <UpcomingMatchCard key={match.id} match={match} />
+                  <div key={match._id} className="p-4 rounded-xl border border-white/10 bg-white/5">
+                    Match {match._id}
+                  </div>
                 ))}
               </DashboardGrid>
             ) : (
@@ -171,9 +185,21 @@ export default async function PlayerDashboardPage() {
 
             {activeRegistrations.length > 0 ? (
               <DashboardGrid cols={2}>
-                {activeRegistrations.slice(0, 4).map((tournament: any) => (
-                  <MyTournamentCard key={tournament.id} tournament={tournament} />
-                ))}
+                {activeRegistrations.slice(0, 4).map((reg: any) => {
+                  const tournament = reg.tournamentId;
+                  const event = reg.eventId;
+                  return (
+                    <div key={reg._id} className="p-4 rounded-xl border border-white/10 bg-white/5 flex justify-between items-center">
+                      <div>
+                        <p className="font-semibold text-sm">{tournament?.name || 'Tournament'}</p>
+                        <p className="text-xs text-muted-foreground">{event?.name || 'Event'}</p>
+                      </div>
+                      <div className="text-xs px-2 py-1 rounded bg-violet-500/20 text-violet-300">
+                        {reg.status}
+                      </div>
+                    </div>
+                  );
+                })}
               </DashboardGrid>
             ) : (
               <EmptyState
@@ -197,35 +223,39 @@ export default async function PlayerDashboardPage() {
         <div className="space-y-4">
           <h2 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">Quick Access</h2>
           <div className="grid grid-cols-1 gap-4">
-            <QuickActionCard
-              title="Discover Tournaments"
-              description="Find your next competition and register"
-              icon={Search}
-              href="/workspace/player/tournaments"
-              colorClass="text-violet-400 bg-violet-500/10 border-violet-500/20"
-            />
-            <QuickActionCard
-              title="My Profile"
-              description="Update your details and preferences"
-              icon={User}
-              href="/workspace/player/profile"
-              colorClass="text-blue-400 bg-blue-500/10 border-blue-500/20"
-            />
-            <QuickActionCard
-              title="Notifications"
-              description="View recent alerts and updates"
-              icon={Bell}
-              href="/workspace/player/notifications"
-              colorClass="text-amber-400 bg-amber-500/10 border-amber-500/20"
-              badge={unreadNotificationCount > 0 ? String(unreadNotificationCount) : undefined}
-            />
-            <QuickActionCard
-              title="Rankings"
-              description="Check your standing across categories"
-              icon={TrendingUp}
-              href="/workspace/player/rankings"
-              colorClass="text-emerald-400 bg-emerald-500/10 border-emerald-500/20"
-            />
+              <Link href="/workspace/player/tournaments" className="flex items-center gap-4 p-4 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-colors">
+                <div className="p-3 bg-violet-500/20 rounded-lg text-violet-400"><Search className="w-5 h-5" /></div>
+                <div>
+                  <h4 className="font-semibold text-sm">Discover Tournaments</h4>
+                  <p className="text-xs text-muted-foreground">Find your next competition</p>
+                </div>
+              </Link>
+              <Link href="/workspace/player/profile" className="flex items-center gap-4 p-4 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-colors">
+                <div className="p-3 bg-blue-500/20 rounded-lg text-blue-400"><User className="w-5 h-5" /></div>
+                <div>
+                  <h4 className="font-semibold text-sm">My Profile</h4>
+                  <p className="text-xs text-muted-foreground">Update your details</p>
+                </div>
+              </Link>
+              <Link href="/workspace/player/notifications" className="flex items-center gap-4 p-4 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-colors relative">
+                <div className="p-3 bg-amber-500/20 rounded-lg text-amber-400"><Bell className="w-5 h-5" /></div>
+                <div>
+                  <h4 className="font-semibold text-sm">Notifications</h4>
+                  <p className="text-xs text-muted-foreground">Recent alerts and updates</p>
+                </div>
+                {unreadNotificationCount > 0 && (
+                  <span className="absolute top-4 right-4 bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                    {unreadNotificationCount}
+                  </span>
+                )}
+              </Link>
+              <Link href="/workspace/player/rankings" className="flex items-center gap-4 p-4 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-colors">
+                <div className="p-3 bg-emerald-500/20 rounded-lg text-emerald-400"><TrendingUp className="w-5 h-5" /></div>
+                <div>
+                  <h4 className="font-semibold text-sm">Rankings</h4>
+                  <p className="text-xs text-muted-foreground">Check your standing</p>
+                </div>
+              </Link>
           </div>
         </div>
       </DashboardGrid>

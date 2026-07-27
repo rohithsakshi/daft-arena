@@ -4,7 +4,9 @@ import { LayoutDashboard, BarChart3, Target, Coins, TrendingUp, Handshake, Eye }
 import { WidgetContainer } from '@/components/shared/WidgetContainer';
 import connectToDatabase from '@/lib/db/mongoose';
 import { UserModel } from '@/modules/iam/models/User';
+import { SponsorCampaignModel } from '@/modules/sponsor/models/Campaign';
 import { headers } from 'next/headers';
+import Link from 'next/link';
 
 export const metadata = {
   title: 'Sponsor Dashboard | DAFT Arena',
@@ -19,6 +21,13 @@ export default async function SponsorDashboardPage() {
   const headersList = await headers();
   const userId = headersList.get('x-user-id');
   const user = await UserModel.findById(userId);
+
+  const campaigns = await SponsorCampaignModel.find({ sponsorUserId: userId }).lean();
+  
+  const activeCampaignsCount = campaigns.filter(c => c.status === 'Active').length;
+  const totalImpressions = campaigns.reduce((sum, c) => sum + (c.impressions || 0), 0);
+  const totalClicks = campaigns.reduce((sum, c) => sum + (c.clicks || 0), 0);
+  const engagementRate = totalImpressions > 0 ? ((totalClicks / totalImpressions) * 100).toFixed(1) : '0';
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500 pb-10 max-w-6xl">
@@ -38,7 +47,7 @@ export default async function SponsorDashboardPage() {
             </div>
             <div>
               <p className="text-sm text-indigo-400/80">Active Campaigns</p>
-              <h4 className="text-2xl font-bold text-indigo-400">3</h4>
+              <h4 className="text-2xl font-bold text-indigo-400">{activeCampaignsCount}</h4>
             </div>
           </div>
         </WidgetContainer>
@@ -50,7 +59,7 @@ export default async function SponsorDashboardPage() {
             </div>
             <div>
               <p className="text-sm text-blue-400/80">Total Impressions</p>
-              <h4 className="text-2xl font-bold text-blue-400">124.5K</h4>
+              <h4 className="text-2xl font-bold text-blue-400">{totalImpressions > 1000 ? (totalImpressions/1000).toFixed(1) + 'K' : totalImpressions}</h4>
             </div>
           </div>
         </WidgetContainer>
@@ -62,7 +71,7 @@ export default async function SponsorDashboardPage() {
             </div>
             <div>
               <p className="text-sm text-emerald-400/80">Engagement Rate</p>
-              <h4 className="text-2xl font-bold text-emerald-400">4.8%</h4>
+              <h4 className="text-2xl font-bold text-emerald-400">{engagementRate}%</h4>
             </div>
           </div>
         </WidgetContainer>
@@ -74,7 +83,7 @@ export default async function SponsorDashboardPage() {
             </div>
             <div>
               <p className="text-sm text-amber-400/80">Spent this Month</p>
-              <h4 className="text-2xl font-bold text-amber-400">₹45,000</h4>
+              <h4 className="text-2xl font-bold text-amber-400">₹0</h4>
             </div>
           </div>
         </WidgetContainer>
@@ -106,9 +115,9 @@ export default async function SponsorDashboardPage() {
               </div>
             ))}
           </div>
-          <button className="w-full mt-6 py-2 bg-white/5 hover:bg-white/10 text-sm font-medium rounded-lg transition-colors text-foreground">
+          <Link href="/workspace/sponsor/contracts" className="w-full mt-6 py-2 bg-white/5 hover:bg-white/10 text-sm font-medium rounded-lg transition-colors text-foreground text-center">
             View All Sponsorships
-          </button>
+          </Link>
         </WidgetContainer>
 
         {/* Quick Actions */}
@@ -121,12 +130,12 @@ export default async function SponsorDashboardPage() {
             Discover new tournaments looking for sponsors or launch a targeted ad campaign across the DAFT Arena network.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 w-full justify-center">
-            <button className="px-6 py-2.5 bg-violet-600 hover:bg-violet-700 text-white font-medium rounded-xl transition-colors text-sm">
+            <Link href="/workspace/sponsor/opportunities" className="px-6 py-2.5 bg-violet-600 hover:bg-violet-700 text-white font-medium rounded-xl transition-colors text-sm text-center">
               Explore Opportunities
-            </button>
-            <button className="px-6 py-2.5 bg-white/5 border border-white/10 hover:bg-white/10 text-white font-medium rounded-xl transition-colors text-sm">
+            </Link>
+            <Link href="/workspace/sponsor/campaigns" className="px-6 py-2.5 bg-white/5 border border-white/10 hover:bg-white/10 text-white font-medium rounded-xl transition-colors text-sm text-center">
               New Campaign
-            </button>
+            </Link>
           </div>
         </WidgetContainer>
       </div>

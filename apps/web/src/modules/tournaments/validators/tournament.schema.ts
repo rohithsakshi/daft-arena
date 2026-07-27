@@ -40,7 +40,14 @@ const BaseTournamentSchema = z.object({
   capacity: z.number().int().min(1).optional(),
   tags: z.array(z.string()).default([]),
   
-  documents: z.array(TournamentDocumentSchema).default([])
+  documents: z.array(TournamentDocumentSchema).default([]),
+  
+  paymentConfiguration: z.object({
+    upiId: z.string().optional(),
+    accountName: z.string().optional(),
+    qrCodeUrl: z.string().url().optional().or(z.literal('')),
+    instructions: z.string().optional(),
+  }).optional()
 });
 
 export const CreateTournamentSchema = BaseTournamentSchema.refine(data => data.registrationWindow.startDate <= data.registrationWindow.endDate, {

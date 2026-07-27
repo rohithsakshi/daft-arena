@@ -1,19 +1,43 @@
-// @ts-nocheck
 import { IIncident, IOfficial, IOperationsDashboardData, ICheckIn, ICourtStatus } from '../models';
+import { MatchModel, MatchState } from '@/modules/brackets/models/Match';
+import { RegistrationModel } from '@/modules/tournaments/models/Registration';
+import { TournamentModel } from '@/modules/tournaments/models/Tournament';
+import { PlayingAreaModel } from '@/modules/tournaments/models/PlayingArea';
+import { RegistrationStatus } from '@/modules/core/enums';
+import mongoose from 'mongoose';
 
 export class OperationsService {
   
   async getDashboardData(tournamentId: string): Promise<IOperationsDashboardData> {
-    // Mock implementation for full stack completeness
+    const liveMatchesCount = await MatchModel.countDocuments({ 
+      status: MatchState.IN_PROGRESS 
+    });
+    
+    // We can define 'delayed' based on scheduledAt < now and status not started
+    const delayedMatchesCount = await MatchModel.countDocuments({
+      status: { $in: [MatchState.READY, MatchState.SCHEDULED] },
+      scheduledAt: { $lt: new Date() }
+    });
+
+    const upcomingEventsCount = await MatchModel.countDocuments({
+      status: MatchState.SCHEDULED,
+      scheduledAt: { $gte: new Date() }
+    });
+    
+    const checkedInPlayersCount = await RegistrationModel.countDocuments({
+      tournamentId,
+      status: RegistrationStatus.Approved // Representing active participants
+    });
+
     return {
-      liveMatchesCount: 12,
-      delayedMatchesCount: 3,
-      upcomingEventsCount: 5,
-      openIncidentsCount: 2,
-      checkedInPlayersCount: 145,
-      activeOfficialsCount: 8,
-      recentIncidents: await this.getIncidents(tournamentId),
-      activeOfficials: await this.getOfficials(tournamentId)
+      liveMatchesCount,
+      delayedMatchesCount,
+      upcomingEventsCount,
+      openIncidentsCount: 0, // Implement IncidentModel when ready
+      checkedInPlayersCount,
+      activeOfficialsCount: 0,
+      recentIncidents: [],
+      activeOfficials: []
     };
   }
 
@@ -70,12 +94,32 @@ export class OperationsService {
   }
 
   async getCourts(tournamentId: string): Promise<ICourtStatus[]> {
-    return [
-      { id: 'crt_1', name: 'Center Court', status: 'Occupied', currentMatchId: 'm_1', currentMatchTitle: 'Mens Singles Final', nextMatchTime: '14:00' },
-      { id: 'crt_2', name: 'Court 1', status: 'Available' },
-      { id: 'crt_3', name: 'Court 2', status: 'Maintenance' },
-      { id: 'crt_4', name: 'Court 3', status: 'Delayed', currentMatchId: 'm_2', currentMatchTitle: 'Womens Doubles SF' },
-    ];
+    const tournament = await TournamentModel.findById(tournamentId);
+    if (!tournament) return [];
+
+    const venueIds = tournament.venueIds || [];
+    const playingAreas = await PlayingAreaModel.find({ venueId: { $in: venueIds } });
+
+    // Look up active matches for these courts
+    const courtIds = playingAreas.map(p => p._id);
+    const activeMatches = await MatchModel.find({
+      courtId: { $in: courtIds },
+      status: { $in: [MatchState.IN_PROGRESS, MatchState.READY, MatchState.SCHEDULED] }
+    }).sort({ scheduledAt: 1 }).lean();
+
+    return playingAreas.map(area => {
+      const activeMatchForCourt = activeMatches.find(m => m.courtId?.toString() === area._id.toString() && m.status === MatchState.IN_PROGRESS);
+      const nextMatchForCourt = activeMatches.find(m => m.courtId?.toString() === area._id.toString() && m.status !== MatchState.IN_PROGRESS);
+
+      return {
+        id: area._id.toString(),
+        name: area.name,
+        status: activeMatchForCourt ? 'Occupied' : (area.isAvailable ? 'Available' : 'Maintenance'),
+        currentMatchId: activeMatchForCourt ? activeMatchForCourt._id.toString() : undefined,
+        currentMatchTitle: activeMatchForCourt ? 'Live Match' : undefined,
+        nextMatchTime: nextMatchForCourt?.scheduledAt ? new Date(nextMatchForCourt.scheduledAt).toLocaleTimeString() : undefined
+      };
+    });
   }
 
   async getAssignments(tournamentId: string) {

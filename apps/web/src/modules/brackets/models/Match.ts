@@ -17,6 +17,7 @@ export enum MatchState {
 }
 
 export interface IMatch extends IBaseDocument {
+  tournamentId: mongoose.Types.ObjectId | string;
   drawId: mongoose.Types.ObjectId | string;
   roundId: mongoose.Types.ObjectId | string;
   
@@ -33,6 +34,7 @@ export interface IMatch extends IBaseDocument {
 }
 
 const MatchSchema = createBaseSchema({
+  tournamentId: { type: Schema.Types.ObjectId, ref: 'Tournament', required: true, index: true },
   drawId: { type: Schema.Types.ObjectId, ref: 'Draw', required: true, index: true },
   roundId: { type: Schema.Types.ObjectId, ref: 'Round', required: true, index: true },
   
