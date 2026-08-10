@@ -13,4 +13,8 @@ export class PaymentRepository extends BaseRepository<IPayment> {
   async findPending() {
     return this.findMany({ status: 'PENDING' });
   }
+
+  async findByPlayer(playerId: string) {
+    return this.findMany({ playerId });
+  }
 }
