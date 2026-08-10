@@ -14,20 +14,20 @@ export default function LandingPage() {
   return (
     <main className="relative min-h-screen w-full overflow-hidden bg-background flex">
       {/* Left: Content */}
-      <div className="flex-none flex flex-col justify-center px-8 md:px-16 lg:px-24 z-10 lg:w-[40%] max-w-2xl py-12">
+      <div className="flex-none w-full lg:w-[40%] max-w-2xl flex flex-col justify-center px-6 sm:px-8 md:px-16 lg:px-24 z-10 py-12 md:py-20">
         {/* Tag */}
         <div className="inline-flex items-center gap-2 mb-6 px-3 py-1.5 rounded-full bg-violet-500/10 border border-violet-500/20 w-fit">
           <Sparkles className="w-3.5 h-3.5 text-violet-400" />
           <span className="text-xs font-semibold text-violet-400 tracking-wide">Enterprise Sports Platform</span>
         </div>
 
-        <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight mb-6 text-foreground leading-[1.1]">
+        <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight mb-6 text-foreground leading-[1.1] break-words">
           Welcome to{' '}
           <span className="bg-clip-text text-transparent bg-gradient-to-r from-violet-500 via-purple-500 to-pink-500">
             DAFT Arena
           </span>
         </h1>
-        <p className="text-xl md:text-2xl text-muted-foreground leading-relaxed mb-10">
+        <p className="text-lg sm:text-xl md:text-2xl text-muted-foreground leading-relaxed mb-10">
           The ultimate Tournament Execution System. Built for scale, designed for performance, engineered for champions.
         </p>
 
