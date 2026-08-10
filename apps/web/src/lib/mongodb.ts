@@ -1,49 +1,22 @@
 import mongoose from 'mongoose';
-import { config } from './config';
 import { logger } from './logger';
-
-const MONGODB_URI = config.MONGODB_URI;
-
-declare global {
-  var mongooseConnection: { conn: typeof mongoose | null; promise: Promise<typeof mongoose> | null };
-}
-
-let cached = global.mongooseConnection;
-
-if (!cached) {
-  cached = global.mongooseConnection = { conn: null, promise: null };
-}
+import { connectToDatabase } from './db/mongoose';
 
 export async function connectDB() {
-  if (cached.conn) {
-    return cached.conn;
-  }
-
-  if (!cached.promise) {
-    const opts = {
-      bufferCommands: false,
-      maxPoolSize: 10,
-      serverSelectionTimeoutMS: 5000,
-      socketTimeoutMS: 45000,
-    };
-
-    cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
-      logger.info('Connected to MongoDB');
-      return mongoose;
-    }).catch(error => {
-      logger.error('Error connecting to MongoDB', error);
-      throw error;
-    });
-  }
-  
-  cached.conn = await cached.promise;
-  return cached.conn;
+  await connectToDatabase();
+  return mongoose;
 }
 
-process.on('SIGINT', async () => {
-  if (cached.conn) {
-    await cached.conn.connection.close();
-    logger.info('MongoDB connection closed due to app termination');
-    process.exit(0);
-  }
-});
+// Guard against duplicate SIGINT listeners on Next.js hot-reloads
+const SIGINT_HANDLER_KEY = '__daft_arena_sigint_registered__';
+if (!(globalThis as any)[SIGINT_HANDLER_KEY]) {
+  (globalThis as any)[SIGINT_HANDLER_KEY] = true;
+  process.setMaxListeners(20); // raise cap slightly to avoid spurious warnings
+  process.on('SIGINT', async () => {
+    if (mongoose.connection.readyState !== 0) {
+      await mongoose.connection.close();
+      logger.info('MongoDB connection closed due to app termination');
+      process.exit(0);
+    }
+  });
+}

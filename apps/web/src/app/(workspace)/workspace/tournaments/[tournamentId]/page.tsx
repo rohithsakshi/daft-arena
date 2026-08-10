@@ -12,6 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import Link from 'next/link';
+import { StatusBadgePicker } from '@/components/shared/StatusBadgePicker';
 import {
   Users, Clock, CheckCircle2, XCircle, Trophy,
   QrCode, Settings, ExternalLink, BarChart3, CalendarDays
@@ -126,7 +127,7 @@ export default function TournamentDetailsPage() {
               <h2 className="text-3xl font-bold tracking-tight">{tournament.name}</h2>
               <p className="text-muted-foreground text-sm">/{tournament.slug}</p>
             </div>
-            <Badge variant={STATUS_COLOR[tournament.status] as any}>{tournament.status}</Badge>
+            <StatusBadgePicker tournamentId={id} currentStatus={tournament.status} size="lg" />
           </div>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -140,12 +141,16 @@ export default function TournamentDetailsPage() {
               {statusMutation.isPending ? 'Updating...' : action.label}
             </Button>
           ))}
-          <Button variant="outline" render={<Link href={`/workspace/tournaments/${id}/edit`} />}>
-            <Settings className="w-4 h-4 mr-2" /> Edit
-          </Button>
-          <Button variant="outline" size="icon" render={<Link href={`/tournaments/${tournament.slug}`} target="_blank" />}>
-            <ExternalLink className="w-4 h-4" />
-          </Button>
+          <Link href={`/workspace/tournaments/${id}/edit`}>
+            <Button variant="outline">
+              <Settings className="w-4 h-4 mr-2" /> Edit
+            </Button>
+          </Link>
+          <Link href={`/tournaments/${tournament.slug}`} target="_blank">
+            <Button variant="outline" size="icon">
+              <ExternalLink className="w-4 h-4" />
+            </Button>
+          </Link>
         </div>
       </div>
 
@@ -206,6 +211,14 @@ export default function TournamentDetailsPage() {
             <div className="flex justify-between">
               <span className="font-medium text-muted-foreground">Registration Opens</span>
               <span>{format(new Date(tournament.registrationWindow.startDate), 'PPp')}</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="font-medium text-muted-foreground">Entry Fee</span>
+              {tournament.isFreeEntry || !tournament.entryFee ? (
+                <span className="text-emerald-400 font-semibold bg-emerald-500/10 px-2.5 py-0.5 rounded text-xs border border-emerald-500/20">Free Entry</span>
+              ) : (
+                <span className="font-bold text-foreground">{tournament.currency || 'INR'} {tournament.entryFee}</span>
+              )}
             </div>
             <div className="flex justify-between">
               <span className="font-medium text-muted-foreground">Registration Closes</span>
@@ -285,9 +298,11 @@ export default function TournamentDetailsPage() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle>Events ({events.length})</CardTitle>
-            <Button size="sm" render={<Link href={`/workspace/tournaments/${id}/events`} />}>
-              Manage Events
-            </Button>
+            <Link href={`/workspace/tournaments/${id}/events`}>
+              <Button size="sm">
+                Manage Events
+              </Button>
+            </Link>
           </div>
         </CardHeader>
         <CardContent>
@@ -295,9 +310,11 @@ export default function TournamentDetailsPage() {
             <div className="text-center py-12 text-muted-foreground">
               <Trophy className="w-10 h-10 mx-auto mb-3 opacity-30" />
               <p>No events created yet.</p>
-              <Button size="sm" className="mt-4" render={<Link href={`/workspace/tournaments/${id}/events`} />}>
-                Create First Event
-              </Button>
+              <Link href={`/workspace/tournaments/${id}/events`}>
+                <Button size="sm" className="mt-4">
+                  Create First Event
+                </Button>
+              </Link>
             </div>
           ) : (
             <div className="space-y-2">

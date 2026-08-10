@@ -30,6 +30,8 @@ export default function CreateTournamentPage() {
       slug: '',
       description: '',
       organizerName: '',
+      sportName: 'Badminton',
+      sports: ['Badminton'],
       organizationId: '000000000000000000000000',
       sportId: '000000000000000000000000',
       rulePackageId: '000000000000000000000000',
@@ -44,6 +46,8 @@ export default function CreateTournamentPage() {
         startDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
         endDate: new Date(Date.now() + 16 * 24 * 60 * 60 * 1000),
       },
+      entryFee: 0,
+      isFreeEntry: false,
       venueIds: [],
       tags: [],
       documents: [],
@@ -59,18 +63,34 @@ export default function CreateTournamentPage() {
   }, [watchName]);
 
   const createMutation = useMutation({
-    mutationFn: (data: any) => TournamentService.create({
-      ...data,
-      bannerUrl,
-      logoUrl,
-      paymentConfiguration: {
-        ...data.paymentConfiguration,
-        qrCodeUrl: qrUrl,
-      },
-    }),
+    mutationFn: (data: any) => {
+      const isFree = Boolean(data.isFreeEntry);
+      const fee = isFree ? 0 : (Number(data.entryFee) || 0);
+      const selectedSport = data.sportName || 'Badminton';
+      return TournamentService.create({
+        ...data,
+        sportName: selectedSport,
+        sports: Array.isArray(data.sports) && data.sports.length > 0 ? data.sports : [selectedSport],
+        entryFee: fee,
+        isFreeEntry: isFree,
+        bannerUrl,
+        logoUrl,
+        paymentConfiguration: {
+          ...data.paymentConfiguration,
+          entryFee: fee,
+          isFreeEntry: isFree,
+          qrCodeUrl: qrUrl,
+        },
+      });
+    },
     onSuccess: (response: any) => {
       toast.success('Tournament created successfully as Draft');
-      router.push(`/workspace/tournaments/${response.data._id}`);
+      const tournamentId = response?.data?.id || response?.data?._id || response?.data?.data?.id || response?.data?.data?._id;
+      if (tournamentId) {
+        router.push(`/workspace/tournaments/${tournamentId}`);
+      } else {
+        router.push('/workspace/tournaments');
+      }
     },
     onError: (error: any) => {
       toast.error(error.message || 'Failed to create tournament');
@@ -148,6 +168,28 @@ export default function CreateTournamentPage() {
                 <Input {...form.register('organizerName')} placeholder="Pollachi Sports Club" />
               </div>
               <div className="space-y-2">
+                <Label>Sport Category *</Label>
+                <Select
+                  onValueChange={(v) => {
+                    form.setValue('sportName', v);
+                    form.setValue('sports', [v]);
+                  }}
+                  defaultValue="Badminton"
+                >
+                  <SelectTrigger><SelectValue placeholder="Select Sport" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Badminton">Badminton</SelectItem>
+                    <SelectItem value="Tennis">Tennis</SelectItem>
+                    <SelectItem value="Pickleball">Pickleball</SelectItem>
+                    <SelectItem value="Table Tennis">Table Tennis</SelectItem>
+                    <SelectItem value="Squash">Squash</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-4">
+              <div className="space-y-2">
                 <Label>Timezone</Label>
                 <Select onValueChange={(v) => form.setValue('timezone', v)} defaultValue="Asia/Kolkata">
                   <SelectTrigger><SelectValue /></SelectTrigger>
@@ -159,9 +201,7 @@ export default function CreateTournamentPage() {
                   </SelectContent>
                 </Select>
               </div>
-            </div>
 
-            <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Currency</Label>
                 <Select onValueChange={(v) => form.setValue('currency', v)} defaultValue="INR">
@@ -173,6 +213,7 @@ export default function CreateTournamentPage() {
                   </SelectContent>
                 </Select>
               </div>
+
               <div className="space-y-2">
                 <Label>Visibility</Label>
                 <Select onValueChange={(v) => form.setValue('visibility', v)} defaultValue="Public">
@@ -229,48 +270,92 @@ export default function CreateTournamentPage() {
           </CardContent>
         </Card>
 
-        {/* Payment Configuration */}
+        {/* Payment & Registration Fee Configuration */}
         <Card>
           <CardHeader>
-            <CardTitle>Payment Configuration</CardTitle>
-            <CardDescription>How players should pay the registration fee.</CardDescription>
+            <CardTitle>Payment & Registration Fee</CardTitle>
+            <CardDescription>Configure tournament registration fees and player payment instructions.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>UPI ID</Label>
-                <Input
-                  {...form.register('paymentConfiguration.upiId')}
-                  placeholder="organizer@ybl"
+            {/* Free Entry Checkbox & Entry Fee Field */}
+            <div className="p-4 rounded-xl border border-white/10 bg-white/5 space-y-3">
+              <div className="flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  id="isFreeEntry"
+                  className="w-4 h-4 rounded border-white/20 text-violet-600 focus:ring-violet-500 bg-background accent-violet-600 cursor-pointer"
+                  {...form.register('isFreeEntry')}
+                  onChange={(e) => {
+                    form.setValue('isFreeEntry', e.target.checked);
+                    if (e.target.checked) {
+                      form.setValue('entryFee', 0);
+                    }
+                  }}
                 />
+                <Label htmlFor="isFreeEntry" className="font-semibold text-sm cursor-pointer">
+                  Free Entry Tournament (No registration fee required)
+                </Label>
               </div>
-              <div className="space-y-2">
-                <Label>Account Name</Label>
-                <Input
-                  {...form.register('paymentConfiguration.accountName')}
-                  placeholder="DAFT Sports Pvt Ltd"
-                />
-              </div>
+
+              {!form.watch('isFreeEntry') && (
+                <div className="grid grid-cols-2 gap-4 pt-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="entryFee">Registration Fee Amount ({form.watch('currency') || 'INR'}) *</Label>
+                    <Input
+                      id="entryFee"
+                      type="number"
+                      min="0"
+                      step="1"
+                      placeholder="e.g. 500"
+                      {...form.register('entryFee', { valueAsNumber: true })}
+                    />
+                    {form.formState.errors.entryFee && (
+                      <p className="text-sm text-destructive">{form.formState.errors.entryFee.message as string}</p>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
-            <div className="space-y-2">
-              <Label>Payment QR Code</Label>
-              <CloudinaryUploader
-                folder="qr"
-                value={qrUrl}
-                onChange={setQrUrl}
-                label="Upload UPI QR Code"
-                aspectRatio="square"
-                className="max-w-[200px]"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Payment Instructions</Label>
-              <Textarea
-                {...form.register('paymentConfiguration.instructions')}
-                placeholder="Pay via UPI and upload screenshot with UTR number..."
-                rows={3}
-              />
-            </div>
+
+            {!form.watch('isFreeEntry') && (
+              <>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>UPI ID</Label>
+                    <Input
+                      {...form.register('paymentConfiguration.upiId')}
+                      placeholder="organizer@ybl"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Account Name</Label>
+                    <Input
+                      {...form.register('paymentConfiguration.accountName')}
+                      placeholder="DAFT Sports Pvt Ltd"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label>Payment QR Code</Label>
+                  <CloudinaryUploader
+                    folder="qr"
+                    value={qrUrl}
+                    onChange={setQrUrl}
+                    label="Upload UPI QR Code"
+                    aspectRatio="square"
+                    className="max-w-[200px]"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Payment Instructions</Label>
+                  <Textarea
+                    {...form.register('paymentConfiguration.instructions')}
+                    placeholder="Pay via UPI and upload screenshot with UTR number..."
+                    rows={3}
+                  />
+                </div>
+              </>
+            )}
           </CardContent>
         </Card>
 

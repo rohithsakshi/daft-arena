@@ -42,12 +42,12 @@ export function useDiscoverTournaments(tournaments: DiscoverTournament[]) {
   const resetFilters = useCallback(() => setFilters(DEFAULT_FILTERS), []);
 
   const availableSports = useMemo(() => {
-    const all = tournaments.flatMap((t) => t.sports);
-    return Array.from(new Set(all)).sort();
+    const all = tournaments.flatMap((t) => t.sports || []);
+    return Array.from(new Set(all)).filter(Boolean).sort();
   }, [tournaments]);
 
   const availableLocations = useMemo(() => {
-    const all = tournaments.map((t) => t.location);
+    const all = tournaments.map((t) => t.location || t.city).filter(Boolean);
     return Array.from(new Set(all)).sort();
   }, [tournaments]);
 
@@ -58,24 +58,25 @@ export function useDiscoverTournaments(tournaments: DiscoverTournament[]) {
       const q = filters.query.toLowerCase();
       result = result.filter(
         (t) =>
-          t.title.toLowerCase().includes(q) ||
-          t.location.toLowerCase().includes(q) ||
-          t.venueName.toLowerCase().includes(q) ||
-          t.sports.some((s) => s.toLowerCase().includes(q)) ||
-          (t.organizerName ?? '').toLowerCase().includes(q)
+          (t.title || t.name || '').toLowerCase().includes(q) ||
+          (t.location || t.city || '').toLowerCase().includes(q) ||
+          (t.venueName || t.venue || '').toLowerCase().includes(q) ||
+          (t.sports || []).some((s) => s.toLowerCase().includes(q)) ||
+          (t.organizerName || t.organizer || '').toLowerCase().includes(q)
       );
     }
 
     if (filters.sport) {
-      result = result.filter((t) => t.sports.includes(filters.sport));
+      result = result.filter((t) => (t.sports || []).includes(filters.sport));
     }
 
     if (filters.location) {
-      result = result.filter((t) => t.location === filters.location);
+      result = result.filter((t) => (t.location || t.city) === filters.location);
     }
 
     if (filters.status) {
-      result = result.filter((t) => t.status === filters.status);
+      const normFilter = filters.status.replace(/_/g, '').toLowerCase();
+      result = result.filter((t) => (t.status || '').replace(/_/g, '').toLowerCase() === normFilter);
     }
 
     result.sort((a: any, b: any) => {

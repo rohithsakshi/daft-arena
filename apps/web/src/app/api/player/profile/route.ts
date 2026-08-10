@@ -4,7 +4,7 @@ import { UserModel } from '@/modules/iam/models/User';
 import { verifyToken } from '@/lib/auth/jwt';
 
 async function getUserFromReq(req: NextRequest) {
-  const cookie = req.cookies.get('token')?.value || req.cookies.get('session')?.value;
+  const cookie = req.cookies.get('daft_token')?.value || req.cookies.get('daft_superadmin_token')?.value || req.cookies.get('token')?.value || req.cookies.get('session')?.value;
   const header = req.headers.get('authorization')?.replace('Bearer ', '');
   const token = cookie || header;
   if (!token) return null;

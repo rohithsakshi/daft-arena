@@ -3,21 +3,22 @@ import { z } from 'zod';
 import { EventType, Gender, AgeCategory, DrawType, QualificationType, SeedType } from '../../core/enums';
 
 export const CreateEventSchema = z.object({
-  tournamentId: z.string().regex(/^[0-9a-fA-F]{24}$/, 'Invalid Tournament ID'),
-  sportId: z.string().regex(/^[0-9a-fA-F]{24}$/, 'Invalid Sport ID'),
-  rulePackageId: z.string().regex(/^[0-9a-fA-F]{24}$/, 'Invalid Rule Package ID'),
+  tournamentId: z.string().optional(),
+  sportId: z.string().optional().default('000000000000000000000000'),
+  rulePackageId: z.string().optional().default('000000000000000000000000'),
   
-  name: z.string().min(1),
-  eventType: z.nativeEnum(EventType),
-  gender: z.nativeEnum(Gender),
-  ageCategory: z.nativeEnum(AgeCategory),
+  name: z.string().min(1, 'Event name is required'),
+  eventType: z.nativeEnum(EventType).default(EventType.Singles),
+  gender: z.nativeEnum(Gender).default(Gender.Male),
+  ageCategory: z.nativeEnum(AgeCategory).default(AgeCategory.Senior),
   
-  minEntries: z.number().int().min(0).default(0),
-  maxEntries: z.number().int().min(1),
+  minEntries: z.number().int().min(0).optional().default(0),
+  maxEntries: z.number().int().min(1).optional().default(32),
+  entryFee: z.number().min(0).optional().default(0),
   
-  drawType: z.nativeEnum(DrawType),
-  qualificationType: z.nativeEnum(QualificationType),
-  seedType: z.nativeEnum(SeedType),
+  drawType: z.nativeEnum(DrawType).default(DrawType.Knockout),
+  qualificationType: z.nativeEnum(QualificationType).default(QualificationType.Direct),
+  seedType: z.nativeEnum(SeedType).default(SeedType.Random),
   
   rankingConfigurationId: z.string().optional()
 });

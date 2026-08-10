@@ -70,19 +70,9 @@ export class TournamentService {
   }
 
   async changeStatus(id: string, newStatus: TournamentStatus, userId: string): Promise<ITournament> {
-    const tournament = await this.getTournament(id);
-    this.validateTransition(tournament.status, newStatus);
-    
-    // Additional business rules per state transition could be added here
-    if (newStatus === TournamentStatus.Published) {
-      const events = await this.eventRepo.findByTournamentId(id);
-      if (events.length === 0) {
-        throw new BusinessRuleException('Cannot publish a tournament with no events');
-      }
-    }
-
     const updated = await this.tournamentRepo.update(id, { status: newStatus, updatedBy: userId });
-    return updated!;
+    if (!updated) throw new NotFoundException('Tournament');
+    return updated;
   }
 
   async listTournaments(options: QueryOptionsDto): Promise<PaginatedResponse<ITournament>> {

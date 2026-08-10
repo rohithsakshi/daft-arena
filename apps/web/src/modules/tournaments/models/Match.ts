@@ -22,6 +22,8 @@ export interface IMatch extends IBaseDocument {
   };
   winnerId?: mongoose.Types.ObjectId | string;
   
+  courtId?: mongoose.Types.ObjectId | string;
+  
   // Walkovers / Retirements
   isWalkover?: boolean;
   isRetired?: boolean;
@@ -48,6 +50,7 @@ const MatchSchema = createBaseSchema({
   },
   
   winnerId: { type: Schema.Types.ObjectId, ref: 'Registration' },
+  courtId: { type: Schema.Types.ObjectId, ref: 'PlayingArea' },
   isWalkover: { type: Boolean, default: false },
   isRetired: { type: Boolean, default: false },
   

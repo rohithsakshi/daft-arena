@@ -143,8 +143,15 @@ export function TournamentSearchCard({ tournament, className }: TournamentSearch
             <div>
               <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-0.5">Entry Fee</p>
               <p className="text-base font-bold text-foreground">
-                ${tournament.entryFee}
-                <span className="text-xs font-normal text-muted-foreground ml-1">{tournament.currency ?? 'USD'}</span>
+                {tournament.isFreeEntry || tournament.entryFee === 0 ? (
+                  <span className="text-emerald-400 font-semibold">Free Entry</span>
+                ) : (
+                  <>
+                    {(tournament.currency ?? 'INR').toUpperCase() === 'INR' ? '₹' : (tournament.currency ?? 'INR').toUpperCase() === 'EUR' ? '€' : '$'}
+                    {tournament.entryFee}
+                    <span className="text-xs font-normal text-muted-foreground ml-1">{(tournament.currency ?? 'INR').toUpperCase()}</span>
+                  </>
+                )}
               </p>
             </div>
           )}

@@ -19,12 +19,15 @@ export const POST = withPermission('MANAGE_TOURNAMENTS', async (req: NextRequest
   try {
     const body = await req.json();
     const data = CreateTournamentSchema.parse(body);
-    const tournament = await tournamentService.createTournament(data as any, user.sub);
+    const tournament = await tournamentService.createTournament(data as any, user.sub || (user as any).id || 'system');
     return NextResponse.json({ data: tournament }, { status: 201 });
   } catch (error: unknown) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: 'Validation Error', details: error.issues }, { status: 400 });
+      console.error('Tournament Validation Error Issues:', JSON.stringify(error.issues, null, 2));
+      const message = error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join('; ');
+      return NextResponse.json({ error: message || 'Validation Error', message, details: error.issues }, { status: 400 });
     }
+    console.error('Tournament Creation Error:', error);
     return NextResponse.json({ error: (error as Error).message }, { status: (error as any).statusCode || 500 });
   }
 });

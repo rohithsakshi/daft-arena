@@ -9,11 +9,15 @@ import { NotFoundException, BusinessRuleException } from '../../../../modules/co
 export const GET = async (req: NextRequest, { params }: { params: Promise<{ tournamentId: string }> }) => {
   try {
     const { tournamentId } = await params;
+    if (!tournamentId || tournamentId === 'undefined' || tournamentId.length !== 24) {
+      return NextResponse.json({ error: 'Invalid tournament ID' }, { status: 400 });
+    }
     const tournament = await tournamentService.getTournament(tournamentId);
     return NextResponse.json({ data: tournament }, { status: 200 });
   } catch (error: unknown) {
     if (error instanceof NotFoundException) return NextResponse.json({ error: (error as Error).message }, { status: 404 });
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error('GET Tournament Error:', error);
+    return NextResponse.json({ error: (error as Error).message || 'Internal server error' }, { status: 500 });
   }
 };
 

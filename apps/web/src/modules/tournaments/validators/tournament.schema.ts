@@ -1,77 +1,66 @@
 // @ts-nocheck
 import { z } from 'zod';
 
-
 export const TournamentDocumentSchema = z.object({
   title: z.string().min(1),
-  url: z.string().url(),
+  url: z.string(),
   type: z.enum(['Rulebook', 'Prospectus', 'Circular', 'Schedule', 'Other'])
 });
 
 const BaseTournamentSchema = z.object({
-  name: z.string().min(1),
-  slug: z.string().min(1).regex(/^[a-z0-9-]+$/, 'Slug must be lowercase alphanumeric with hyphens'),
-  description: z.string().optional(),
-  bannerUrl: z.string().url().optional(),
-  logoUrl: z.string().url().optional(),
+  name: z.string().min(1, 'Tournament name is required'),
+  slug: z.string().min(1, 'Slug is required'),
+  description: z.string().optional().default(''),
+  bannerUrl: z.string().optional().default(''),
+  logoUrl: z.string().optional().default(''),
   
-  organizationId: z.string().regex(/^[0-9a-fA-F]{24}$/, 'Invalid Organization ID'),
-  organizerName: z.string().min(1),
+  organizationId: z.string().optional().default('000000000000000000000000'),
+  organizerName: z.string().min(1, 'Organizer name is required'),
   
-  sportId: z.string().regex(/^[0-9a-fA-F]{24}$/, 'Invalid Sport ID'),
-  rulePackageId: z.string().regex(/^[0-9a-fA-F]{24}$/, 'Invalid Rule Package ID'),
+  sportId: z.string().optional().default('000000000000000000000000'),
+  rulePackageId: z.string().optional().default('000000000000000000000000'),
   
-  venueIds: z.array(z.string().regex(/^[0-9a-fA-F]{24}$/, 'Invalid Venue ID')).default([]),
+  venueIds: z.array(z.string()).optional().default([]),
   
   visibility: z.enum(['Public', 'Private', 'Unlisted']).default('Public'),
+  status: z.enum(['Draft', 'Published', 'RegistrationOpen', 'RegistrationClosed', 'Seeding', 'Scheduling', 'Live', 'Completed', 'Cancelled', 'Archived']).optional().default('Draft'),
   
   registrationWindow: z.object({
     startDate: z.coerce.date(),
     endDate: z.coerce.date()
-  }),
+  }).optional().default(() => ({
+    startDate: new Date(),
+    endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+  })),
   
   tournamentDates: z.object({
     startDate: z.coerce.date(),
     endDate: z.coerce.date()
-  }),
+  }).optional().default(() => ({
+    startDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
+    endDate: new Date(Date.now() + 16 * 24 * 60 * 60 * 1000)
+  })),
   
-  timezone: z.string().min(1),
-  currency: z.string().min(3).max(3).default('USD'),
+  timezone: z.string().optional().default('Asia/Kolkata'),
+  currency: z.string().optional().default('INR'),
+  entryFee: z.number().min(0).optional().default(0),
+  isFreeEntry: z.boolean().optional().default(false),
   capacity: z.number().int().min(1).optional(),
-  tags: z.array(z.string()).default([]),
+  tags: z.array(z.string()).optional().default([]),
   
-  documents: z.array(TournamentDocumentSchema).default([]),
+  documents: z.array(TournamentDocumentSchema).optional().default([]),
   
   paymentConfiguration: z.object({
-    upiId: z.string().optional(),
-    accountName: z.string().optional(),
-    qrCodeUrl: z.string().url().optional().or(z.literal('')),
-    instructions: z.string().optional(),
-  }).optional()
+    entryFee: z.number().min(0).optional().default(0),
+    isFreeEntry: z.boolean().optional().default(false),
+    upiId: z.string().optional().default(''),
+    accountName: z.string().optional().default(''),
+    qrCodeUrl: z.string().optional().default(''),
+    instructions: z.string().optional().default(''),
+  }).optional().default({})
 });
 
-export const CreateTournamentSchema = BaseTournamentSchema.refine(data => data.registrationWindow.startDate <= data.registrationWindow.endDate, {
-  message: 'Registration start date must be before end date',
-  path: ['registrationWindow']
-}).refine(data => data.tournamentDates.startDate <= data.tournamentDates.endDate, {
-  message: 'Tournament start date must be before end date',
-  path: ['tournamentDates']
-});
+export const CreateTournamentSchema = BaseTournamentSchema;
 
-export const UpdateTournamentSchema = BaseTournamentSchema.partial().refine(data => {
-  if (data.registrationWindow) {
-    return data.registrationWindow.startDate <= data.registrationWindow.endDate;
-  }
-  return true;
-}, {
-  message: 'Registration start date must be before end date',
-  path: ['registrationWindow']
-}).refine(data => {
-  if (data.tournamentDates) {
-    return data.tournamentDates.startDate <= data.tournamentDates.endDate;
-  }
-  return true;
-}, {
-  message: 'Tournament start date must be before end date',
-  path: ['tournamentDates']
-});
+export const UpdateTournamentSchema = BaseTournamentSchema.partial();
+

@@ -21,7 +21,7 @@ function isPublicApiRoute(pathname: string) {
   return PUBLIC_API_PREFIXES.some((prefix) => pathname.startsWith(prefix));
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // 1. Allow static assets
@@ -69,8 +69,8 @@ export async function middleware(request: NextRequest) {
     return applySecurityHeaders(response);
   }
 
-  // --- CUSTOMER ORGANIZATION ROUTING ---
-  const token = request.cookies.get('daft_token')?.value;
+  // --- CUSTOMER & ADMIN ROUTING ---
+  const token = request.cookies.get('daft_token')?.value || request.cookies.get('daft_superadmin_token')?.value;
 
   if (!token) {
     if (pathname.startsWith('/api/')) {
@@ -156,6 +156,11 @@ export async function middleware(request: NextRequest) {
   response.headers.set('x-user-id', String(payload.sub ?? ''));
   response.headers.set('x-user-role', String(payload.role ?? ''));
   return applySecurityHeaders(response);
+}
+
+// Alias export for compatibility
+export async function middleware(request: NextRequest) {
+  return proxy(request);
 }
 
 function applySecurityHeaders(response: NextResponse) {

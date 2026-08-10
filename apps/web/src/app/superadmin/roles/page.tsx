@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic';
 export default async function RolesPage() {
   await connectToDatabase();
   
-  let settings = await PlatformSettingsModel.findOne().lean();
+  const settings = await PlatformSettingsModel.findOne().lean();
   let enabledRoles = ['PLAYER', 'TOURNAMENT_ADMIN', 'SPONSOR']; // defaults
   
   if (settings && Array.isArray(settings.enabledRoles)) {

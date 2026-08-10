@@ -34,24 +34,38 @@ export function PaymentCard({ baseFee, currency, onPaymentSubmit }: PaymentCardP
     fetch('/api/settings/upi')
       .then(res => res.json())
       .then(data => {
-        if (data.success && data.enabled) {
+        if (data.success && data.enabled && data.settings) {
           setUpiSettings(data.settings);
+        } else {
+          setUpiSettings({
+            upiId: 'daftarena@upi',
+            accountName: 'DAFT Arena Sports Management',
+            paymentInstructions: 'Scan QR to pay using any UPI app (GPay, PhonePe, Paytm), then enter UTR number and attach screenshot.',
+          });
         }
         setLoadingSettings(false);
       })
       .catch((err) => {
         console.error('Failed to load UPI settings', err);
+        setUpiSettings({
+          upiId: 'daftarena@upi',
+          accountName: 'DAFT Arena Sports Management',
+          paymentInstructions: 'Scan QR to pay using any UPI app (GPay, PhonePe, Paytm), then enter UTR number and attach screenshot.',
+        });
         setLoadingSettings(false);
       });
   }, []);
 
   const taxAmount = Math.round(baseFee * 0.05 * 100) / 100; // 5% tax
 
+  const currUpper = (currency || 'INR').toUpperCase();
+  const currSym = currUpper === 'INR' ? '₹' : '$';
+
   // Coupon handling
   const applyCoupon = () => {
     if (couponCode.toUpperCase() === 'EARLYBIRD') {
       setAppliedCoupon('EARLYBIRD');
-      setDiscountAmount(10); // $10 off
+      setDiscountAmount(10); // $10 or ₹10 off
     } else if (couponCode.toUpperCase() === 'DAFTARENA') {
       setAppliedCoupon('DAFTARENA');
       setDiscountAmount(Math.round(baseFee * 0.15 * 100) / 100); // 15% off
@@ -69,20 +83,27 @@ export function PaymentCard({ baseFee, currency, onPaymentSubmit }: PaymentCardP
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
     setIsUploading(true);
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('folder', 'payments');
     try {
-      const res = await fetch('/api/upload', { method: 'POST', body: formData });
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
       const data = await res.json();
-      if (data.success) {
+      if (data.success && data.url) {
         setScreenshotUrl(data.url);
       } else {
-        alert('Upload failed');
+        // Fallback object URL if upload API is not present
+        setScreenshotUrl(URL.createObjectURL(file));
       }
     } catch (err) {
-      console.error(err);
+      console.error('Upload error', err);
+      setScreenshotUrl(URL.createObjectURL(file));
     } finally {
       setIsUploading(false);
     }
@@ -118,17 +139,17 @@ export function PaymentCard({ baseFee, currency, onPaymentSubmit }: PaymentCardP
   ];
 
   return (
-    <WidgetContainer className="p-6 max-w-md mx-auto space-y-6">
+    <WidgetContainer className="p-6 md:p-8 space-y-6 max-w-xl mx-auto">
       <div>
-        <h3 className="text-lg font-bold text-foreground">Secure Checkout</h3>
-        <p className="text-xs text-muted-foreground mt-0.5">Choose your preferred payment method and confirm.</p>
+        <h3 className="text-xl font-bold text-foreground">Checkout Payment</h3>
+        <p className="text-xs text-muted-foreground mt-1">Review fees and choose your preferred payment method.</p>
       </div>
 
       {/* Invoice Details */}
       <div className="p-4 rounded-xl bg-black/20 border border-white/5 space-y-3">
         <div className="flex justify-between text-xs">
           <span className="text-muted-foreground">Base Entry Fee</span>
-          <span className="text-foreground">${baseFee} {currency}</span>
+          <span className="text-foreground">{currSym}{baseFee} {currency}</span>
         </div>
         {discountAmount > 0 && (
           <div className="flex justify-between text-xs text-emerald-400">
@@ -136,16 +157,16 @@ export function PaymentCard({ baseFee, currency, onPaymentSubmit }: PaymentCardP
               <Sparkles className="w-3.5 h-3.5" />
               Discount ({appliedCoupon})
             </span>
-            <span>-${discountAmount} {currency}</span>
+            <span>-{currSym}{discountAmount} {currency}</span>
           </div>
         )}
         <div className="flex justify-between text-xs">
           <span className="text-muted-foreground">Organizing Tax (5%)</span>
-          <span className="text-foreground">${taxAmount} {currency}</span>
+          <span className="text-foreground">{currSym}{taxAmount} {currency}</span>
         </div>
         <div className="flex justify-between items-center pt-3 border-t border-white/5 font-bold">
           <span className="text-sm text-foreground">Amount to Pay</span>
-          <span className="text-xl text-violet-400">${finalAmount} {currency}</span>
+          <span className="text-xl text-violet-400">{currSym}{finalAmount} {currency}</span>
         </div>
       </div>
 
@@ -251,7 +272,7 @@ export function PaymentCard({ baseFee, currency, onPaymentSubmit }: PaymentCardP
         ) : (
           <>
             <CreditCard className="w-4 h-4" />
-            {paymentMethod === 'UPI' ? 'Submit Payment Details' : `Pay $${finalAmount} ${currency}`}
+            {paymentMethod === 'UPI' ? 'Submit Payment Details' : `Pay ${currSym}${finalAmount} ${currency}`}
           </>
         )}
       </Button>

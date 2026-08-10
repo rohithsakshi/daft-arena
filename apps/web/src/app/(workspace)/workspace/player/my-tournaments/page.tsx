@@ -76,9 +76,12 @@ export default function MyTournamentsPage() {
           title="No registrations yet"
           description="Browse available tournaments and register to participate."
           action={
-            <Button render={<Link href="/workspace/player/tournaments" />}>
-              <Search className="w-4 h-4 mr-2" /> Find Tournaments
-            </Button>
+            <Link
+              href="/workspace/player/tournaments"
+              className="inline-flex items-center gap-2 h-8 px-4 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/80 transition-colors"
+            >
+              <Search className="w-4 h-4" /> Find Tournaments
+            </Link>
           }
         />
       ) : (
@@ -106,9 +109,13 @@ export default function MyTournamentsPage() {
                   <div className="flex items-center gap-2 shrink-0">
                     <Badge variant={reg.status === 'Approved' ? 'default' : 'secondary'}>{reg.status}</Badge>
                     {tournament?.slug && (
-                      <Button size="sm" variant="ghost" render={<Link href={`/tournaments/${tournament.slug}`} target="_blank" />}>
+                      <Link
+                        href={`/workspace/player/tournaments/${String(reg.tournamentId?._id || reg.tournamentId?.id || '')}`}
+                        target="_blank"
+                        className="inline-flex items-center justify-center h-7 w-7 rounded-md hover:bg-muted transition-colors"
+                      >
                         <ExternalLink className="w-4 h-4" />
-                      </Button>
+                      </Link>
                     )}
                   </div>
                 </div>

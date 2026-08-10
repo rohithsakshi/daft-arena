@@ -33,17 +33,21 @@ export async function register() {
         }
 
         if (needsSave) {
+          const mongoose = await import('mongoose');
+          const dbString = mongoose.connection.host ? `mongodb://${mongoose.connection.host}:${mongoose.connection.port}/${mongoose.connection.name}` : (config.MONGODB_URI?.split('@').pop() ?? 'connected');
           await existingAdmin.save();
           console.log(`[BOOTSTRAP] ✅ Super Admin repaired`);
           console.log(`[BOOTSTRAP] Email:    ${config.SUPER_ADMIN_EMAIL}`);
           console.log(`[BOOTSTRAP] Role:     SUPERADMIN`);
-          console.log(`[BOOTSTRAP] Database: ${config.MONGODB_URI?.split('@').pop() ?? 'connected'}`);
+          console.log(`[BOOTSTRAP] Database: ${dbString}`);
           console.log(`[BOOTSTRAP] Result:   REPAIRED`);
         } else {
+          const mongoose = await import('mongoose');
+          const dbString = mongoose.connection.host ? `mongodb://${mongoose.connection.host}:${mongoose.connection.port}/${mongoose.connection.name}` : (config.MONGODB_URI?.split('@').pop() ?? 'connected');
           console.log(`[BOOTSTRAP] ✅ Super Admin verified`);
           console.log(`[BOOTSTRAP] Email:    ${config.SUPER_ADMIN_EMAIL}`);
           console.log(`[BOOTSTRAP] Role:     SUPERADMIN`);
-          console.log(`[BOOTSTRAP] Database: ${config.MONGODB_URI?.split('@').pop() ?? 'connected'}`);
+          console.log(`[BOOTSTRAP] Database: ${dbString}`);
           console.log(`[BOOTSTRAP] Result:   ALREADY_EXISTS_OK`);
         }
       } else {
@@ -59,11 +63,13 @@ export async function register() {
           authProvider: 'LOCAL',
         });
 
-        console.log(`[BOOTSTRAP] ✅ Super Admin created`);
-        console.log(`[BOOTSTRAP] Email:    ${config.SUPER_ADMIN_EMAIL}`);
-        console.log(`[BOOTSTRAP] Role:     SUPERADMIN`);
-        console.log(`[BOOTSTRAP] Database: ${config.MONGODB_URI?.split('@').pop() ?? 'connected'}`);
-        console.log(`[BOOTSTRAP] Result:   CREATED`);
+          const mongoose = await import('mongoose');
+          const dbString = mongoose.connection.host ? `mongodb://${mongoose.connection.host}:${mongoose.connection.port}/${mongoose.connection.name}` : (config.MONGODB_URI?.split('@').pop() ?? 'connected');
+          console.log(`[BOOTSTRAP] ✅ Super Admin created`);
+          console.log(`[BOOTSTRAP] Email:    ${config.SUPER_ADMIN_EMAIL}`);
+          console.log(`[BOOTSTRAP] Role:     SUPERADMIN`);
+          console.log(`[BOOTSTRAP] Database: ${dbString}`);
+          console.log(`[BOOTSTRAP] Result:   CREATED`);
       }
     } catch (err) {
       console.error('[BOOTSTRAP] ❌ Failed to bootstrap Super Admin:', err);

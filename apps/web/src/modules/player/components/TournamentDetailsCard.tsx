@@ -113,15 +113,15 @@ export function TournamentDetailsCard({
             </>
           ) : (
             <>
-              <Lock className="w-4 h-4 mr-2 text-white/50" />
-              Register Now (Soon)
+              <Trophy className="w-4 h-4 mr-2 text-white" />
+              Register Now
             </>
           )}
         </Button>
         <p className="text-center text-[10px] text-muted-foreground mt-3">
           {registrationStatus === 'REGISTERED'
             ? 'Your spot is secured. Access draw sheets under Matches.'
-            : 'The registration flow is scheduled for Phase 8.'}
+            : 'Instant entry slot confirmation upon registration.'}
         </p>
       </WidgetContainer>
 
@@ -149,21 +149,21 @@ export function TournamentDetailsCard({
       </WidgetContainer>
 
       {/* Events List Card */}
-      {tournament.events.length > 0 && (
+      {Array.isArray(tournament?.events) && tournament.events.length > 0 && (
         <WidgetContainer className="p-5">
           <h4 className="font-bold text-xs uppercase tracking-wider text-muted-foreground mb-4">Available Events</h4>
           <div className="space-y-3">
             {tournament.events.map((event) => {
-              const evtFill = getFillPercentage(event.currentParticipants, event.maxParticipants);
+              const evtFill = getFillPercentage(event.currentParticipants || 0, event.maxParticipants || 32);
               return (
                 <div
-                  key={event.id}
+                  key={event.id || event.name}
                   className="p-3 rounded-xl bg-black/20 border border-white/5 flex items-center justify-between"
                 >
                   <div className="flex-1 min-w-0 mr-3">
                     <p className="text-sm font-semibold text-foreground truncate">{event.name}</p>
                     <p className="text-xs text-muted-foreground mt-0.5">
-                      {event.currentParticipants}/{event.maxParticipants} players
+                      {event.currentParticipants || 0}/{event.maxParticipants || 32} players
                     </p>
                     <div className="h-1 bg-white/5 rounded-full mt-1.5 overflow-hidden">
                       <div
@@ -173,7 +173,7 @@ export function TournamentDetailsCard({
                     </div>
                   </div>
                   <span className="text-sm font-bold text-foreground whitespace-nowrap">
-                    {formatCurrency(event.entryFee, tournament.currency)}
+                    {formatCurrency(event.entryFee || tournament.baseEntryFee || 0, tournament.currency)}
                   </span>
                 </div>
               );
@@ -183,7 +183,7 @@ export function TournamentDetailsCard({
       )}
 
       {/* Documents Card */}
-      {tournament.documents.length > 0 && (
+      {Array.isArray(tournament?.documents) && tournament.documents.length > 0 && (
         <WidgetContainer className="p-5">
           <h4 className="font-bold text-xs uppercase tracking-wider text-muted-foreground mb-4">Documents</h4>
           <div className="space-y-2">

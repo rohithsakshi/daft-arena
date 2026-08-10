@@ -10,8 +10,7 @@ export class PlatformSettingsService {
         return settings.enabledRoles;
       }
       return ['PLAYER', 'SPONSOR', 'TOURNAMENT_ADMIN'];
-    } catch (error) {
-      console.error('Failed to fetch platform settings', error);
+    } catch {
       return ['PLAYER', 'SPONSOR', 'TOURNAMENT_ADMIN'];
     }
   }

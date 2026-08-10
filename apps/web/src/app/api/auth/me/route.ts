@@ -5,7 +5,7 @@ import { UserRepository } from '@/modules/iam/repositories/user.repository';
 
 export async function GET(req: NextRequest) {
   try {
-    const token = req.cookies.get('daft_token')?.value;
+    const token = req.cookies.get('daft_token')?.value || req.cookies.get('daft_superadmin_token')?.value || req.cookies.get('token')?.value || req.cookies.get('session')?.value;
     if (!token) {
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     }
@@ -22,6 +22,9 @@ export async function GET(req: NextRequest) {
     if (!user) {
       return NextResponse.json({ success: false, error: 'User not found' }, { status: 404 });
     }
+
+    const name = user.name || (user.email ? user.email.split('@')[0] : 'User');
+    const role = user.systemRole || payload.role || 'PLAYER';
 
     return NextResponse.json({
       success: true,

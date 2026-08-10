@@ -35,3 +35,6 @@ pnpm-debug.log*
 .turbo
 .vercel
 .env*
+
+# mongo db local
+.mongo-local-data/

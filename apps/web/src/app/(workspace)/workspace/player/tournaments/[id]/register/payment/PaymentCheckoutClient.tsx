@@ -53,7 +53,9 @@ export function PaymentCheckoutClient({ tournamentId }: { tournamentId: string }
         draft.tournamentId,
         draft.selectedEvents,
         draft.partnerId,
-        draft.docUrl
+        draft.docUrl,
+        finalBreakdown.screenshotUrl,
+        finalBreakdown.utr
       );
 
       // 2. Submit payment and generate invoice/transaction mocks
@@ -65,12 +67,14 @@ export function PaymentCheckoutClient({ tournamentId }: { tournamentId: string }
       );
 
       // 3. Save confirmations in sessionStorage
+      const profile = await PlayerService.getProfile();
+      
       const receiptData = {
         registrationId: registration.id,
-        invoice,
-        transaction,
-        playerName: 'Alex Johnson',
-        playerId: 'PLR_12345'
+        invoice: { ...invoice, id: invoice._id || invoice.id, status: invoice.status || 'PAID', amount: invoice.amount },
+        transaction: { ...transaction, id: transaction._id || transaction.id, status: 'SUCCESS' },
+        playerName: profile.fullName || 'Player',
+        playerId: profile.userId || 'PLR_12345'
       };
       sessionStorage.setItem(`registration_receipt_${tournamentId}`, JSON.stringify(receiptData));
 

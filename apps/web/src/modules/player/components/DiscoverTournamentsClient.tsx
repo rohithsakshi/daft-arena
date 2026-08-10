@@ -27,11 +27,22 @@ const STATUS_OPTIONS = [
   { value: 'COMPLETED', label: 'Completed' },
 ];
 
+import { useQuery } from '@tanstack/react-query';
+import { PlayerService } from '@/modules/player/services/player.client.service';
+
 interface DiscoverTournamentsClientProps {
   initialTournaments: DiscoverTournament[];
 }
 
 export function DiscoverTournamentsClient({ initialTournaments }: DiscoverTournamentsClientProps) {
+  const { data: liveTournaments } = useQuery({
+    queryKey: ['discover-tournaments-live'],
+    queryFn: () => PlayerService.discoverTournaments(),
+    refetchOnWindowFocus: true,
+  });
+
+  const tournamentsToUse = Array.isArray(liveTournaments) && liveTournaments.length > 0 ? liveTournaments : initialTournaments;
+
   const {
     filters,
     updateFilter,
@@ -42,7 +53,7 @@ export function DiscoverTournamentsClient({ initialTournaments }: DiscoverTourna
     activeFilterCount,
     filteredCount,
     totalCount,
-  } = useDiscoverTournaments(initialTournaments);
+  } = useDiscoverTournaments(tournamentsToUse);
 
   const [showFilters, setShowFilters] = React.useState(false);
 

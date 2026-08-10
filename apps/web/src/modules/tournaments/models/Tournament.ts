@@ -33,6 +33,8 @@ export interface ITournament extends IBaseDocument {
   
   timezone: string;
   currency: string;
+  entryFee?: number;
+  isFreeEntry?: boolean;
   capacity?: number; // Total max players across all events
   tags?: string[];
   
@@ -45,6 +47,8 @@ export interface ITournament extends IBaseDocument {
   
   // Payment Configuration
   paymentConfiguration?: {
+    entryFee?: number;
+    isFreeEntry?: boolean;
     upiId?: string;
     accountName?: string;
     qrCodeUrl?: string;
@@ -82,6 +86,8 @@ const TournamentSchema = createBaseSchema({
   
   timezone: { type: String, required: true },
   currency: { type: String, required: true, default: 'USD' },
+  entryFee: { type: Number, default: 0 },
+  isFreeEntry: { type: Boolean, default: false },
   capacity: { type: Number },
   tags: [{ type: String }],
   
@@ -92,6 +98,8 @@ const TournamentSchema = createBaseSchema({
   }],
   
   paymentConfiguration: {
+    entryFee: { type: Number, default: 0 },
+    isFreeEntry: { type: Boolean, default: false },
     upiId: { type: String },
     accountName: { type: String },
     qrCodeUrl: { type: String },

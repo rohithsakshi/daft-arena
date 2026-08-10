@@ -131,7 +131,11 @@ export function RegistrationWizard({ tournament, onSubmit, onCancel }: Registrat
               <p className="text-xs text-muted-foreground">Select the event categories you wish to participate in.</p>
             </div>
             <div className="space-y-3">
-              {tournament.events.map((event) => (
+              {(!tournament.events || tournament.events.length === 0) ? (
+                <div className="p-6 text-center border border-dashed border-white/10 rounded-xl text-muted-foreground text-sm">
+                  No events available for this tournament yet.
+                </div>
+              ) : tournament.events.map((event) => (
                 <div
                   key={event.id}
                   onClick={() => handleEventToggle(event.id)}
@@ -145,7 +149,7 @@ export function RegistrationWizard({ tournament, onSubmit, onCancel }: Registrat
                   <div>
                     <p className="text-sm font-semibold text-foreground">{event.name}</p>
                     <p className="text-xs text-muted-foreground mt-0.5">
-                      Fee: ${event.entryFee} · Limit: {event.maxParticipants} players
+                      Fee: {tournament.currency === 'INR' ? '₹' : '$'}{event.entryFee} · Limit: {event.maxParticipants} players
                     </p>
                   </div>
                   <div className={cn(
@@ -284,11 +288,11 @@ export function RegistrationWizard({ tournament, onSubmit, onCancel }: Registrat
               </div>
               <div className="space-y-2">
                 {selectedEvents.map(eventId => {
-                  const ev = tournament.events.find(e => e.id === eventId);
+                  const ev = tournament.events?.find(e => e.id === eventId);
                   return (
                     <div key={eventId} className="flex justify-between text-xs">
                       <span className="text-foreground">{ev?.name}</span>
-                      <span className="text-muted-foreground">${ev?.entryFee}</span>
+                      <span className="text-muted-foreground">{tournament.currency === 'INR' ? '₹' : '$'}{ev?.entryFee}</span>
                     </div>
                   );
                 })}
@@ -307,7 +311,7 @@ export function RegistrationWizard({ tournament, onSubmit, onCancel }: Registrat
               )}
               <div className="flex justify-between items-center pt-3 border-t border-white/8 font-bold">
                 <span className="text-sm text-foreground">Total Entry Fee</span>
-                <span className="text-lg text-violet-400">${totalFee}</span>
+                <span className="text-lg text-violet-400">{tournament.currency === 'INR' ? '₹' : '$'}{totalFee}</span>
               </div>
             </div>
           </div>

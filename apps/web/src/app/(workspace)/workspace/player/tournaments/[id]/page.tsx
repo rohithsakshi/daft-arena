@@ -61,13 +61,18 @@ export default async function TournamentDetailsPage({
   }
 
   const dateRange = formatTournamentDate(tournament.startDate, tournament.endDate);
-  const deadline = new Date(tournament.registrationDeadline).toLocaleDateString('en-US', {
-    month: 'long', day: 'numeric', year: 'numeric'
-  });
-  const statusColorClass = TOURNAMENT_DISCOVERY_STATUS_COLORS[tournament.status] ?? '';
+  const deadlineDate = tournament.registrationDeadline ? new Date(tournament.registrationDeadline) : null;
+  const deadline = deadlineDate && !isNaN(deadlineDate.getTime())
+    ? deadlineDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+    : 'TBA';
+  const statusColorClass = TOURNAMENT_DISCOVERY_STATUS_COLORS[tournament.status] ?? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
   const fillPct = tournament.capacity && tournament.registeredCount
     ? Math.round((tournament.registeredCount / tournament.capacity) * 100)
     : null;
+
+  const sportsList = Array.isArray(tournament.sports) && tournament.sports.length > 0
+    ? tournament.sports
+    : [tournament.sport || tournament.sportName || 'Badminton'];
 
   return (
     <div className="animate-in fade-in duration-500 pb-20">
@@ -102,7 +107,7 @@ export default async function TournamentDetailsPage({
               'px-3 py-1.5 text-xs font-bold rounded-xl border backdrop-blur-md',
               statusColorClass
             )}>
-              {tournament.status.replace('_', ' ')}
+              {(tournament.status || 'RegistrationOpen').replace('_', ' ')}
             </span>
           </div>
 
@@ -110,7 +115,7 @@ export default async function TournamentDetailsPage({
           <div className="absolute bottom-6 left-6 md:bottom-10 md:left-10 right-6 md:right-10">
             {/* Sport tags */}
             <div className="flex flex-wrap gap-2 mb-3">
-              {tournament.sports.map((sport: any) => (
+              {sportsList.map((sport: any) => (
                 <span
                   key={sport}
                   className="text-xs font-bold uppercase tracking-wider bg-white/20 backdrop-blur-md px-2.5 py-1 rounded-lg text-white border border-white/10"
@@ -238,8 +243,9 @@ export default async function TournamentDetailsPage({
                           <div>
                             <p className="text-xs text-violet-400/80 uppercase tracking-wider font-semibold mb-0.5">Entry Fee From</p>
                             <p className="text-2xl font-black text-violet-400">
-                              ${tournament.baseEntryFee}
-                              <span className="text-sm font-normal text-violet-400/60 ml-1">{tournament.currency}</span>
+                              {(tournament.currency || 'INR').toUpperCase() === 'INR' ? '₹' : '$'}
+                              {tournament.baseEntryFee}
+                              <span className="text-sm font-normal text-violet-400/60 ml-1">{tournament.currency || 'INR'}</span>
                             </p>
                           </div>
                         </div>

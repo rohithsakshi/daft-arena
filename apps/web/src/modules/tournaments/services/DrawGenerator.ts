@@ -6,16 +6,17 @@ export interface MatchNode {
   id: string;
   round: number;
   matchNumber: number;
-  player1: any | null; // Participant or BYE
-  player2: any | null;
-  winner?: any;
+  player1: IRegistration | 'BYE' | null;
+  player2: IRegistration | 'BYE' | null;
+  winner?: IRegistration | 'BYE';
   nextMatchId?: string;
 }
 
 export class DrawGenerator {
   
   static generateKnockoutDraw(event: ITournamentEvent, registrations: IRegistration[]): MatchNode[] {
-    const participants = registrations.map(r => r.participantIds).sort(() => Math.random() - 0.5); // Random shuffle for unseeded
+    // Keep the entire Registration object, just shuffle them
+    const participants = [...registrations].sort(() => Math.random() - 0.5); 
     
     // Calculate nearest power of 2
     const n = participants.length;
@@ -32,8 +33,8 @@ export class DrawGenerator {
     
     // Generate First Round
     for (let i = 1; i <= firstRoundMatches; i++) {
-      let p1 = null;
-      let p2 = null;
+      let p1: IRegistration | 'BYE' | null = null;
+      let p2: IRegistration | 'BYE' | null = null;
       
       if (participantIndex < participants.length) p1 = participants[participantIndex++];
       
@@ -50,7 +51,7 @@ export class DrawGenerator {
         matchNumber: i,
         player1: p1,
         player2: p2,
-        winner: p2 === 'BYE' ? p1 : undefined
+        winner: p2 === 'BYE' ? (p1 || undefined) : undefined
       });
     }
     
@@ -83,7 +84,7 @@ export class DrawGenerator {
         if (prev2.winner) matchNode.player2 = prev2.winner;
         
         // If this match now has both players via byes, and one is BYE (not possible with standard logic but safe fallback)
-        if (matchNode.player2 === 'BYE') matchNode.winner = matchNode.player1;
+        if (matchNode.player2 === 'BYE') matchNode.winner = matchNode.player1 || undefined;
         
         matches.push(matchNode);
       }
