@@ -10,7 +10,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { Plus, Trash2, Building2, ExternalLink, Loader2 } from 'lucide-react';
-import { SponsorTier } from '@/modules/sponsors/models/Sponsor';
+export enum SponsorTier {
+  Title = 'Title',
+  Gold = 'Gold',
+  Silver = 'Silver',
+  Bronze = 'Bronze'
+}
 
 export default function SponsorsAdminPage() {
   const params = useParams();
