@@ -271,7 +271,7 @@ export default function RegistrationsQueuePage() {
           </div>
         </CardHeader>
 
-        <CardContent className="p-0">
+        <CardContent className="p-0 overflow-x-auto custom-scrollbar">
           <Table>
             <TableHeader>
               <TableRow>

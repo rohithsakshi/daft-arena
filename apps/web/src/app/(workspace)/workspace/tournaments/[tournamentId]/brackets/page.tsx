@@ -190,14 +190,14 @@ export default function BracketsPage() {
           </div>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 overflow-x-auto py-4">
+          <div className="flex gap-6 overflow-x-auto py-4 custom-scrollbar snap-x snap-mandatory">
             {displayRounds.length === 0 ? (
               <div className="col-span-full py-12 text-center text-muted-foreground">
                 No draw has been generated for this event yet. Click "Generate Draw" to begin.
               </div>
             ) : (
               displayRounds.map((round, rIndex) => (
-                <div key={round.name} className="space-y-4">
+                <div key={round.name} className="space-y-4 flex-shrink-0 w-[280px] sm:w-[320px] snap-center">
                   <div className="text-center pb-2 border-b border-white/10">
                     <h4 className="font-semibold text-sm text-violet-300">{round.name}</h4>
                   </div>
