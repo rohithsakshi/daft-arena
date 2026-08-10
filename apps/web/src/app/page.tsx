@@ -12,9 +12,9 @@ export const metadata = {
 
 export default function LandingPage() {
   return (
-    <main className="relative min-h-screen w-full overflow-hidden bg-background flex">
+    <main className="relative min-h-screen w-full overflow-x-hidden bg-background flex flex-col-reverse lg:flex-row">
       {/* Left: Content */}
-      <div className="flex-none w-full lg:w-[40%] max-w-2xl flex flex-col justify-center px-6 sm:px-8 md:px-16 lg:px-24 z-10 py-12 md:py-20">
+      <div className="flex-none w-full lg:w-[40%] max-w-2xl flex flex-col justify-center px-6 sm:px-8 md:px-16 lg:px-24 z-10 py-10 md:py-20 relative">
         {/* Tag */}
         <div className="inline-flex items-center gap-2 mb-6 px-3 py-1.5 rounded-full bg-violet-500/10 border border-violet-500/20 w-fit">
           <Sparkles className="w-3.5 h-3.5 text-violet-400" />
@@ -73,7 +73,7 @@ export default function LandingPage() {
       </div>
 
       {/* Right: Hero Artwork */}
-      <div className="absolute inset-0 lg:static lg:flex-1 z-0 bg-black/10">
+      <div className="relative w-full h-[45vh] min-h-[300px] lg:h-auto lg:flex-1 z-0">
         <div className="relative w-full h-full">
           <Image
             src="/Hero.png"
@@ -83,8 +83,9 @@ export default function LandingPage() {
             className="object-cover object-center lg:object-right"
           />
           {/* Gradient overlays */}
-          <div className="absolute inset-0 bg-background/60 lg:bg-transparent" />
           <div className="absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-background to-transparent hidden lg:block" />
+          {/* Mobile bottom gradient to blend with content */}
+          <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-background to-transparent lg:hidden" />
         </div>
       </div>
     </main>
