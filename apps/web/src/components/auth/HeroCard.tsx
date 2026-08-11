@@ -1,5 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
+import loginHero from '../../../public/login-hero-generated.png';
 
 export function HeroCard() {
   return (
@@ -7,11 +8,11 @@ export function HeroCard() {
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <Image
-          src="/login-hero-generated.png"
+          src={loginHero}
           alt="DAFT Arena Login Hero"
           fill
           priority
-          unoptimized
+          placeholder="blur"
           className="object-cover object-right transition-transform duration-1000 group-hover:scale-105"
         />
         {/* Gradient Overlay for Text Readability */}
