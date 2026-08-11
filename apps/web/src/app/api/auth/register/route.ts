@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
     await connectToDatabase();
     
     const body = await req.json();
-    const { email, password, name } = body;
+    const { email, password, name, portalRole } = body;
 
     if (!email || !password || !name) {
       return NextResponse.json({ success: false, error: 'Email, password, and name are required' }, { status: 400 });
@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    const pendingRole = req.cookies.get('daft_pending_role')?.value || 'PLAYER';
+    const pendingRole = portalRole?.toUpperCase() || req.cookies.get('daft_pending_role')?.value || 'PLAYER';
 
     const newUser = await userRepo.create({
       email,

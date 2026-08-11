@@ -17,9 +17,9 @@ function CapabilitiesContent() {
   };
 
   const roles = [
-    { id: 'player', icon: Trophy, title: 'Player', description: 'Join tournaments and compete', color: 'text-purple-600', bg: 'bg-purple-100', hoverBg: 'group-hover:bg-purple-600' },
-    { id: 'admin', icon: Shield, title: 'Administrator', description: 'Organize and manage tournaments', color: 'text-blue-600', bg: 'bg-blue-100', hoverBg: 'group-hover:bg-blue-600' },
-    { id: 'sponsor', icon: Medal, title: 'Sponsor', description: 'Promote your brand and reach players', color: 'text-green-600', bg: 'bg-green-100', hoverBg: 'group-hover:bg-green-600' },
+    { id: 'PLAYER', icon: Trophy, title: 'Player', description: 'Join tournaments and compete', color: 'text-purple-600', bg: 'bg-purple-100', hoverBg: 'group-hover:bg-purple-600' },
+    { id: 'TOURNAMENT_ADMIN', icon: Shield, title: 'Administrator', description: 'Organize and manage tournaments', color: 'text-blue-600', bg: 'bg-blue-100', hoverBg: 'group-hover:bg-blue-600' },
+    { id: 'SPONSOR', icon: Medal, title: 'Sponsor', description: 'Promote your brand and reach players', color: 'text-green-600', bg: 'bg-green-100', hoverBg: 'group-hover:bg-green-600' },
   ];
 
   return (

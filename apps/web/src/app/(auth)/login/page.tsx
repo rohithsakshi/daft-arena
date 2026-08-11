@@ -19,13 +19,21 @@ function LoginContent() {
   const [activeTab, setActiveTab] = useState<Tab>('login');
   
   useEffect(() => {
+    const roleParam = searchParams.get('role');
+    
+    // Redirect if no role is present
+    if (!roleParam) {
+      router.replace('/capabilities');
+      return;
+    }
+
     const tabParam = searchParams.get('tab');
     if (tabParam === 'register') {
       setActiveTab('register');
     } else {
       setActiveTab('login'); // Default
     }
-  }, [searchParams]);
+  }, [searchParams, router]);
 
   const activeRole = searchParams.get('role')?.toUpperCase();
   const roleDisplay = activeRole === 'TOURNAMENT_ADMIN' ? 'Tournament Administrator' : 

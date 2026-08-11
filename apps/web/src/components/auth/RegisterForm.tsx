@@ -81,6 +81,7 @@ export function RegisterForm() {
           email: data.email,
           password: data.password,
           phone: data.phone || '',
+          portalRole: searchParams.get('role')
         }),
       });
 
