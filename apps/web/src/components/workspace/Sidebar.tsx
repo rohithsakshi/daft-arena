@@ -114,7 +114,7 @@ export default function Sidebar() {
     try {
       await fetch('/api/auth/logout', { method: 'POST' });
       toast.success('Logged out successfully');
-      router.push('/login');
+      router.push('/roles?intent=login');
     } catch {
       toast.error('Logout failed. Please try again.');
       setIsLoggingOut(false);
