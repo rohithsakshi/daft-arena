@@ -143,14 +143,14 @@ export default async function RolesPage(props: { searchParams: Promise<{ intent?
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="flex flex-wrap justify-center gap-6 max-w-7xl mx-auto">
           {visibleRoles.map((role) => {
             const Icon = role.icon;
             return (
-              <form key={role.id} action={selectRoleAction.bind(null, role.id, intent)} className="h-full">
+              <form key={role.id} action={selectRoleAction.bind(null, role.id, intent)} className="w-full sm:w-[calc(50%-1.5rem)] lg:w-[300px] h-full flex flex-col">
                 <button 
                   type="submit" 
-                  className="w-full text-left h-full bg-card/50 backdrop-blur-md border border-border/50 hover:border-violet-500/50 rounded-2xl p-6 transition-all duration-300 hover:shadow-[0_0_30px_rgba(124,58,237,0.1)] hover:-translate-y-1 flex flex-col group cursor-pointer"
+                  className="w-full text-left h-full min-h-[320px] bg-card/50 backdrop-blur-md border border-border/50 hover:border-violet-500/50 rounded-2xl p-6 transition-all duration-300 hover:shadow-[0_0_30px_rgba(124,58,237,0.1)] hover:-translate-y-1 flex flex-col group cursor-pointer"
                 >
                   <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 ${role.bg} ${role.color} group-hover:scale-110 transition-transform duration-300`}>
                     <Icon className="w-6 h-6" />
