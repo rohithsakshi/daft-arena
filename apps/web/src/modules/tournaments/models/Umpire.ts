@@ -26,11 +26,10 @@ const UmpireSchema = new Schema(
 );
 
 // Pre-save hook to generate token if it doesn't exist
-UmpireSchema.pre('save', function(next) {
+UmpireSchema.pre('save', async function() {
   if (!this.token) {
     this.token = generateToken();
   }
-  next();
 });
 
 export const UmpireModel = mongoose.models.Umpire || mongoose.model<IUmpire>('Umpire', UmpireSchema);
