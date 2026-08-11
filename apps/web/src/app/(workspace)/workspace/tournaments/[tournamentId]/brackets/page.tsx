@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { ArrowLeft, BarChart3, Shuffle, Trophy, CheckCircle, RefreshCw, Loader2, ExternalLink, FileText, Download, Printer, FileSpreadsheet } from 'lucide-react';
 
@@ -146,6 +147,21 @@ export default function BracketsPage() {
     window.print();
   };
 
+  // Estimation Logic
+  const [numCourts, setNumCourts] = React.useState<number>(1);
+  const [matchDuration, setMatchDuration] = React.useState<number>(30); // in minutes
+
+  const totalMatches = generatedMatches.length;
+  const totalEstimatedTimeMinutes = totalMatches * matchDuration;
+  const estimatedDurationMinutes = numCourts > 0 ? totalEstimatedTimeMinutes / numCourts : 0;
+  
+  const formatMinutes = (mins: number) => {
+    if (mins === 0) return '0h 0m';
+    const h = Math.floor(mins / 60);
+    const m = Math.floor(mins % 60);
+    return `${h}h ${m}m`;
+  };
+
   return (
     <div className="max-w-6xl mx-auto space-y-6 pb-12">
       {/* Top Header */}
@@ -211,6 +227,54 @@ export default function BracketsPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Time & Capacity Estimator */}
+      {generatedMatches.length > 0 && (
+        <Card className="bg-violet-900/10 border-violet-500/20">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg flex items-center gap-2">
+              Time & Capacity Estimator
+            </CardTitle>
+            <CardDescription>
+              Estimate how long this event will take to complete based on your available resources.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
+              <div className="space-y-2">
+                <Label htmlFor="courts">Available Courts</Label>
+                <Input 
+                  id="courts" 
+                  type="number" 
+                  min="1" 
+                  value={numCourts} 
+                  onChange={(e) => setNumCourts(parseInt(e.target.value) || 1)} 
+                  className="bg-background"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="duration">Avg. Match Time (mins)</Label>
+                <Input 
+                  id="duration" 
+                  type="number" 
+                  min="1" 
+                  value={matchDuration} 
+                  onChange={(e) => setMatchDuration(parseInt(e.target.value) || 30)} 
+                  className="bg-background"
+                />
+              </div>
+              <div className="space-y-1 p-3 rounded-md bg-background/50 border border-white/5">
+                <p className="text-sm text-muted-foreground">Total Matches</p>
+                <p className="text-2xl font-bold">{totalMatches}</p>
+              </div>
+              <div className="space-y-1 p-3 rounded-md bg-violet-500/10 border border-violet-500/20">
+                <p className="text-sm text-violet-300">Estimated Total Duration</p>
+                <p className="text-2xl font-bold text-violet-100">{formatMinutes(estimatedDurationMinutes)}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Bracket Visualization */}
       <Card>
