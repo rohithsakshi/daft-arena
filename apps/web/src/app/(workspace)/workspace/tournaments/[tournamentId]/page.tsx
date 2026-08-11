@@ -277,6 +277,7 @@ export default function TournamentDetailsPage() {
               { label: 'Registration Queue', href: `/workspace/tournaments/${id}/registrations`, icon: Users },
               { label: 'Manage Events', href: `/workspace/tournaments/${id}/events`, icon: Trophy },
               { label: 'Brackets & Draw', href: `/workspace/tournaments/${id}/brackets`, icon: BarChart3 },
+              { label: 'Team Ties', href: `/workspace/tournaments/${id}/team-ties`, icon: Trophy },
               { label: 'Match Schedule', href: `/workspace/tournaments/${id}/matches`, icon: CalendarDays },
             ].map((item) => (
               <Link

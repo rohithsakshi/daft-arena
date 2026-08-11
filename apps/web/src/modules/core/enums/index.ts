@@ -71,7 +71,8 @@ export enum DrawType {
   RoundRobin = 'RoundRobin',
   Swiss = 'Swiss',
   Group = 'Group',
-  Hybrid = 'Hybrid'
+  Hybrid = 'Hybrid',
+  Tie = 'Tie'          // Team Tie format (Rubbers)
 }
 
 export enum QualificationType {
@@ -92,7 +93,8 @@ export enum EventType {
   Singles = 'Singles',
   Doubles = 'Doubles',
   MixedDoubles = 'MixedDoubles',
-  Team = 'Team'
+  Team = 'Team',
+  ReverseSingles = 'ReverseSingles'  // Used within Team Tie rubbers
 }
 
 export enum NotificationType {

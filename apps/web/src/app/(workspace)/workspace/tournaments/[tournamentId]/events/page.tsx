@@ -12,7 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
-import { Trophy, Plus, ArrowLeft, Trash2, Users, Loader2 } from 'lucide-react';
+import { Trophy, Plus, ArrowLeft, Trash2, Users, Loader2, GripVertical, Settings2 } from 'lucide-react';
 import { EventType, Gender, AgeCategory, DrawType } from '@/modules/core/enums';
 
 export default function ManageEventsPage() {
@@ -28,6 +28,19 @@ export default function ManageEventsPage() {
   const [drawType, setDrawType] = React.useState<DrawType>(DrawType.Knockout);
   const [maxEntries, setMaxEntries] = React.useState(32);
   const [entryFee, setEntryFee] = React.useState(0);
+
+  // Team Tie rubber config state
+  const [rubberCount, setRubberCount] = React.useState(5);
+  const [winCondition, setWinCondition] = React.useState(3);
+  const [rubbers, setRubbers] = React.useState([
+    { order: 1, rubberType: EventType.Singles,      name: 'Rubber 1 - Singles' },
+    { order: 2, rubberType: EventType.Doubles,      name: 'Rubber 2 - Doubles' },
+    { order: 3, rubberType: EventType.MixedDoubles, name: 'Rubber 3 - Mixed Doubles' },
+    { order: 4, rubberType: EventType.ReverseSingles, name: 'Rubber 4 - Reverse Singles' },
+    { order: 5, rubberType: EventType.ReverseSingles, name: 'Rubber 5 - Reverse Singles' },
+  ]);
+
+  const isTeamTie = eventType === EventType.Team && drawType === DrawType.Tie;
 
   // Fetch Tournament
   const { data: tournamentRes } = useQuery({
@@ -57,6 +70,7 @@ export default function ManageEventsPage() {
   // Create Event Mutation
   const createMutation = useMutation({
     mutationFn: async () => {
+      // Step 1: Create the event
       const res = await fetch(`/api/tournaments/${tournamentId}/events`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -74,6 +88,19 @@ export default function ManageEventsPage() {
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to create event');
+
+      // Step 2: If Team Tie, save rubber configuration
+      if (isTeamTie && data?.data?._id) {
+        const eventId = data.data._id;
+        const configRes = await fetch(`/api/tournaments/${tournamentId}/events/${eventId}/tie-config`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ rubberCount, winCondition, rubbers })
+        });
+        const configData = await configRes.json();
+        if (!configRes.ok) throw new Error(configData.error || 'Failed to save rubber config');
+      }
+
       return data;
     },
     onSuccess: () => {
@@ -86,6 +113,21 @@ export default function ManageEventsPage() {
       toast.error(err.message || 'Failed to create event');
     },
   });
+
+  const updateRubber = (index: number, field: string, value: any) => {
+    setRubbers(prev => prev.map((r, i) => i === index ? { ...r, [field]: value } : r));
+  };
+
+  const addRubber = () => {
+    const nextOrder = rubbers.length + 1;
+    setRubbers(prev => [...prev, { order: nextOrder, rubberType: EventType.Singles, name: `Rubber ${nextOrder}` }]);
+    setRubberCount(prev => prev + 1);
+  };
+
+  const removeRubber = (index: number) => {
+    setRubbers(prev => prev.filter((_, i) => i !== index).map((r, i) => ({ ...r, order: i + 1 })));
+    setRubberCount(prev => Math.max(1, prev - 1));
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -193,6 +235,7 @@ export default function ManageEventsPage() {
                       <SelectItem value={DrawType.RoundRobin}>Round Robin</SelectItem>
                       <SelectItem value={DrawType.League}>League</SelectItem>
                       <SelectItem value={DrawType.Group}>Group Stage + Knockout</SelectItem>
+                      <SelectItem value={DrawType.Tie}>Team Tie (Rubbers)</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -219,6 +262,71 @@ export default function ManageEventsPage() {
                   />
                 </div>
               </div>
+
+              {/* Team Tie Rubber Configuration */}
+              {isTeamTie && (
+                <div className="mt-6 p-4 bg-amber-500/5 border border-amber-500/20 rounded-xl space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-base font-semibold text-amber-400 flex items-center gap-2">
+                      🏸 Team Tie — Rubber Configuration
+                    </h4>
+                    <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-2">
+                        <Label className="text-xs">Win Condition</Label>
+                        <Input
+                          type="number" min="1" max={rubberCount}
+                          value={winCondition}
+                          onChange={(e) => setWinCondition(parseInt(e.target.value) || 3)}
+                          className="w-16 h-8 text-sm"
+                        />
+                        <span className="text-xs text-muted-foreground">rubbers to win</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    {rubbers.map((rubber, index) => (
+                      <div key={index} className="flex items-center gap-3 p-2 bg-black/30 rounded-lg border border-white/5">
+                        <div className="w-7 h-7 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-400 text-xs font-bold shrink-0">
+                          {rubber.order}
+                        </div>
+                        <Input
+                          value={rubber.name}
+                          onChange={(e) => updateRubber(index, 'name', e.target.value)}
+                          className="flex-1 h-8 text-sm"
+                          placeholder="Rubber name"
+                        />
+                        <Select
+                          value={rubber.rubberType}
+                          onValueChange={(v) => updateRubber(index, 'rubberType', v)}
+                        >
+                          <SelectTrigger className="w-48 h-8 text-sm"><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value={EventType.Singles}>Singles</SelectItem>
+                            <SelectItem value={EventType.Doubles}>Doubles</SelectItem>
+                            <SelectItem value={EventType.MixedDoubles}>Mixed Doubles</SelectItem>
+                            <SelectItem value={EventType.ReverseSingles}>Reverse Singles</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <Button
+                          type="button" variant="ghost" size="icon"
+                          onClick={() => removeRubber(index)}
+                          className="h-8 w-8 text-red-400 hover:text-red-300 hover:bg-red-950/30 shrink-0"
+                          disabled={rubbers.length <= 1}
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                  <Button type="button" variant="outline" size="sm" onClick={addRubber} className="w-full border-dashed border-amber-500/30 text-amber-400 hover:bg-amber-500/5">
+                    <Plus className="w-3.5 h-3.5 mr-2" /> Add Rubber
+                  </Button>
+                  <p className="text-xs text-amber-400/70 text-center">
+                    First team to win <strong>{winCondition}</strong> rubbers wins the Tie
+                  </p>
+                </div>
+              )}
 
               <div className="flex justify-end gap-3 pt-2">
                 <Button type="button" variant="outline" onClick={() => setIsCreating(false)}>
