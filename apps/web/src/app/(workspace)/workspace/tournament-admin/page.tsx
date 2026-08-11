@@ -72,41 +72,47 @@ export default async function AdminAdministratorDashboardPage() {
       />
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <WidgetContainer className="p-6">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-blue-500/10 rounded-xl text-blue-500">
-              <Trophy className="w-6 h-6" />
+        <Link href="/workspace/tournaments" className="block transition-transform active:scale-95">
+          <WidgetContainer className="p-6 cursor-pointer" hoverEffect glowEffect>
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-blue-500/10 rounded-xl text-blue-500">
+                <Trophy className="w-6 h-6" />
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Active Tournaments</p>
+                <h4 className="text-2xl font-bold">{tournamentCount}</h4>
+              </div>
             </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Active Tournaments</p>
-              <h4 className="text-2xl font-bold">{tournamentCount}</h4>
-            </div>
-          </div>
-        </WidgetContainer>
+          </WidgetContainer>
+        </Link>
 
-        <WidgetContainer className="p-6">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-violet-500/10 rounded-xl text-violet-500">
-              <Users className="w-6 h-6" />
+        <Link href="/workspace/tournament-admin/players" className="block transition-transform active:scale-95">
+          <WidgetContainer className="p-6 cursor-pointer" hoverEffect glowEffect>
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-violet-500/10 rounded-xl text-violet-500">
+                <Users className="w-6 h-6" />
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Registered Players</p>
+                <h4 className="text-2xl font-bold">{playerApprovals}</h4>
+              </div>
             </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Registered Players</p>
-              <h4 className="text-2xl font-bold">{playerApprovals}</h4>
-            </div>
-          </div>
-        </WidgetContainer>
+          </WidgetContainer>
+        </Link>
 
-        <WidgetContainer className="p-6">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-amber-500/10 rounded-xl text-amber-500">
-              <AlertCircle className="w-6 h-6" />
+        <Link href="/workspace/tournament-admin/registrations" className="block transition-transform active:scale-95">
+          <WidgetContainer className="p-6 cursor-pointer" hoverEffect glowEffect>
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-amber-500/10 rounded-xl text-amber-500">
+                <AlertCircle className="w-6 h-6" />
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Pending Approvals</p>
+                <h4 className="text-2xl font-bold">{pendingApprovalsCount}</h4>
+              </div>
             </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Pending Approvals</p>
-              <h4 className="text-2xl font-bold">{pendingApprovalsCount}</h4>
-            </div>
-          </div>
-        </WidgetContainer>
+          </WidgetContainer>
+        </Link>
 
         <WidgetContainer className="p-6 border-emerald-500/20 bg-emerald-500/5">
           <div className="flex items-center gap-4">

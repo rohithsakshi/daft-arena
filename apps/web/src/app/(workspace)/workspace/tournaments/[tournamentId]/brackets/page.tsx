@@ -263,13 +263,17 @@ export default function BracketsPage() {
                   className="bg-background"
                 />
               </div>
-              <div className="space-y-1 p-3 rounded-md bg-background/50 border border-white/5">
-                <p className="text-sm text-muted-foreground">Total Matches</p>
-                <p className="text-2xl font-bold">{totalMatches}</p>
+              <div className="space-y-2">
+                <Label className="text-zinc-700 font-semibold dark:text-zinc-300">Total Matches</Label>
+                <div className="h-10 flex items-center px-3 rounded-md bg-background border border-input text-foreground font-bold">
+                  {totalMatches}
+                </div>
               </div>
-              <div className="space-y-1 p-3 rounded-md bg-violet-500/10 border border-violet-500/20">
-                <p className="text-sm text-violet-300">Estimated Total Duration</p>
-                <p className="text-2xl font-bold text-violet-100">{formatMinutes(estimatedDurationMinutes)}</p>
+              <div className="space-y-2">
+                <Label className="text-violet-800 dark:text-violet-300 font-semibold">Estimated Total Duration</Label>
+                <div className="h-10 flex items-center px-3 rounded-md bg-violet-100 dark:bg-violet-950 border border-violet-300 dark:border-violet-800 text-violet-950 dark:text-violet-50 font-bold">
+                  {formatMinutes(estimatedDurationMinutes)}
+                </div>
               </div>
             </div>
           </CardContent>
