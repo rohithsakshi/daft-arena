@@ -11,7 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
-import { ArrowLeft, BarChart3, Shuffle, Trophy, CheckCircle, RefreshCw, Loader2 } from 'lucide-react';
+import { ArrowLeft, BarChart3, Shuffle, Trophy, CheckCircle, RefreshCw, Loader2, ExternalLink, FileText, Download, Printer, FileSpreadsheet } from 'lucide-react';
 
 export default function BracketsPage() {
   const params = useParams();
@@ -112,6 +112,40 @@ export default function BracketsPage() {
     };
   });
 
+  const handleExportCSV = () => {
+    if (!generatedMatches.length) return toast.error('No matches to export');
+    
+    const rows = [
+      ['Round', 'Match ID', 'Player 1', 'Player 2', 'Score', 'Status', 'Winner']
+    ];
+    
+    generatedMatches.forEach(m => {
+      rows.push([
+        m.round,
+        m.id,
+        getPlayerName(m.player1),
+        getPlayerName(m.player2),
+        'Scheduled',
+        'Pending',
+        m.winner ? (m.winner === m.player1 ? 'Player 1' : 'Player 2') : 'TBD'
+      ]);
+    });
+    
+    const csvContent = "data:text/csv;charset=utf-8," + rows.map(e => e.join(",")).join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `draw_${selectedEvent?.name || 'export'}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast.success('Draw exported to CSV');
+  };
+
+  const handlePrint = () => {
+    window.print();
+  };
+
   return (
     <div className="max-w-6xl mx-auto space-y-6 pb-12">
       {/* Top Header */}
@@ -187,6 +221,19 @@ export default function BracketsPage() {
               {selectedEvent ? `${selectedEvent.name} - Draw Tree` : 'Knockout Tournament Tree'}
             </CardTitle>
             <CardDescription>Interactive match tree and progression view.</CardDescription>
+          </div>
+          <div className="flex items-center gap-2">
+            <Link href={`/brackets/view?tournamentId=${tournamentId}&eventId=${selectedEventId}`} target="_blank">
+              <Button variant="outline" size="sm" disabled={!selectedEventId || !generatedMatches.length}>
+                <ExternalLink className="w-4 h-4 mr-2" /> Open in New Tab
+              </Button>
+            </Link>
+            <Button variant="outline" size="sm" onClick={handlePrint} disabled={!generatedMatches.length}>
+              <Printer className="w-4 h-4 mr-2" /> Print / PDF
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleExportCSV} disabled={!generatedMatches.length}>
+              <FileSpreadsheet className="w-4 h-4 mr-2" /> Export Excel
+            </Button>
           </div>
         </CardHeader>
         <CardContent>
