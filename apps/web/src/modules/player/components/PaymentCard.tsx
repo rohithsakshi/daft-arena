@@ -110,9 +110,15 @@ export function PaymentCard({ baseFee, currency, onPaymentSubmit }: PaymentCardP
   };
 
   const handleCheckout = () => {
-    if (paymentMethod === 'UPI' && !utr.trim()) {
-      alert('Please enter your UTR/Reference number for UPI payments.');
-      return;
+    if (paymentMethod === 'UPI') {
+      if (!utr.trim()) {
+        alert('Please enter your UTR/Reference number for UPI payments.');
+        return;
+      }
+      if (!screenshotUrl) {
+        alert('Please upload a screenshot of your payment.');
+        return;
+      }
     }
 
     setIsProcessing(true);
@@ -244,7 +250,7 @@ export function PaymentCard({ baseFee, currency, onPaymentSubmit }: PaymentCardP
               />
             </div>
             <div>
-              <label className="text-xs text-muted-foreground mb-1 block">Payment Screenshot (Optional)</label>
+              <label className="text-xs text-muted-foreground mb-1 block">Payment Screenshot *</label>
               <input 
                 type="file" 
                 accept="image/*"
