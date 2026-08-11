@@ -102,8 +102,8 @@ export async function POST(req: Request, props: { params: Promise<{ tournamentId
 
     // Algorithm: Iterating through matches
     for (const match of matches) {
-      const p1Id = match.participant1Id?._id?.toString();
-      const p2Id = match.participant2Id?._id?.toString();
+      const p1Id = (match.participant1Id as any)?._id?.toString();
+      const p2Id = (match.participant2Id as any)?._id?.toString();
       
       // Calculate when both players are available
       let p1AvailableTime = p1Id ? (playerNextAvailableTime.get(p1Id) || currentScheduleTime.getTime()) : currentScheduleTime.getTime();
@@ -147,7 +147,7 @@ export async function POST(req: Request, props: { params: Promise<{ tournamentId
       }
 
       // Update state
-      courtNextAvailableTime.set(courtId, matchEndTime + (5 * 60000)); // 5 min buffer for court
+      courtNextAvailableTime.set(courtId as string, matchEndTime + (5 * 60000)); // 5 min buffer for court
       
       // Add rest duration for players
       const nextPlayerAvail = matchEndTime + (restDuration * 60000);
@@ -155,8 +155,8 @@ export async function POST(req: Request, props: { params: Promise<{ tournamentId
       if (p2Id) playerNextAvailableTime.set(p2Id, nextPlayerAvail);
 
       // Save schedule
-      match.courtId = courtId;
-      match.umpireId = umpireId;
+      match.courtId = (courtId as string) || undefined;
+      match.umpireId = umpireId || undefined;
       match.startTime = new Date(matchStartTime);
       match.endTime = new Date(matchEndTime);
       

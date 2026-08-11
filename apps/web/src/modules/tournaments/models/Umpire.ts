@@ -1,8 +1,8 @@
 import mongoose, { Schema, Document } from 'mongoose';
-import { customAlphabet } from 'nanoid';
+import crypto from 'crypto';
 
 // Function to generate a secure random token for the magic link
-const generateToken = customAlphabet('1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', 32);
+const generateToken = () => crypto.randomBytes(16).toString('hex');
 
 export interface IUmpire extends Document {
   tournamentId: mongoose.Types.ObjectId;
