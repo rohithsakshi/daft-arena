@@ -82,7 +82,7 @@ function BracketViewContent() {
               </div>
 
               <div className="space-y-6 flex flex-col justify-around h-full">
-                {round.matches.map((m) => (
+                {round.matches.map((m: any) => (
                   <div
                     key={m.id}
                     className="p-3 rounded-xl border border-white/10 bg-white/5 space-y-2 shadow-sm"
