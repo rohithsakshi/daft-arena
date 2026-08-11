@@ -44,9 +44,31 @@ export default function PublicTournamentDetailPage() {
     enabled: !!id
   });
 
+  const { data: matchesRes } = useQuery({
+    queryKey: ['public-tournament-matches', id],
+    queryFn: async () => {
+      const response = await fetch(`/api/tournaments/${id}/public/matches`);
+      if (!response.ok) throw new Error('Failed to fetch matches');
+      return response.json();
+    },
+    enabled: !!id
+  });
+
+  const { data: standingsRes } = useQuery({
+    queryKey: ['public-tournament-standings', id],
+    queryFn: async () => {
+      const response = await fetch(`/api/tournaments/${id}/public/standings`);
+      if (!response.ok) throw new Error('Failed to fetch standings');
+      return response.json();
+    },
+    enabled: !!id
+  });
+
   const tournament = res?.data;
   const events = Array.isArray(eventsRes?.data) ? eventsRes.data : [];
   const sponsors = Array.isArray(sponsorsRes?.data) ? sponsorsRes.data : [];
+  const matchesByEvent = matchesRes?.data || {};
+  const standings = standingsRes?.data || [];
   
   const titleSponsor = sponsors.find((s: any) => s.tier === 'Title');
   const otherSponsors = sponsors.filter((s: any) => s.tier !== 'Title');
@@ -134,8 +156,9 @@ export default function PublicTournamentDetailPage() {
         <Tabs defaultValue="overview" className="w-full">
           <TabsList className="bg-white/5 border border-white/10 p-1 rounded-xl mb-8 overflow-x-auto flex w-fit max-w-full justify-start">
             <TabsTrigger value="overview" className="rounded-lg data-[state=active]:bg-violet-600 data-[state=active]:text-white">Overview</TabsTrigger>
-            <TabsTrigger value="events" className="rounded-lg data-[state=active]:bg-violet-600 data-[state=active]:text-white">Categories & Events</TabsTrigger>
-            <TabsTrigger value="brackets" className="rounded-lg data-[state=active]:bg-violet-600 data-[state=active]:text-white">Brackets & Live Scores</TabsTrigger>
+            <TabsTrigger value="events" className="rounded-lg data-[state=active]:bg-violet-600 data-[state=active]:text-white">Categories</TabsTrigger>
+            <TabsTrigger value="brackets" className="rounded-lg data-[state=active]:bg-violet-600 data-[state=active]:text-white">Draws & Matches</TabsTrigger>
+            <TabsTrigger value="standings" className="rounded-lg data-[state=active]:bg-violet-600 data-[state=active]:text-white">Standings</TabsTrigger>
             <TabsTrigger value="sponsors" className="rounded-lg data-[state=active]:bg-violet-600 data-[state=active]:text-white">Sponsors</TabsTrigger>
           </TabsList>
 
@@ -221,15 +244,119 @@ export default function PublicTournamentDetailPage() {
           </TabsContent>
 
           <TabsContent value="brackets" className="animate-in fade-in-50 duration-500">
-            <Card className="bg-zinc-900/50 border-white/10">
-              <CardContent className="p-12 text-center">
-                <Trophy className="w-16 h-16 mx-auto mb-6 text-violet-500/50" />
-                <h3 className="text-2xl font-bold mb-2">Draws not yet published</h3>
-                <p className="text-muted-foreground max-w-md mx-auto">
-                  The brackets and draws for this tournament will be published once registrations close. Check back later!
-                </p>
-              </CardContent>
-            </Card>
+            {Object.keys(matchesByEvent).length === 0 ? (
+              <Card className="bg-zinc-900/50 border-white/10">
+                <CardContent className="p-12 text-center">
+                  <Trophy className="w-16 h-16 mx-auto mb-6 text-violet-500/50" />
+                  <h3 className="text-2xl font-bold mb-2">Draws not yet published</h3>
+                  <p className="text-muted-foreground max-w-md mx-auto">
+                    The brackets and draws for this tournament will be published once registrations close. Check back later!
+                  </p>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="space-y-12">
+                {Object.values(matchesByEvent).map((data: any) => (
+                  <div key={data.event._id} className="space-y-4">
+                    <h3 className="text-2xl font-bold border-b border-white/10 pb-2 text-violet-400">{data.event.name} Matches</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {data.matches.map((match: any) => {
+                        const p1Name = match.participant1Id?.participantIds?.map((p: any) => p.name).join(' & ') || 'TBD';
+                        const p2Name = match.participant2Id?.participantIds?.map((p: any) => p.name).join(' & ') || 'TBD';
+                        const isLive = match.status === 'InProgress';
+                        
+                        return (
+                          <div key={match._id} className={`p-4 rounded-xl border ${isLive ? 'border-violet-500 bg-violet-900/20 shadow-[0_0_15px_rgba(139,92,246,0.2)]' : 'border-white/10 bg-zinc-900/80'}`}>
+                            <div className="flex justify-between items-center mb-3 text-xs">
+                              <span className="font-semibold text-muted-foreground">Round {match.round}</span>
+                              <div className="flex items-center gap-2">
+                                {isLive && (
+                                  <span className="flex items-center gap-1 text-red-500 font-bold animate-pulse">
+                                    <div className="w-2 h-2 bg-red-500 rounded-full" /> LIVE
+                                  </span>
+                                )}
+                                <Badge variant="outline">{match.courtId?.name || 'TBD Court'}</Badge>
+                              </div>
+                            </div>
+                            
+                            <div className="space-y-3">
+                              <div className={`flex justify-between items-center p-2 rounded ${match.winnerId === match.participant1Id?._id ? 'bg-white/5 font-bold' : ''}`}>
+                                <span className={match.winnerId === match.participant1Id?._id ? 'text-white' : 'text-muted-foreground'}>{p1Name}</span>
+                                <span className="font-mono font-bold text-violet-400">
+                                  {match.scores?.p1?.join(', ') || ''}
+                                </span>
+                              </div>
+                              <div className={`flex justify-between items-center p-2 rounded ${match.winnerId === match.participant2Id?._id ? 'bg-white/5 font-bold' : ''}`}>
+                                <span className={match.winnerId === match.participant2Id?._id ? 'text-white' : 'text-muted-foreground'}>{p2Name}</span>
+                                <span className="font-mono font-bold text-violet-400">
+                                  {match.scores?.p2?.join(', ') || ''}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="standings" className="animate-in fade-in-50 duration-500">
+            {standings.length === 0 ? (
+              <div className="text-center py-20 text-muted-foreground border border-dashed border-white/20 rounded-xl">
+                <p>Tournament is still ongoing. Final standings will appear here once events are completed.</p>
+              </div>
+            ) : (
+              <div className="space-y-8">
+                {standings.map((standing: any, index: number) => {
+                  if (!standing.firstPlace && !standing.secondPlace) return null;
+                  
+                  return (
+                    <Card key={index} className="bg-zinc-900/50 border-white/10">
+                      <CardContent className="p-8">
+                        <h3 className="text-2xl font-bold mb-8 text-center text-violet-400">{standing.event?.name}</h3>
+                        
+                        <div className="flex flex-col md:flex-row justify-center items-end gap-6 pt-8">
+                          {/* 2nd Place */}
+                          {standing.secondPlace && (
+                            <div className="order-2 md:order-1 flex-1 max-w-[200px] flex flex-col items-center">
+                              <div className="relative mb-4">
+                                <div className="absolute -top-4 -right-4 w-8 h-8 bg-zinc-400 text-black font-bold rounded-full flex items-center justify-center z-10 border-2 border-black shadow-[0_0_15px_rgba(161,161,170,0.5)]">2</div>
+                                <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-zinc-400 bg-zinc-800 flex items-center justify-center">
+                                  {standing.secondPlace.participantIds?.[0]?.avatar ? <img src={standing.secondPlace.participantIds[0].avatar} className="w-full h-full object-cover"/> : <span className="text-2xl font-bold">{standing.secondPlace.participantIds?.map((p:any)=>p.name).join(' & ').charAt(0)}</span>}
+                                </div>
+                              </div>
+                              <div className="text-center w-full bg-gradient-to-t from-zinc-800 to-zinc-900/50 p-4 rounded-t-xl border border-b-0 border-white/10 h-32 flex flex-col justify-end pb-6">
+                                <div className="font-bold truncate w-full text-sm">{standing.secondPlace.participantIds?.map((p:any)=>p.name).join(' & ')}</div>
+                                <div className="text-zinc-400 font-semibold text-xs">Runner Up</div>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* 1st Place */}
+                          {standing.firstPlace && (
+                            <div className="order-1 md:order-2 flex-1 max-w-[220px] flex flex-col items-center z-10">
+                              <div className="relative mb-6">
+                                <div className="absolute -top-5 -right-5 w-10 h-10 bg-amber-400 text-black font-black text-lg rounded-full flex items-center justify-center z-10 border-2 border-black shadow-[0_0_25px_rgba(251,191,36,0.6)]">1</div>
+                                <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-amber-400 bg-zinc-800 flex items-center justify-center shadow-[0_0_30px_rgba(251,191,36,0.2)]">
+                                  {standing.firstPlace.participantIds?.[0]?.avatar ? <img src={standing.firstPlace.participantIds[0].avatar} className="w-full h-full object-cover"/> : <span className="text-4xl font-bold">{standing.firstPlace.participantIds?.map((p:any)=>p.name).join(' & ').charAt(0)}</span>}
+                                </div>
+                              </div>
+                              <div className="text-center w-full bg-gradient-to-t from-amber-900/40 to-zinc-900 p-4 rounded-t-xl border border-b-0 border-amber-500/30 h-40 flex flex-col justify-end pb-8 shadow-[0_-10px_30px_rgba(251,191,36,0.1)]">
+                                <div className="font-bold text-lg truncate w-full">{standing.firstPlace.participantIds?.map((p:any)=>p.name).join(' & ')}</div>
+                                <div className="text-amber-400 font-bold text-sm">Champion</div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+            )}
           </TabsContent>
 
           <TabsContent value="sponsors" className="animate-in fade-in-50 duration-500">
