@@ -80,6 +80,8 @@ const DEMO_ROLES = [
 
 import { PlatformSettingsService } from '@/modules/settings/services/PlatformSettingsService';
 
+export const dynamic = 'force-dynamic';
+
 export default async function DemoPage() {
   const enabledRoles = await PlatformSettingsService.getEnabledRoles();
   const visibleRoles = DEMO_ROLES.filter(r => enabledRoles.includes(r.id.toUpperCase()));

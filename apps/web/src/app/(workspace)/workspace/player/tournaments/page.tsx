@@ -10,6 +10,8 @@ export const metadata = {
   description: 'Browse and find upcoming tournaments to register for.',
 };
 
+export const dynamic = 'force-dynamic';
+
 export default async function DiscoverTournamentsPage() {
   const tournaments = await PlayerService.discoverTournaments();
 

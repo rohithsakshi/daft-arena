@@ -119,6 +119,8 @@ const ROLES = [
 
 import { PlatformSettingsService } from '@/modules/settings/services/PlatformSettingsService';
 
+export const dynamic = 'force-dynamic';
+
 export default async function RolesPage(props: { searchParams: Promise<{ intent?: string }> }) {
   const searchParams = await props.searchParams;
   const intent = searchParams?.intent === 'login' ? 'login' : 'register';
