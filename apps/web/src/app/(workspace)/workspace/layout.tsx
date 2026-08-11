@@ -4,6 +4,8 @@ import Sidebar from '@/components/workspace/Sidebar';
 import Header from '@/components/workspace/Header';
 import { CommandPalette } from '@/components/navigation/CommandPalette';
 
+export const dynamic = 'force-dynamic';
+
 export default function WorkspaceLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex h-screen overflow-hidden bg-background">

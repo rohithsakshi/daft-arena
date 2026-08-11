@@ -6,6 +6,8 @@ export const metadata = {
   title: 'DAFT Labs | Super Admin Portal',
 };
 
+export const dynamic = 'force-dynamic';
+
 export default function SuperAdminLayout({
   children,
 }: {
