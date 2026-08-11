@@ -14,7 +14,7 @@ function BracketViewContent() {
   const { data: matchesRes, isLoading } = useQuery({
     queryKey: ['bracket-matches', tournamentId, eventId],
     queryFn: async () => {
-      const res = await fetch(`/api/tournaments/${tournamentId}/operations/matches`);
+      const res = await fetch(`/api/tournaments/${tournamentId}/events/${eventId}/draw`);
       if (!res.ok) throw new Error('Failed to load matches');
       return res.json();
     },
@@ -25,7 +25,7 @@ function BracketViewContent() {
     return <div className="p-8 text-center text-red-500">Missing parameters</div>;
   }
 
-  const generatedMatches = (matchesRes?.data || []).filter((m: any) => m.eventId === eventId);
+  const generatedMatches = matchesRes?.data || [];
 
   const getPlayerName = (playerData: any) => {
     if (playerData === 'BYE') return 'BYE';

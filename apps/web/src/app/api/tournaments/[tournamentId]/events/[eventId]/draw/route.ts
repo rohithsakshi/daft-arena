@@ -85,3 +85,31 @@ export async function POST(req: Request, props: { params: Promise<{ tournamentId
     return NextResponse.json({ error: error.message || 'Server error' }, { status: 500 });
   }
 }
+
+export async function GET(req: Request, props: { params: Promise<{ tournamentId: string, eventId: string }> }) {
+  try {
+    await connectDB();
+    const { tournamentId, eventId } = await props.params;
+
+    const savedMatches = await MatchModel.find({ eventId })
+      .populate({ path: 'participant1Id', populate: { path: 'participantIds', select: 'name email avatar' } })
+      .populate({ path: 'participant2Id', populate: { path: 'participantIds', select: 'name email avatar' } })
+      .populate({ path: 'winnerId', populate: { path: 'participantIds', select: 'name email avatar' } })
+      .lean();
+    
+    const formattedMatches = savedMatches.map(m => ({
+      id: m._id.toString(),
+      round: m.round,
+      matchNumber: m.matchNumber,
+      player1: m.participant1Id ? (m.participant1Id as any).participantIds : (m.isWalkover && !m.participant1Id ? 'BYE' : null),
+      player2: m.participant2Id ? (m.participant2Id as any).participantIds : (m.isWalkover && !m.participant2Id ? 'BYE' : null),
+      winner: m.winnerId ? (m.winnerId as any).participantIds : null,
+      score: 'Scheduled',
+      originalMatchStatus: m.status
+    }));
+    
+    return NextResponse.json({ success: true, data: formattedMatches });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message || 'Server error' }, { status: 500 });
+  }
+}
