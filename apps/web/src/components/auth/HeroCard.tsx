@@ -7,7 +7,7 @@ export function HeroCard() {
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <Image
-          src="/login-hero - Copy.png"
+          src="/login-hero-copy.png"
           alt="DAFT Arena Login Hero"
           fill
           priority
