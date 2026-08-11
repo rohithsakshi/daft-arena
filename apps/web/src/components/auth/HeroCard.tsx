@@ -1,6 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
-import loginHero from '../../../public/login-hero-generated.png';
+import loginHero from '../../../public/login-hero.png';
 
 export function HeroCard() {
   return (
