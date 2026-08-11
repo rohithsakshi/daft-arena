@@ -11,6 +11,7 @@ export function HeroCard() {
           alt="DAFT Arena Login Hero"
           fill
           priority
+          unoptimized
           className="object-cover object-right transition-transform duration-1000 group-hover:scale-105"
         />
         {/* Gradient Overlay for Text Readability */}
