@@ -26,4 +26,41 @@ export class PlatformSettingsService {
     }
     return settings.enabledRoles;
   }
+
+  static async getGeneralSettings() {
+    await connectToDatabase();
+    let settings = await PlatformSettingsModel.findOne().lean();
+    if (!settings) {
+      return {
+        platformName: 'DAFT Arena',
+        supportEmail: 'support@daftarena.com',
+        supportPhone: '+91 9999999999',
+        registrationFeeDefault: 500
+      };
+    }
+    return {
+      platformName: settings.platformName || 'DAFT Arena',
+      supportEmail: settings.supportEmail || 'support@daftarena.com',
+      supportPhone: settings.supportPhone || '+91 9999999999',
+      registrationFeeDefault: settings.registrationFeeDefault || 500
+    };
+  }
+
+  static async setGeneralSettings(data: any) {
+    await connectToDatabase();
+    let settings = await PlatformSettingsModel.findOne();
+    if (settings) {
+      settings.platformName = data.platformName;
+      settings.supportEmail = data.supportEmail;
+      settings.supportPhone = data.supportPhone;
+      settings.registrationFeeDefault = data.registrationFeeDefault;
+      await settings.save();
+    } else {
+      settings = await PlatformSettingsModel.create({
+        enabledRoles: ['PLAYER', 'SPONSOR', 'TOURNAMENT_ADMIN'],
+        ...data
+      });
+    }
+    return settings;
+  }
 }

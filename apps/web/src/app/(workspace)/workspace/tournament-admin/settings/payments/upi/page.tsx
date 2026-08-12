@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Loader2, Upload, QrCode } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function UPISettingsPage() {
   const [loading, setLoading] = useState(true);
@@ -43,10 +44,10 @@ export default function UPISettingsPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(settings)
       });
-      alert('UPI Settings saved successfully!');
+      toast.success('UPI Settings saved successfully!');
     } catch (err) {
       console.error(err);
-      alert('Failed to save settings.');
+      toast.error('Failed to save settings.');
     } finally {
       setSaving(false);
     }
@@ -70,11 +71,11 @@ export default function UPISettingsPage() {
       if (data.success) {
         setSettings({ ...settings, qrImageUrl: data.url });
       } else {
-        alert('Upload failed');
+        toast.error('Upload failed');
       }
     } catch (err) {
       console.error(err);
-      alert('Upload failed');
+      toast.error('Upload failed');
     } finally {
       setUploading(false);
     }
