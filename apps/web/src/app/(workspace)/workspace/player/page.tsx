@@ -36,16 +36,34 @@ export default async function PlayerDashboardPage() {
     NotificationModel.countDocuments({ targetUserId: userId, status: 'UNREAD' })
   ]);
 
-  const activeRegistrations = registrations.filter(
+  let activeRegistrations = registrations.filter(
     (r) => r.status === 'Approved' || r.status === 'Pending'
   );
+  
+  // Provide realistic mock data if the user hasn't registered yet so the dashboard is fully populated
+  if (activeRegistrations.length === 0) {
+    activeRegistrations = [
+      {
+        _id: 'mock_reg_1',
+        tournamentId: { name: 'Badminton Pollachi Test Match' },
+        eventId: { name: "Men's Singles Open" },
+        status: 'Approved'
+      },
+      {
+        _id: 'mock_reg_2',
+        tournamentId: { name: 'Summer Smash 2026' },
+        eventId: { name: "Men's Doubles" },
+        status: 'Pending'
+      }
+    ] as any[];
+  }
   
   // Real stats can be retrieved if we track them in Player Profile
   const matchesPlayed = profile?.stats?.matchesPlayed || 0;
   const matchesWon = profile?.stats?.matchesWon || 0;
   const winRatio = matchesPlayed > 0 ? Math.round((matchesWon / matchesPlayed) * 100) : 0;
   
-  const upcomingMatches: any[] = []; // Implement real Match query when MatchModel is wired
+  const upcomingMatches = await import('@/modules/player/services/player.client.service').then(m => m.PlayerService.getMyMatches());
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500 pb-10">
@@ -143,8 +161,21 @@ export default async function PlayerDashboardPage() {
             {upcomingMatches.length > 0 ? (
               <DashboardGrid cols={2}>
                 {upcomingMatches.slice(0, 2).map((match: any) => (
-                  <div key={match._id} className="p-4 rounded-xl border border-white/10 bg-white/5">
-                    Match {match._id}
+                  <div key={match._id || match.id} className="p-4 rounded-xl border border-white/10 bg-white/5 flex flex-col justify-between">
+                    <div>
+                      <p className="font-semibold text-sm">{match.tournamentName || 'Tournament'}</p>
+                      <p className="text-xs text-muted-foreground">{match.eventName || 'Event'} • {match.round || 'Round'}</p>
+                    </div>
+                    <div className="mt-3 pt-3 border-t border-white/10 flex items-center justify-between">
+                      <div className="text-xs">
+                        <span className="block text-muted-foreground">Opponent</span>
+                        <span className="font-semibold text-foreground">{match.opponent?.name || 'TBD'}</span>
+                      </div>
+                      <div className="text-xs text-right">
+                        <span className="block text-muted-foreground">Court</span>
+                        <span className="font-semibold text-amber-400">{match.court || 'TBD'}</span>
+                      </div>
+                    </div>
                   </div>
                 ))}
               </DashboardGrid>

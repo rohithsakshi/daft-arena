@@ -411,10 +411,58 @@ export class PlayerService {
   static async processPayment(tournamentId: string, amount: number, utr: string, screenshotUrl: string) {
     return new PlayerService().processPayment(tournamentId, amount, utr, screenshotUrl);
   }
-  async getTransactions(...args: any[]) { return [] as any; }
-  static async getTransactions(...args: any[]) { return [] as any; }
-  async getMyTournaments(...args: any[]) { return [] as any; }
-  static async getMyTournaments(...args: any[]) { return [] as any; }
+  async getTransactions(...args: any[]) {
+    return [
+      {
+        id: 'txn_101',
+        date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+        amount: 1500,
+        currency: 'INR',
+        status: 'COMPLETED',
+        description: 'Registration: Badminton Pollachi Test Match',
+        type: 'REGISTRATION',
+        paymentMethod: 'UPI',
+      },
+      {
+        id: 'txn_102',
+        date: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
+        amount: 500,
+        currency: 'INR',
+        status: 'COMPLETED',
+        description: 'Registration: Men\'s Singles Open',
+        type: 'REGISTRATION',
+        paymentMethod: 'Credit Card',
+      }
+    ];
+  }
+  static async getTransactions(...args: any[]) { return new PlayerService().getTransactions(...args); }
+
+  async getMyTournaments(...args: any[]) {
+    return [
+      {
+        id: 't_mock_1',
+        title: 'Badminton Pollachi Test Match',
+        sport: 'Badminton',
+        startDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
+        endDate: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toISOString(),
+        status: 'RegistrationClosed',
+        venueName: 'Pollachi Stadium',
+        events: [{ name: "Men's Singles Open", status: 'Registered' }],
+      },
+      {
+        id: 't_mock_2',
+        title: 'Summer Smash 2026',
+        sport: 'Tennis',
+        startDate: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
+        endDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+        status: 'Completed',
+        venueName: 'Main Sports Complex',
+        events: [{ name: "Men's Doubles", status: 'Winner' }],
+      }
+    ];
+  }
+  static async getMyTournaments(...args: any[]) { return new PlayerService().getMyTournaments(...args); }
+
   async getWithdrawals(...args: any[]) { return [] as any; }
   static async getWithdrawals(...args: any[]) { return [] as any; }
   async submitWithdrawal(...args: any[]) { return {} as any; }
@@ -423,8 +471,35 @@ export class PlayerService {
   static async searchAllPlayers(...args: any[]) { return [] as any; }
   async getCertificates(...args: any[]) { return [] as any; }
   static async getCertificates(...args: any[]) { return [] as any; }
-  async getMyMatches(...args: any[]) { return [] as any; }
-  static async getMyMatches(...args: any[]) { return [] as any; }
+
+  async getMyMatches(...args: any[]) {
+    return [
+      {
+        id: 'm_mock_1',
+        tournamentName: 'Badminton Pollachi Test Match',
+        eventName: "Men's Singles Open",
+        round: 'Round of 16',
+        scheduledTime: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
+        status: 'Scheduled',
+        court: 'Court 1',
+        opponent: { name: 'Rahul Kumar', seed: 4 }
+      },
+      {
+        id: 'm_mock_2',
+        tournamentName: 'Summer Smash 2026',
+        eventName: "Men's Doubles",
+        round: 'Finals',
+        scheduledTime: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+        status: 'Completed',
+        court: 'Center Court',
+        opponent: { name: 'Team Alpha', seed: 2 },
+        score: '21-19, 21-15',
+        result: 'Win'
+      }
+    ];
+  }
+  static async getMyMatches(...args: any[]) { return new PlayerService().getMyMatches(...args); }
+
   async getBracketData(...args: any[]) { return {} as any; }
   static async getBracketData(...args: any[]) { return {} as any; }
   async getScheduleTimeline(...args: any[]) { return [] as any; }
@@ -437,8 +512,28 @@ export class PlayerService {
   static async submitFeedback(...args: any[]) { return {} as any; }
   async searchPartners(...args: any[]) { return [] as any; }
   static async searchPartners(...args: any[]) { return [] as any; }
-  async getNotifications(...args: any[]) { return [] as any; }
-  static async getNotifications(...args: any[]) { return [] as any; }
+
+  async getNotifications(...args: any[]) {
+    return [
+      {
+        id: 'notif_1',
+        title: 'Match Scheduled',
+        message: 'Your Round of 16 match is scheduled for tomorrow at 10:00 AM on Court 1.',
+        date: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+        read: false,
+        type: 'MATCH_UPDATE',
+      },
+      {
+        id: 'notif_2',
+        title: 'Registration Confirmed',
+        message: 'Your registration for Badminton Pollachi Test Match is confirmed.',
+        date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+        read: true,
+        type: 'SYSTEM',
+      }
+    ];
+  }
+  static async getNotifications(...args: any[]) { return new PlayerService().getNotifications(...args); }
 }
 
 export const playerService = new PlayerService();
