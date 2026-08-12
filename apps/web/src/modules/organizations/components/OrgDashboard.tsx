@@ -12,7 +12,9 @@ import {
   Tag, 
   X,
   PlusCircle,
-  FolderOpen
+  FolderOpen,
+  Edit2,
+  Trash2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -28,6 +30,11 @@ export function OrgDashboard({ orgId }: { orgId: string }) {
   const [showTeamForm, setShowTeamForm] = useState(false);
   const [teamName, setTeamName] = useState('');
   const [teamCategory, setTeamCategory] = useState('U-19');
+
+  // Team edit states
+  const [editingTeam, setEditingTeam] = useState<any>(null);
+  const [editName, setEditName] = useState('');
+  const [editCategory, setEditCategory] = useState('U-19');
 
   const fetchData = async () => {
     setLoading(true);
@@ -91,6 +98,72 @@ export function OrgDashboard({ orgId }: { orgId: string }) {
       }
     } catch {
       toast.error('Error creating team.');
+    }
+  };
+
+  const handleStartEditTeam = (team: any) => {
+    setEditingTeam(team);
+    setEditName(team.name);
+    setEditCategory(team.category);
+    setShowTeamForm(false); // Close create form if open
+  };
+
+  const handleUpdateTeam = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editName.trim()) {
+      toast.error('Please enter a team name.');
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/organizations/teams', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: editingTeam.id,
+          name: editName,
+          category: editCategory
+        })
+      });
+
+      if (res.ok) {
+        toast.success('Team updated successfully!');
+        setEditingTeam(null);
+        // Refresh teams
+        const teamsRes = await fetch(`/api/organizations/teams?orgId=${orgId}`);
+        if (teamsRes.ok) {
+          const teamsData = await teamsRes.json();
+          setTeams(teamsData);
+        }
+      } else {
+        toast.error('Failed to update team.');
+      }
+    } catch {
+      toast.error('Error updating team.');
+    }
+  };
+
+  const handleDeleteTeam = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this team?')) return;
+
+    try {
+      const res = await fetch(`/api/organizations/teams?id=${id}`, {
+        method: 'DELETE'
+      });
+
+      if (res.ok) {
+        toast.success('Team deleted successfully!');
+        // Refresh teams
+        const teamsRes = await fetch(`/api/organizations/teams?orgId=${orgId}`);
+        if (teamsRes.ok) {
+          const teamsData = await teamsRes.json();
+          setTeams(teamsData);
+        }
+      } else {
+        toast.error('Failed to delete team.');
+      }
+    } catch {
+      toast.error('Error deleting team.');
     }
   };
 
@@ -173,8 +246,8 @@ export function OrgDashboard({ orgId }: { orgId: string }) {
             <h3 className="text-xl font-bold text-foreground">Teams List</h3>
             <p className="text-sm text-muted-foreground">Configure teams, coaches, and rosters for matches.</p>
           </div>
-          {!showTeamForm && (
-            <Button onClick={() => setShowTeamForm(true)} className="bg-primary hover:bg-primary/90 text-primary-foreground">
+          {!showTeamForm && !editingTeam && (
+            <Button onClick={() => { setShowTeamForm(true); setEditingTeam(null); }} className="bg-primary hover:bg-primary/90 text-primary-foreground">
               <PlusCircle className="w-4 h-4 mr-2" /> Add Team
             </Button>
           )}
@@ -204,7 +277,7 @@ export function OrgDashboard({ orgId }: { orgId: string }) {
                   <select
                     value={teamCategory}
                     onChange={e => setTeamCategory(e.target.value)}
-                    className="w-full px-3 py-2 bg-background border border-white/10 rounded-md text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-violet-500"
+                    className="w-full px-3 py-2 bg-background border border-border rounded-md text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
                   >
                     <option value="U-15">Under-15</option>
                     <option value="U-19">Under-19</option>
@@ -219,6 +292,51 @@ export function OrgDashboard({ orgId }: { orgId: string }) {
                 </Button>
                 <Button type="submit" className="bg-primary hover:bg-primary/90 text-primary-foreground">
                   Add Team
+                </Button>
+              </div>
+            </form>
+          </div>
+        )}
+
+        {editingTeam && (
+          <div className="bg-muted/30 p-6 rounded-2xl border border-primary/20 max-w-lg">
+            <div className="flex justify-between items-center mb-4 border-b border-border pb-2">
+              <h4 className="font-bold text-foreground">Edit Team</h4>
+              <button onClick={() => setEditingTeam(null)} className="text-muted-foreground hover:text-foreground">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <form onSubmit={handleUpdateTeam} className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-muted-foreground">Team Name</label>
+                  <Input 
+                    placeholder="e.g. Under-19 Boys A"
+                    value={editName}
+                    onChange={e => setEditName(e.target.value)}
+                    className="bg-background focus:outline-none"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-muted-foreground">Age/Category</label>
+                  <select
+                    value={editCategory}
+                    onChange={e => setEditCategory(e.target.value)}
+                    className="w-full px-3 py-2 bg-background border border-border rounded-md text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                  >
+                    <option value="U-15">Under-15</option>
+                    <option value="U-19">Under-19</option>
+                    <option value="Senior">Senior Elite</option>
+                    <option value="Veteran">Veteran Masters</option>
+                  </select>
+                </div>
+              </div>
+              <div className="flex justify-end gap-2 pt-2 border-t border-border">
+                <Button type="button" variant="outline" onClick={() => setEditingTeam(null)}>
+                  Cancel
+                </Button>
+                <Button type="submit" className="bg-primary hover:bg-primary/90 text-primary-foreground">
+                  Save Changes
                 </Button>
               </div>
             </form>
@@ -240,7 +358,23 @@ export function OrgDashboard({ orgId }: { orgId: string }) {
                 <div>
                   <div className="flex justify-between items-start">
                     <h4 className="font-bold text-lg text-foreground">{team.name}</h4>
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-primary/20 text-primary font-semibold">{team.category}</span>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-primary/20 text-primary font-semibold">{team.category}</span>
+                      <button 
+                        onClick={() => handleStartEditTeam(team)} 
+                        className="p-1 text-muted-foreground hover:text-primary transition-colors cursor-pointer"
+                        title="Edit Team"
+                      >
+                        <Edit2 className="w-3.5 h-3.5" />
+                      </button>
+                      <button 
+                        onClick={() => handleDeleteTeam(team.id)} 
+                        className="p-1 text-muted-foreground hover:text-destructive transition-colors cursor-pointer"
+                        title="Delete Team"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                   </div>
                   <p className="text-xs text-muted-foreground mt-2">Members: {team.members?.length || 0} Registered</p>
                 </div>

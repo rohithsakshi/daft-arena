@@ -41,4 +41,29 @@ export class TeamRepository {
       createdAt: doc.createdAt?.toISOString() || new Date().toISOString()
     };
   }
+
+  async update(id: string, team: Partial<ITeam>): Promise<ITeam | null> {
+    await connectToDatabase();
+    const doc = await TeamModel.findByIdAndUpdate(
+      id,
+      { $set: team },
+      { new: true }
+    );
+    if (!doc) return null;
+    return {
+      id: doc._id.toString(),
+      name: doc.name,
+      organizationId: doc.organizationId,
+      category: doc.category,
+      status: doc.status as any,
+      members: doc.members,
+      createdAt: doc.createdAt?.toISOString() || new Date().toISOString()
+    };
+  }
+
+  async delete(id: string): Promise<boolean> {
+    await connectToDatabase();
+    const res = await TeamModel.findByIdAndDelete(id);
+    return !!res;
+  }
 }

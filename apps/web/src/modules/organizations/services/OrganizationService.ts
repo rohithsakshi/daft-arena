@@ -24,4 +24,12 @@ export class OrganizationService {
   async createTeam(data: ITeam) {
     return this.teamRepo.create(data);
   }
+
+  async updateTeam(id: string, data: Partial<ITeam>) {
+    return this.teamRepo.update(id, data);
+  }
+
+  async deleteTeam(id: string) {
+    return this.teamRepo.delete(id);
+  }
 }
