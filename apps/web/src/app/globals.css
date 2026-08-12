@@ -35,3 +35,8 @@ body {
   opacity: 1;
 }
 
+::selection {
+  background-color: rgba(168, 85, 247, 0.35); /* Premium purple/violet accent with high contrast readability */
+  color: #ffffff;
+}
+
