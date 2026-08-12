@@ -185,8 +185,59 @@ export class PlayerService {
     return new PlayerService().discoverTournaments(...args);
   }
 
-  async getRankings(...args: any[]) { return [] as any; }
-  static async getRankings(...args: any[]) { return [] as any; }
+  async getRankings(...args: any[]) {
+    return [
+      {
+        categoryId: 'cat_mens_singles',
+        categoryName: "Men's Singles Open",
+        points: 2450,
+        districtRank: 4,
+        stateRank: 12,
+        nationalRank: 156,
+        history: [
+          { month: 'Jan', points: 1200 },
+          { month: 'Feb', points: 1450 },
+          { month: 'Mar', points: 1450 },
+          { month: 'Apr', points: 1800 },
+          { month: 'May', points: 2100 },
+          { month: 'Jun', points: 2450 },
+        ],
+      },
+      {
+        categoryId: 'cat_mens_doubles',
+        categoryName: "Men's Doubles Open",
+        points: 1800,
+        districtRank: 8,
+        stateRank: 24,
+        nationalRank: 312,
+        history: [
+          { month: 'Jan', points: 800 },
+          { month: 'Feb', points: 950 },
+          { month: 'Mar', points: 1100 },
+          { month: 'Apr', points: 1400 },
+          { month: 'May', points: 1650 },
+          { month: 'Jun', points: 1800 },
+        ],
+      },
+      {
+        categoryId: 'cat_mixed_doubles',
+        categoryName: "Mixed Doubles",
+        points: 950,
+        districtRank: 15,
+        stateRank: 42,
+        nationalRank: null,
+        history: [
+          { month: 'Jan', points: 200 },
+          { month: 'Feb', points: 400 },
+          { month: 'Mar', points: 400 },
+          { month: 'Apr', points: 650 },
+          { month: 'May', points: 800 },
+          { month: 'Jun', points: 950 },
+        ],
+      }
+    ];
+  }
+  static async getRankings(...args: any[]) { return new PlayerService().getRankings(...args); }
   async getTimeline(...args: any[]) { return [] as any; }
   static async getTimeline(...args: any[]) { return [] as any; }
   async getTournamentDetail(id: string) {
