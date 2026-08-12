@@ -83,6 +83,7 @@ export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const [userInfo, setUserInfo] = useState<{ name: string; email: string; role: string } | null>(null);
+  const [loading, setLoading] = useState(true);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -93,7 +94,7 @@ export default function Sidebar() {
   }, []);
 
   useEffect(() => {
-    // Read user info from a dedicated endpoint
+    setLoading(true);
     fetch('/api/auth/me')
       .then((r) => r.json())
       .then((data) => {
@@ -102,7 +103,10 @@ export default function Sidebar() {
         }
       })
       .catch(() => {
-        // ignore — will use defaults
+        // ignore
+      })
+      .finally(() => {
+        setLoading(false);
       });
   }, []);
 
@@ -137,53 +141,72 @@ export default function Sidebar() {
       </div>
 
       <nav className="flex-1 px-4 py-4 space-y-1 overflow-y-auto">
-        {navigation.map((item) => {
-          const isActive =
-            'exact' in item && item.exact
-              ? pathname === item.href
-              : pathname.startsWith(item.href);
+        {loading ? (
+          Array.from({ length: 6 }).map((_, index) => (
+            <div key={index} className="flex items-center px-3 py-2.5 rounded-md animate-pulse">
+              <div className="h-5 w-5 bg-zinc-800/60 rounded-md mr-3 shrink-0" />
+              <div className="h-4 bg-zinc-800/60 rounded-md w-2/3" />
+            </div>
+          ))
+        ) : (
+          navigation.map((item) => {
+            const isActive =
+              'exact' in item && item.exact
+                ? pathname === item.href
+                : pathname.startsWith(item.href);
 
-          return (
-            <Link
-              key={item.name}
-              href={item.href}
-              onClick={() => setIsOpen(false)}
-              className={cn(
-                'flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors',
-                isActive
-                  ? 'bg-primary/10 text-primary'
-                  : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-              )}
-            >
-              <item.icon className="mr-3 h-5 w-5 flex-shrink-0" />
-              {item.name}
-              {item.badge && (
-                <span className="ml-auto text-xs bg-destructive text-destructive-foreground rounded-full px-1.5 py-0.5">
-                  {item.badge}
-                </span>
-              )}
-            </Link>
-          );
-        })}
+            return (
+              <Link
+                key={item.name}
+                href={item.href}
+                onClick={() => setIsOpen(false)}
+                className={cn(
+                  'flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors',
+                  isActive
+                    ? 'bg-primary/10 text-primary'
+                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                )}
+              >
+                <item.icon className="mr-3 h-5 w-5 flex-shrink-0" />
+                {item.name}
+                {item.badge && (
+                  <span className="ml-auto text-xs bg-destructive text-destructive-foreground rounded-full px-1.5 py-0.5">
+                    {item.badge}
+                  </span>
+                )}
+              </Link>
+            );
+          })
+        )}
       </nav>
 
       <div className="p-4 border-t border-border space-y-2">
-        <div className="flex items-center gap-3 px-2">
-          <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-sm flex-shrink-0">
-            {initials}
+        {loading ? (
+          <div className="flex items-center gap-3 px-2 py-1.5 animate-pulse">
+            <div className="w-8 h-8 rounded-full bg-zinc-800/60 shrink-0" />
+            <div className="flex-1 space-y-2 min-w-0">
+              <div className="h-3 bg-zinc-800/60 rounded w-3/4" />
+              <div className="h-2 bg-zinc-800/60 rounded w-1/2" />
+            </div>
           </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium truncate">{userInfo?.name || 'User'}</p>
-            <p className="text-xs text-muted-foreground truncate">{getRoleLabel(role)}</p>
+        ) : (
+          <div className="flex items-center gap-3 px-2">
+            <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-sm flex-shrink-0">
+              {initials}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium truncate">{userInfo?.name || 'User'}</p>
+              <p className="text-xs text-muted-foreground truncate">{getRoleLabel(role)}</p>
+            </div>
+            <Link
+              href={role.toUpperCase() === 'PLAYER' ? '/workspace/player/profile' : '/workspace/settings'}
+              onClick={() => setIsOpen(false)}
+              className="text-muted-foreground hover:text-foreground transition-colors flex-shrink-0"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Link>
           </div>
-          <Link
-            href={role.toUpperCase() === 'PLAYER' ? '/workspace/player/profile' : '/workspace/settings'}
-            onClick={() => setIsOpen(false)}
-            className="text-muted-foreground hover:text-foreground transition-colors flex-shrink-0"
-          >
-            <ChevronRight className="h-4 w-4" />
-          </Link>
-        </div>
+        )}
 
         <button
           onClick={handleLogout}
