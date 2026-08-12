@@ -15,6 +15,7 @@ import {
   TrendingUp, Zap, Calendar, ChevronRight
 } from 'lucide-react';
 import Link from 'next/link';
+import { SponsorAdWall } from '@/modules/player/components/SponsorAdWall';
 
 export const metadata = {
   title: 'Player Dashboard | DAFT Arena',
@@ -67,6 +68,8 @@ export default async function PlayerDashboardPage() {
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500 pb-10">
+      <SponsorAdWall />
+      
       {/* Welcome header container */}
       <WidgetContainer className="p-6 md:p-8 bg-gradient-to-r from-violet-900/40 via-purple-900/30 to-card/60">
         <div
