@@ -21,7 +21,7 @@ export async function POST(req: Request) {
   const team = await service.createTeam({
     name: data.name,
     organizationId: data.organizationId,
-    category: data.category || 'General',
+    categories: data.categories || (data.category ? [data.category] : ['General']),
     status: 'Active',
     members: []
   });
@@ -37,7 +37,7 @@ export async function PUT(req: Request) {
   const service = new OrganizationService();
   const updated = await service.updateTeam(data.id, {
     name: data.name,
-    category: data.category,
+    categories: data.categories,
     status: data.status
   });
 

@@ -39,17 +39,19 @@ export function OrgDashboard({ orgId }: { orgId: string }) {
   // Team creation states
   const [showTeamForm, setShowTeamForm] = useState(false);
   const [teamName, setTeamName] = useState('');
-  const [teamCategory, setTeamCategory] = useState('U-19');
+  const [teamCategories, setTeamCategories] = useState<string[]>(['U-19']);
 
   // Team edit states
   const [editingTeam, setEditingTeam] = useState<any>(null);
   const [editName, setEditName] = useState('');
-  const [editCategory, setEditCategory] = useState('U-19');
+  const [editCategories, setEditCategories] = useState<string[]>(['U-19']);
 
   // Transfer creation states
   const [showTransferForm, setShowTransferForm] = useState(false);
   const [selectedPlayerId, setSelectedPlayerId] = useState('');
   const [transferReason, setTransferReason] = useState('');
+
+  const CATEGORY_OPTIONS = ['U-15', 'U-19', 'Senior', 'Veteran'];
 
   const fetchData = async () => {
     setLoading(true);
@@ -101,10 +103,26 @@ export function OrgDashboard({ orgId }: { orgId: string }) {
     fetchData();
   }, [orgId]);
 
+  const handleToggleCategory = (cat: string, isEdit: boolean) => {
+    if (isEdit) {
+      setEditCategories(prev => 
+        prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]
+      );
+    } else {
+      setTeamCategories(prev => 
+        prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]
+      );
+    }
+  };
+
   const handleCreateTeam = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!teamName.trim()) {
       toast.error('Please enter a team name.');
+      return;
+    }
+    if (teamCategories.length === 0) {
+      toast.error('Please select at least one category.');
       return;
     }
 
@@ -115,13 +133,14 @@ export function OrgDashboard({ orgId }: { orgId: string }) {
         body: JSON.stringify({
           organizationId: orgId,
           name: teamName,
-          category: teamCategory
+          categories: teamCategories
         })
       });
 
       if (res.ok) {
         toast.success('Team created successfully!');
         setTeamName('');
+        setTeamCategories(['U-19']);
         setShowTeamForm(false);
         // Refresh teams
         const teamsRes = await fetch(`/api/organizations/teams?orgId=${orgId}`);
@@ -140,7 +159,7 @@ export function OrgDashboard({ orgId }: { orgId: string }) {
   const handleStartEditTeam = (team: any) => {
     setEditingTeam(team);
     setEditName(team.name);
-    setEditCategory(team.category);
+    setEditCategories(team.categories && team.categories.length > 0 ? team.categories : (team.category ? [team.category] : ['U-19']));
     setShowTeamForm(false);
   };
 
@@ -148,6 +167,10 @@ export function OrgDashboard({ orgId }: { orgId: string }) {
     e.preventDefault();
     if (!editName.trim()) {
       toast.error('Please enter a team name.');
+      return;
+    }
+    if (editCategories.length === 0) {
+      toast.error('Please select at least one category.');
       return;
     }
 
@@ -158,7 +181,7 @@ export function OrgDashboard({ orgId }: { orgId: string }) {
         body: JSON.stringify({
           id: editingTeam.id,
           name: editName,
-          category: editCategory
+          categories: editCategories
         })
       });
 
@@ -400,7 +423,7 @@ export function OrgDashboard({ orgId }: { orgId: string }) {
                 </button>
               </div>
               <form onSubmit={handleCreateTeam} className="space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-3">
                   <div className="space-y-1">
                     <label className="text-xs font-semibold text-muted-foreground">Team Name</label>
                     <Input 
@@ -410,18 +433,21 @@ export function OrgDashboard({ orgId }: { orgId: string }) {
                       className="bg-background focus:outline-none"
                     />
                   </div>
-                  <div className="space-y-1">
-                    <label className="text-xs font-semibold text-muted-foreground">Age/Category</label>
-                    <select
-                      value={teamCategory}
-                      onChange={e => setTeamCategory(e.target.value)}
-                      className="w-full px-3 py-2 bg-background border border-border rounded-md text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
-                    >
-                      <option value="U-15">Under-15</option>
-                      <option value="U-19">Under-19</option>
-                      <option value="Senior">Senior Elite</option>
-                      <option value="Veteran">Veteran Masters</option>
-                    </select>
+                  <div className="space-y-2">
+                    <label className="text-xs font-semibold text-muted-foreground block">Age/Categories (Select Multiple)</label>
+                    <div className="grid grid-cols-2 gap-2 bg-background p-3 border border-border rounded-md">
+                      {CATEGORY_OPTIONS.map(cat => (
+                        <label key={cat} className="flex items-center gap-2 text-sm text-foreground cursor-pointer select-none">
+                          <input 
+                            type="checkbox"
+                            checked={teamCategories.includes(cat)}
+                            onChange={() => handleToggleCategory(cat, false)}
+                            className="rounded border-border text-primary focus:ring-primary"
+                          />
+                          {cat}
+                        </label>
+                      ))}
+                    </div>
                   </div>
                 </div>
                 <div className="flex justify-end gap-2 pt-2 border-t border-border">
@@ -445,7 +471,7 @@ export function OrgDashboard({ orgId }: { orgId: string }) {
                 </button>
               </div>
               <form onSubmit={handleUpdateTeam} className="space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-3">
                   <div className="space-y-1">
                     <label className="text-xs font-semibold text-muted-foreground">Team Name</label>
                     <Input 
@@ -455,18 +481,21 @@ export function OrgDashboard({ orgId }: { orgId: string }) {
                       className="bg-background focus:outline-none"
                     />
                   </div>
-                  <div className="space-y-1">
-                    <label className="text-xs font-semibold text-muted-foreground">Age/Category</label>
-                    <select
-                      value={editCategory}
-                      onChange={e => setEditCategory(e.target.value)}
-                      className="w-full px-3 py-2 bg-background border border-border rounded-md text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
-                    >
-                      <option value="U-15">Under-15</option>
-                      <option value="U-19">Under-19</option>
-                      <option value="Senior">Senior Elite</option>
-                      <option value="Veteran">Veteran Masters</option>
-                    </select>
+                  <div className="space-y-2">
+                    <label className="text-xs font-semibold text-muted-foreground block">Age/Categories (Select Multiple)</label>
+                    <div className="grid grid-cols-2 gap-2 bg-background p-3 border border-border rounded-md">
+                      {CATEGORY_OPTIONS.map(cat => (
+                        <label key={cat} className="flex items-center gap-2 text-sm text-foreground cursor-pointer select-none">
+                          <input 
+                            type="checkbox"
+                            checked={editCategories.includes(cat)}
+                            onChange={() => handleToggleCategory(cat, true)}
+                            className="rounded border-border text-primary focus:ring-primary"
+                          />
+                          {cat}
+                        </label>
+                      ))}
+                    </div>
                   </div>
                 </div>
                 <div className="flex justify-end gap-2 pt-2 border-t border-border">
@@ -497,7 +526,6 @@ export function OrgDashboard({ orgId }: { orgId: string }) {
                     <div className="flex justify-between items-start">
                       <h4 className="font-bold text-lg text-foreground">{team.name}</h4>
                       <div className="flex items-center gap-1.5 shrink-0">
-                        <span className="text-xs px-2 py-0.5 rounded-full bg-primary/20 text-primary font-semibold">{team.category}</span>
                         <button 
                           onClick={() => handleStartEditTeam(team)} 
                           className="p-1 text-muted-foreground hover:text-primary transition-colors cursor-pointer"
@@ -513,6 +541,11 @@ export function OrgDashboard({ orgId }: { orgId: string }) {
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
                       </div>
+                    </div>
+                    <div className="flex flex-wrap gap-1 mt-2">
+                      {(team.categories && team.categories.length > 0 ? team.categories : [team.category || 'General']).map((cat: string) => (
+                        <span key={cat} className="text-[10px] px-2 py-0.5 rounded-full bg-primary/20 text-primary font-semibold">{cat}</span>
+                      ))}
                     </div>
                     <p className="text-xs text-muted-foreground mt-2">Members: {team.members?.length || 0} Registered</p>
                   </div>

@@ -23,7 +23,8 @@ export const TeamSchema = z.object({
   captainId: z.string().optional(),
   coachId: z.string().optional(),
   members: z.array(z.string()),
-  category: z.string(),
+  category: z.string().optional(),
+  categories: z.array(z.string()).optional(),
   status: z.enum(['Active', 'Inactive']),
   createdAt: z.string().optional(),
   updatedAt: z.string().optional()
