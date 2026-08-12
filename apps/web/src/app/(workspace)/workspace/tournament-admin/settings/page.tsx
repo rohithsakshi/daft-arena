@@ -4,8 +4,6 @@ import React, { useEffect, useState } from 'react';
 import { 
   Settings, 
   CreditCard, 
-  ShieldAlert, 
-  HelpCircle, 
   Globe, 
   Mail, 
   Phone, 
@@ -154,20 +152,6 @@ export default function AdminSystemSettingsPage() {
                   UPI Configuration <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
                 </h4>
                 <p className="text-xs text-muted-foreground mt-1">Configure UPI IDs and manual QR codes for registrations.</p>
-              </div>
-            </div>
-          </Link>
-
-          <Link href="/workspace/tournament-admin/settings/roles" className="block group">
-            <div className="p-6 bg-card border border-border rounded-2xl shadow-lg hover:border-primary/30 transition-colors space-y-4">
-              <div className="w-10 h-10 rounded-xl bg-violet-500/10 flex items-center justify-center text-primary group-hover:scale-105 transition-transform">
-                <ShieldAlert className="w-5 h-5" />
-              </div>
-              <div>
-                <h4 className="font-bold text-foreground group-hover:text-primary transition-colors flex items-center gap-1">
-                  Role Feature Flags <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
-                </h4>
-                <p className="text-xs text-muted-foreground mt-1">Enable or disable roles and assign global IAM permissions.</p>
               </div>
             </div>
           </Link>
