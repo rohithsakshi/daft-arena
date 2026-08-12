@@ -246,15 +246,20 @@ export class PlayerService {
       const primarySport = sportsList[0] || 'Badminton';
       const baseEntryFee = t.entryFee ?? t.paymentConfiguration?.entryFee ?? 0;
 
-      // Map DB events to TournamentEvent shape
+      const defaultTournamentCapacity = t.capacity || 64;
+      const defaultEventLimit = events.length === 1 ? defaultTournamentCapacity : 32;
+
       const mappedEvents = events.map((ev: any) => ({
         id: String(ev._id || ev.id),
         name: ev.name || 'Event',
         category: ev.ageCategory || ev.gender || 'Open',
         entryFee: ev.entryFee ?? baseEntryFee,
-        maxParticipants: ev.maxEntries || ev.maxParticipants || 32,
+        maxParticipants: ev.maxEntries || ev.maxParticipants || defaultEventLimit,
         currentParticipants: ev.registeredCount || 0,
       }));
+
+      const calculatedCapacity = mappedEvents.reduce((acc: number, ev: any) => acc + (ev.maxParticipants || 0), 0);
+      const finalCapacity = t.capacity || (calculatedCapacity > 0 ? calculatedCapacity : 64);
 
       return {
         id: String(t._id || t.id),
@@ -281,7 +286,7 @@ export class PlayerService {
         baseEntryFee,
         isFreeEntry: t.isFreeEntry ?? t.paymentConfiguration?.isFreeEntry ?? false,
         currency: t.currency || 'INR',
-        capacity: t.capacity || 64,
+        capacity: finalCapacity,
         registeredCount: t.registeredCount || 0,
         paymentConfiguration: t.paymentConfiguration || {},
         events: mappedEvents,

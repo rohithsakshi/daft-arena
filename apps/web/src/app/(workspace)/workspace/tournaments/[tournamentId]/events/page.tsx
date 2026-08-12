@@ -67,6 +67,13 @@ export default function ManageEventsPage() {
   const tournament = tournamentRes?.data;
   const events = eventsRes?.data || [];
 
+  // Update maxEntries default when tournament loads
+  React.useEffect(() => {
+    if (tournament?.capacity && maxEntries === 32) {
+      setMaxEntries(tournament.capacity);
+    }
+  }, [tournament?.capacity]);
+
   // Create Event Mutation
   const createMutation = useMutation({
     mutationFn: async () => {
