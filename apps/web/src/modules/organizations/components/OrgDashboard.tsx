@@ -312,7 +312,7 @@ export function OrgDashboard({ orgId }: { orgId: string }) {
       {teamToDelete && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-card border border-border p-6 rounded-2xl max-w-sm w-full shadow-2xl space-y-4 animate-in zoom-in duration-200">
-            <div className="flex items-center gap-3 text-amber-500">
+            <div className="flex items-center gap-3 text-primary">
               <AlertCircle className="w-8 h-8" />
               <h4 className="font-bold text-lg text-foreground">Confirm Delete</h4>
             </div>
