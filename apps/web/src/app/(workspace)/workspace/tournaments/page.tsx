@@ -3,17 +3,15 @@
 
 import * as React from 'react';
 import Link from 'next/link';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { TournamentService } from '@/services/tournament.service';
 import { DataTable } from '@/components/shared/data-table';
 import { ColumnDef } from '@tanstack/react-table';
 import { ITournament } from '@/modules/tournaments/models/Tournament';
 import { buttonVariants } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { Plus } from 'lucide-react';
+import { Plus, GitBranch, ExternalLink } from 'lucide-react';
 import { format } from 'date-fns';
-
 import { StatusBadgePicker } from '@/components/shared/StatusBadgePicker';
 
 function StatusCell({ tournament }: { tournament: ITournament }) {
@@ -64,6 +62,32 @@ export default function TournamentsPage() {
       accessorKey: 'organizerName',
       header: 'Organizer',
     },
+    {
+      id: 'actions',
+      header: 'Quick Actions',
+      cell: ({ row }) => {
+        const id = String(row.original.id || row.original._id);
+        return (
+          <div className="flex items-center gap-2">
+            {/* Draw & Brackets shortcut */}
+            <Link
+              href={`/workspace/tournaments/${id}/brackets`}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-violet-500/10 border border-violet-500/20 text-violet-400 text-xs font-semibold hover:bg-violet-500/20 transition-colors whitespace-nowrap"
+            >
+              <GitBranch className="w-3.5 h-3.5" />
+              Draw &amp; Brackets
+            </Link>
+            {/* Open detail */}
+            <Link
+              href={`/workspace/tournaments/${id}`}
+              className="inline-flex items-center gap-1 px-2 py-1.5 rounded-lg bg-muted text-muted-foreground text-xs font-medium hover:text-foreground hover:bg-muted/80 transition-colors"
+            >
+              <ExternalLink className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+        );
+      },
+    },
   ];
 
   return (
@@ -73,7 +97,7 @@ export default function TournamentsPage() {
           <h2 className="text-3xl font-bold tracking-tight">Tournaments</h2>
           <p className="text-muted-foreground">Manage all tournaments across the platform.</p>
         </div>
-        <Link href="/workspace/tournaments/new" className={buttonVariants({ variant: "default" })}>
+        <Link href="/workspace/tournaments/new" className={buttonVariants({ variant: 'default' })}>
           <Plus className="mr-2 h-4 w-4" /> Create Tournament
         </Link>
       </div>

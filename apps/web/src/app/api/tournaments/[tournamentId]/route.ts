@@ -5,6 +5,8 @@ import { UpdateTournamentSchema } from '../../../../modules/tournaments/validato
 import { withPermission } from '../../../../modules/iam/guards/permission.guard';
 import { z } from 'zod';
 import { NotFoundException, BusinessRuleException } from '../../../../modules/core/exceptions';
+import connectToDatabase from '../../../../lib/db/mongoose';
+import { TournamentModel } from '../../../../modules/tournaments/models/Tournament';
 
 export const GET = async (req: NextRequest, { params }: { params: Promise<{ tournamentId: string }> }) => {
   try {
@@ -36,11 +38,37 @@ export const PUT = withPermission('MANAGE_TOURNAMENTS', async (req: NextRequest,
   }
 });
 
+/**
+ * DELETE — Soft delete tournament (30-day retention).
+ * The document is NOT removed from MongoDB. Instead, `deletedAt` is stamped.
+ * Super admins can restore within 30 days. After that a cron purges it.
+ */
 export const DELETE = withPermission('MANAGE_TOURNAMENTS', async (req: NextRequest, user: { sub: string }, { params }: { params: Promise<{ tournamentId: string }> }) => {
   try {
     const { tournamentId } = await params;
-    await tournamentService.deleteDraft(tournamentId, user.sub);
-    return NextResponse.json({ message: 'Draft deleted successfully' }, { status: 200 });
+    await connectToDatabase();
+
+    const tournament = await TournamentModel.findById(tournamentId);
+    if (!tournament) {
+      return NextResponse.json({ error: 'Tournament not found' }, { status: 404 });
+    }
+
+    // Compute purge date (30 days from now)
+    const purgeDate = new Date();
+    purgeDate.setDate(purgeDate.getDate() + 30);
+
+    // Soft delete — stamp deletedAt, record who deleted it
+    await TournamentModel.findByIdAndUpdate(tournamentId, {
+      deletedAt: new Date(),
+      deletedBy: user.sub,
+    });
+
+    return NextResponse.json({
+      message: 'Tournament has been deleted and will be permanently removed after 30 days.',
+      purgeDate: purgeDate.toISOString(),
+      canRestore: true,
+      restoreInfo: 'To restore this tournament within 30 days, contact your Super Administrator and provide the tournament name and deletion date.',
+    }, { status: 200 });
   } catch (error: unknown) {
     if (error instanceof NotFoundException) return NextResponse.json({ error: (error as Error).message }, { status: 404 });
     if (error instanceof BusinessRuleException) return NextResponse.json({ error: (error as Error).message }, { status: 400 });

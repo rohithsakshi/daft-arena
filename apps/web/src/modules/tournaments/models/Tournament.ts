@@ -38,6 +38,10 @@ export interface ITournament extends IBaseDocument {
   capacity?: number; // Total max players across all events
   tags?: string[];
   
+  // Soft Delete — 30-day retention
+  deletedAt?: Date;
+  deletedBy?: string;
+  
   // Documents (Rulebook, Prospectus, etc.)
   documents: {
     title: string;
@@ -104,7 +108,20 @@ const TournamentSchema = createBaseSchema({
     accountName: { type: String },
     qrCodeUrl: { type: String },
     instructions: { type: String }
+  },
+
+  // Soft delete support — 30-day retention window
+  deletedAt: { type: Date, default: null, index: true },
+  deletedBy: { type: String, default: null },
+});
+
+// Automatically exclude soft-deleted tournaments from all default queries
+TournamentSchema.pre(/^find/, function (next) {
+  const query = this as any;
+  if (!query.getOptions()._includeDeleted) {
+    query.where({ deletedAt: null });
   }
+  next();
 });
 
 export const TournamentModel: Model<ITournament> = mongoose.models.Tournament || mongoose.model<ITournament>('Tournament', TournamentSchema);

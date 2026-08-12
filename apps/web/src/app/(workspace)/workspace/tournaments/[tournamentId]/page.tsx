@@ -15,7 +15,8 @@ import Link from 'next/link';
 import { StatusBadgePicker } from '@/components/shared/StatusBadgePicker';
 import {
   Users, Clock, CheckCircle2, XCircle, Trophy,
-  QrCode, Settings, ExternalLink, BarChart3, CalendarDays
+  QrCode, Settings, ExternalLink, BarChart3, CalendarDays,
+  GitBranch, Trash2, AlertTriangle, X, RotateCcw, Info
 } from 'lucide-react';
 
 const STATUS_ACTIONS: Record<string, { label: string; next: TournamentStatus; variant?: 'default' | 'outline' | 'destructive' }[]> = {
@@ -43,22 +44,18 @@ const STATUS_ACTIONS: Record<string, { label: string; next: TournamentStatus; va
   ],
 };
 
-const STATUS_COLOR: Record<string, string> = {
-  Draft: 'secondary',
-  Published: 'default',
-  RegistrationOpen: 'default',
-  RegistrationClosed: 'secondary',
-  Seeding: 'secondary',
-  Live: 'default',
-  Completed: 'default',
-  Archived: 'secondary',
-};
-
 export default function TournamentDetailsPage() {
   const params = useParams();
   const router = useRouter();
   const queryClient = useQueryClient();
   const id = params.tournamentId as string;
+
+  // Delete modal state
+  const [showDeleteModal, setShowDeleteModal] = React.useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = React.useState('');
+  const [isDeleting, setIsDeleting] = React.useState(false);
+  // Post-delete banner info
+  const [deleteResult, setDeleteResult] = React.useState<{ purgeDate: string; restoreInfo: string } | null>(null);
 
   const { data, isLoading } = useQuery({
     queryKey: ['tournament', id],
@@ -97,6 +94,28 @@ export default function TournamentDetailsPage() {
     },
   });
 
+  const handleDelete = async () => {
+    if (deleteConfirmText !== tournament?.name) return;
+    setIsDeleting(true);
+    try {
+      const res = await fetch(`/api/tournaments/${id}`, { method: 'DELETE' });
+      const json = await res.json();
+      if (res.ok) {
+        setDeleteResult({ purgeDate: json.purgeDate, restoreInfo: json.restoreInfo });
+        setShowDeleteModal(false);
+        setDeleteConfirmText('');
+        queryClient.invalidateQueries({ queryKey: ['tournaments'] });
+        toast.success('Tournament deleted — data retained for 30 days.');
+      } else {
+        toast.error(json.error || 'Failed to delete tournament');
+      }
+    } catch {
+      toast.error('Network error. Please try again.');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   if (isLoading) return (
     <div className="flex items-center justify-center h-64">
       <div className="animate-spin w-8 h-8 border-2 border-violet-500 border-t-transparent rounded-full" />
@@ -113,9 +132,28 @@ export default function TournamentDetailsPage() {
   const stats = statsData?.data;
   const events: any[] = eventsData?.data || [];
   const actions = STATUS_ACTIONS[tournament.status] || [];
+  const purgeDeadline = deleteResult?.purgeDate ? format(new Date(deleteResult.purgeDate), 'PPP') : null;
 
   return (
     <div className="space-y-6">
+
+      {/* ── Post-delete retention banner ── */}
+      {deleteResult && (
+        <div className="flex items-start gap-4 p-4 rounded-xl border border-amber-500/30 bg-amber-500/5">
+          <Info className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+          <div className="flex-1 space-y-1">
+            <p className="text-sm font-semibold text-amber-300">Tournament moved to trash</p>
+            <p className="text-sm text-muted-foreground">
+              All tournament data (registrations, brackets, matches, history) is safely stored and will be <strong className="text-foreground">permanently deleted on {purgeDeadline}</strong>.
+            </p>
+            <p className="text-xs text-muted-foreground mt-1 italic">{deleteResult.restoreInfo}</p>
+          </div>
+          <button onClick={() => setDeleteResult(null)} className="text-muted-foreground hover:text-foreground">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="space-y-1">
@@ -131,6 +169,13 @@ export default function TournamentDetailsPage() {
           </div>
         </div>
         <div className="flex flex-wrap gap-2">
+          {/* Draw & Brackets shortcut — always visible */}
+          <Link href={`/workspace/tournaments/${id}/brackets`}>
+            <Button className="bg-violet-600 hover:bg-violet-700 text-white">
+              <GitBranch className="w-4 h-4 mr-2" /> Draw &amp; Brackets
+            </Button>
+          </Link>
+
           {actions.map((action) => (
             <Button
               key={action.next}
@@ -151,6 +196,14 @@ export default function TournamentDetailsPage() {
               <ExternalLink className="w-4 h-4" />
             </Button>
           </Link>
+          {/* Delete */}
+          <Button
+            variant="outline"
+            className="border-red-500/20 text-red-400 hover:bg-red-500/10"
+            onClick={() => setShowDeleteModal(true)}
+          >
+            <Trash2 className="w-4 h-4 mr-2" /> Delete
+          </Button>
         </div>
       </div>
 
@@ -276,7 +329,7 @@ export default function TournamentDetailsPage() {
             {[
               { label: 'Registration Queue', href: `/workspace/tournaments/${id}/registrations`, icon: Users },
               { label: 'Manage Events', href: `/workspace/tournaments/${id}/events`, icon: Trophy },
-              { label: 'Brackets & Draw', href: `/workspace/tournaments/${id}/brackets`, icon: BarChart3 },
+              { label: 'Brackets & Draw', href: `/workspace/tournaments/${id}/brackets`, icon: GitBranch },
               { label: 'Team Ties', href: `/workspace/tournaments/${id}/team-ties`, icon: Trophy },
               { label: 'Match Schedule', href: `/workspace/tournaments/${id}/matches`, icon: CalendarDays },
             ].map((item) => (
@@ -332,6 +385,77 @@ export default function TournamentDetailsPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* ── Delete Confirmation Modal ── */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* Backdrop */}
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowDeleteModal(false)} />
+
+          {/* Modal */}
+          <div className="relative w-full max-w-md bg-card border border-red-500/30 rounded-2xl shadow-2xl shadow-red-900/20 p-6 space-y-5 z-10">
+            {/* Header */}
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-red-500/10 flex items-center justify-center shrink-0">
+                <Trash2 className="w-5 h-5 text-red-400" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-foreground">Delete Tournament</h3>
+                <p className="text-xs text-muted-foreground">This action cannot be undone immediately</p>
+              </div>
+              <button onClick={() => setShowDeleteModal(false)} className="ml-auto text-muted-foreground hover:text-foreground">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Info box */}
+            <div className="flex items-start gap-3 p-4 rounded-xl bg-amber-500/5 border border-amber-500/20">
+              <Info className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+              <div className="text-xs text-muted-foreground space-y-1">
+                <p><strong className="text-amber-300">30-day retention:</strong> All data (registrations, brackets, matches, history) will be safely stored on our servers for <strong>30 days</strong>.</p>
+                <p>During this window, your <strong className="text-foreground">Super Administrator</strong> can restore the tournament on request. After 30 days, it is permanently purged.</p>
+              </div>
+            </div>
+
+            {/* Confirm by typing name */}
+            <div className="space-y-2">
+              <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                Type <span className="text-foreground font-bold">{tournament.name}</span> to confirm
+              </label>
+              <input
+                type="text"
+                value={deleteConfirmText}
+                onChange={e => setDeleteConfirmText(e.target.value)}
+                placeholder={tournament.name}
+                className="w-full bg-background border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:outline-none focus:border-red-500/40 transition-colors"
+              />
+            </div>
+
+            {/* Actions */}
+            <div className="flex justify-end gap-3 pt-1">
+              <Button variant="outline" onClick={() => { setShowDeleteModal(false); setDeleteConfirmText(''); }} disabled={isDeleting}>
+                Cancel
+              </Button>
+              <Button
+                onClick={handleDelete}
+                disabled={deleteConfirmText !== tournament.name || isDeleting}
+                className="bg-red-600 hover:bg-red-700 text-white min-w-[130px]"
+              >
+                {isDeleting ? (
+                  <span className="flex items-center gap-2">
+                    <span className="animate-spin w-4 h-4 border-2 border-white/30 border-t-white rounded-full" />
+                    Deleting...
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-2">
+                    <Trash2 className="w-4 h-4" /> Delete Tournament
+                  </span>
+                )}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
