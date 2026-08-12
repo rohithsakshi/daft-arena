@@ -3,13 +3,21 @@ import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-const MOCK_ADS = [
-  { id: 1, type: 'IMAGE', url: 'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?q=80&w=2069&auto=format&fit=crop', duration: 5, sponsorName: 'Nike Sports' },
-  { id: 2, type: 'IMAGE', url: 'https://images.unsplash.com/photo-1599058917212-d750089bc07e?q=80&w=2069&auto=format&fit=crop', duration: 4, sponsorName: 'Gatorade' },
-  { id: 3, type: 'IMAGE', url: 'https://images.unsplash.com/photo-1627627256672-027a4613d028?q=80&w=2074&auto=format&fit=crop', duration: 4, sponsorName: 'Yonex' },
+const ALL_MOCK_ADS = [
+  { id: 1, type: 'IMAGE', url: 'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?q=80&w=2069&auto=format&fit=crop', duration: 5, sponsorName: 'Nike Sports', sport: 'Fitness' },
+  { id: 2, type: 'IMAGE', url: 'https://images.unsplash.com/photo-1599058917212-d750089bc07e?q=80&w=2069&auto=format&fit=crop', duration: 4, sponsorName: 'Gatorade', sport: 'Tennis' },
+  { id: 3, type: 'IMAGE', url: 'https://images.unsplash.com/photo-1627627256672-027a4613d028?q=80&w=2074&auto=format&fit=crop', duration: 4, sponsorName: 'Yonex', sport: 'Badminton' },
+  { id: 4, type: 'IMAGE', url: 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?q=80&w=2000&auto=format&fit=crop', duration: 4, sponsorName: 'MRF', sport: 'Cricket' },
 ];
 
-export function SponsorAdWall() {
+export function SponsorAdWall({ playerSports = [] }: { playerSports?: string[] }) {
+  // Filter ads to only show ones relevant to the player's sports, or generic ones
+  const filteredAds = ALL_MOCK_ADS.filter(ad => 
+    playerSports.includes(ad.sport) || ad.sport === 'Fitness' || ad.sport === 'All'
+  );
+  
+  const activeAds = filteredAds.length > 0 ? filteredAds : ALL_MOCK_ADS; // Fallback to all if none match
+
   const [isVisible, setIsVisible] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [progress, setProgress] = useState(0);
@@ -27,7 +35,7 @@ export function SponsorAdWall() {
   useEffect(() => {
     if (!isVisible) return;
 
-    const currentAd = MOCK_ADS[currentIndex];
+    const currentAd = activeAds[currentIndex];
     if (!currentAd) {
       handleClose();
       return;
@@ -44,7 +52,7 @@ export function SponsorAdWall() {
 
       if (currentStep >= totalSteps) {
         clearInterval(timer);
-        if (currentIndex < MOCK_ADS.length - 1) {
+        if (currentIndex < activeAds.length - 1) {
           setCurrentIndex(prev => prev + 1);
         } else {
           handleClose();
@@ -63,7 +71,7 @@ export function SponsorAdWall() {
 
   if (!isVisible) return null;
 
-  const currentAd = MOCK_ADS[currentIndex];
+  const currentAd = activeAds[currentIndex];
   // Allowed to skip ONLY after the first ad!
   const canSkip = currentIndex > 0; 
 
@@ -86,7 +94,7 @@ export function SponsorAdWall() {
           </Button>
         ) : (
           <div className="text-xs font-bold text-white/50 uppercase tracking-widest px-4 py-2 border border-white/10 rounded-full">
-            Ad {currentIndex + 1} of {MOCK_ADS.length}
+            Ad {currentIndex + 1} of {activeAds.length}
           </div>
         )}
       </div>

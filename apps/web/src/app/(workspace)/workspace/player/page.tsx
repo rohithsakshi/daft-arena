@@ -46,13 +46,13 @@ export default async function PlayerDashboardPage() {
     activeRegistrations = [
       {
         _id: 'mock_reg_1',
-        tournamentId: { name: 'Badminton Pollachi Test Match' },
+        tournamentId: { name: 'Badminton Pollachi Test Match', sport: 'Badminton' },
         eventId: { name: "Men's Singles Open" },
         status: 'Approved'
       },
       {
         _id: 'mock_reg_2',
-        tournamentId: { name: 'Summer Smash 2026' },
+        tournamentId: { name: 'Summer Smash 2026', sport: 'Tennis' },
         eventId: { name: "Men's Doubles" },
         status: 'Pending'
       }
@@ -66,9 +66,11 @@ export default async function PlayerDashboardPage() {
   
   const upcomingMatches = await import('@/modules/player/services/player.client.service').then(m => m.PlayerService.getMyMatches());
 
+  const playerSports = Array.from(new Set(activeRegistrations.map((r: any) => r.tournamentId?.sport || 'Badminton')));
+
   return (
     <div className="space-y-8 animate-in fade-in duration-500 pb-10">
-      <SponsorAdWall />
+      <SponsorAdWall playerSports={playerSports} />
       
       {/* Welcome header container */}
       <WidgetContainer className="p-6 md:p-8 bg-gradient-to-r from-violet-900/40 via-purple-900/30 to-card/60">
