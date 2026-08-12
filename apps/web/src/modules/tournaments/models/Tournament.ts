@@ -115,13 +115,18 @@ const TournamentSchema = createBaseSchema({
   deletedBy: { type: String, default: null },
 });
 
-// Automatically exclude soft-deleted tournaments from all default queries
-TournamentSchema.pre(/^find/, function (next) {
-  const query = this as any;
-  if (!query.getOptions()._includeDeleted) {
-    query.where({ deletedAt: null });
+// Automatically exclude soft-deleted tournaments from all default queries.
+// Use $or to safely match both: field doesn't exist yet (older documents) OR is explicitly null.
+function excludeSoftDeleted(this: any, next: any) {
+  if (!this.getOptions()._includeDeleted) {
+    this.where({ $or: [{ deletedAt: { $exists: false } }, { deletedAt: null }] });
   }
   next();
-});
+}
+
+TournamentSchema.pre('find', excludeSoftDeleted);
+TournamentSchema.pre('findOne', excludeSoftDeleted);
+TournamentSchema.pre('findOneAndUpdate', excludeSoftDeleted);
+TournamentSchema.pre('countDocuments', excludeSoftDeleted);
 
 export const TournamentModel: Model<ITournament> = mongoose.models.Tournament || mongoose.model<ITournament>('Tournament', TournamentSchema);
