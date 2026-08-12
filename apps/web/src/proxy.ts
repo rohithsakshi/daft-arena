@@ -14,6 +14,7 @@ const PUBLIC_API_PREFIXES = [
   '/api/superadmin/login',
   '/api/superadmin/health',
   '/api/superadmin/seed',
+  '/api/superadmin/migrate/tournaments-soft-delete', // one-time migration — remove after run
   '/api/purchase-requests',
 ];
 
