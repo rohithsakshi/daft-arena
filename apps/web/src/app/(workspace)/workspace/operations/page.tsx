@@ -15,7 +15,10 @@ import {
   Search,
   Plus,
   AlertOctagon,
-  UserCheck
+  UserCheck,
+  Radio,
+  X,
+  Send
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -39,6 +42,24 @@ export default function OperationsDashboardPage() {
   const [incidentType, setIncidentType] = useState('Medical');
   const [incidentSeverity, setIncidentSeverity] = useState('Medium');
   const [incidentDescription, setIncidentDescription] = useState('');
+
+  // Emergency Broadcast modal
+  const [showBroadcastModal, setShowBroadcastModal] = useState(false);
+  const [broadcastMessage, setBroadcastMessage] = useState('');
+  const [broadcastPriority, setBroadcastPriority] = useState<'low' | 'medium' | 'high' | 'critical'>('high');
+  const [broadcastSending, setBroadcastSending] = useState(false);
+
+  const handleSendBroadcast = async () => {
+    if (!broadcastMessage.trim()) return;
+    setBroadcastSending(true);
+    // Simulate network delay
+    await new Promise(r => setTimeout(r, 800));
+    setBroadcastSending(false);
+    setShowBroadcastModal(false);
+    setBroadcastMessage('');
+    setBroadcastPriority('high');
+    toast.success('Emergency broadcast sent to all officials and participants.');
+  };
 
   const fetchDashboard = () => {
     setLoading(true);
@@ -162,7 +183,8 @@ export default function OperationsDashboardPage() {
           <p className="text-sm text-muted-foreground">Live tournament command center, official scheduling, and court allocation.</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" className="border-red-500/20 text-red-400 hover:bg-red-500/10" onClick={() => toast.success('Emergency broadcast sent to all officials.')}>
+          <Button variant="outline" className="border-red-500/20 text-red-400 hover:bg-red-500/10" onClick={() => setShowBroadcastModal(true)}>
+            <Radio className="w-4 h-4 mr-2" />
             Emergency Broadcast
           </Button>
           <Button className="bg-violet-600 hover:bg-violet-700 text-white" onClick={() => { setActiveTab('incidents'); setShowIncidentForm(true); }}>
@@ -625,6 +647,97 @@ export default function OperationsDashboardPage() {
             )}
           </CardContent>
         </Card>
+      )}
+      {/* Emergency Broadcast Modal */}
+      {showBroadcastModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* Backdrop */}
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowBroadcastModal(false)} />
+
+          {/* Modal */}
+          <div className="relative w-full max-w-lg bg-card border border-red-500/30 rounded-2xl shadow-2xl shadow-red-900/20 p-6 space-y-5 z-10">
+            {/* Header */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-red-500/10 flex items-center justify-center">
+                  <Radio className="w-5 h-5 text-red-400 animate-pulse" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-foreground">Emergency Broadcast</h3>
+                  <p className="text-xs text-muted-foreground">Sent instantly to all officials &amp; participants</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowBroadcastModal(false)}
+                className="text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Priority selector */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Priority Level</label>
+              <div className="grid grid-cols-4 gap-2">
+                {(['low', 'medium', 'high', 'critical'] as const).map(p => (
+                  <button
+                    key={p}
+                    onClick={() => setBroadcastPriority(p)}
+                    className={`py-2 rounded-lg text-xs font-bold capitalize border transition-all ${
+                      broadcastPriority === p
+                        ? p === 'critical' ? 'bg-red-600 border-red-500 text-white'
+                          : p === 'high' ? 'bg-orange-500/20 border-orange-500 text-orange-400'
+                          : p === 'medium' ? 'bg-yellow-500/20 border-yellow-500 text-yellow-400'
+                          : 'bg-blue-500/20 border-blue-500 text-blue-400'
+                        : 'bg-muted border-border text-muted-foreground hover:border-border/80'
+                    }`}
+                  >
+                    {p}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Message input */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Broadcast Message</label>
+              <textarea
+                rows={4}
+                placeholder="e.g. Court 3 has been closed due to a safety issue. All players please report to Court 1 immediately."
+                value={broadcastMessage}
+                onChange={e => setBroadcastMessage(e.target.value)}
+                className="w-full bg-background border border-border rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-red-500/40 resize-none transition-colors"
+              />
+              <p className="text-xs text-muted-foreground text-right">{broadcastMessage.length} / 500</p>
+            </div>
+
+            {/* Target info */}
+            <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-red-500/5 border border-red-500/10">
+              <Users className="w-4 h-4 text-red-400 shrink-0" />
+              <p className="text-xs text-muted-foreground">
+                This message will be delivered as an <span className="text-foreground font-semibold">in-app notification</span> to all active officials, referees, and registered participants.
+              </p>
+            </div>
+
+            {/* Actions */}
+            <div className="flex justify-end gap-3 pt-1">
+              <Button variant="outline" onClick={() => setShowBroadcastModal(false)} disabled={broadcastSending}>
+                Cancel
+              </Button>
+              <Button
+                onClick={handleSendBroadcast}
+                disabled={!broadcastMessage.trim() || broadcastSending}
+                className="bg-red-600 hover:bg-red-700 text-white min-w-[130px]"
+              >
+                {broadcastSending ? (
+                  <span className="flex items-center gap-2"><span className="animate-spin w-4 h-4 border-2 border-white/30 border-t-white rounded-full" /> Sending...</span>
+                ) : (
+                  <span className="flex items-center gap-2"><Send className="w-4 h-4" /> Send Broadcast</span>
+                )}
+              </Button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
