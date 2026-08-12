@@ -118,8 +118,11 @@ const TournamentSchema = createBaseSchema({
 // Automatically exclude soft-deleted tournaments from all default queries.
 // Use $or to safely match both: field doesn't exist yet (older documents) OR is explicitly null.
 function excludeSoftDeleted(this: any, next: any) {
-  if (!this.getOptions()._includeDeleted) {
-    this.where({ $or: [{ deletedAt: { $exists: false } }, { deletedAt: null }] });
+  if (typeof this.where === 'function') {
+    const options = typeof this.getOptions === 'function' ? this.getOptions() : {};
+    if (!options._includeDeleted) {
+      this.where({ $or: [{ deletedAt: { $exists: false } }, { deletedAt: null }] });
+    }
   }
   next();
 }
