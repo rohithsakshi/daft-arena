@@ -104,7 +104,17 @@ export class OperationsService {
   }
 
   async getCourts(tournamentId: string): Promise<ICourtStatus[]> {
-    const tournament = await TournamentModel.findById(tournamentId);
+    let targetId = tournamentId;
+    if (tournamentId === 'current' || !mongoose.Types.ObjectId.isValid(tournamentId)) {
+      const firstTournament = await TournamentModel.findOne({});
+      if (firstTournament) {
+        targetId = firstTournament._id.toString();
+      } else {
+        return [];
+      }
+    }
+
+    const tournament = await TournamentModel.findById(targetId);
     if (!tournament) return [];
 
     const venueIds = tournament.venueIds || [];
