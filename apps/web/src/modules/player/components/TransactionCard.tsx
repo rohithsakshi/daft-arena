@@ -68,7 +68,7 @@ export function TransactionCard({ transaction, invoice, className }: Transaction
 
       <div className="text-left sm:text-right flex-shrink-0 self-start sm:self-center">
         <p className="text-sm font-black text-foreground">
-          ${transaction.amount}
+          ₹{transaction.amount}
           <span className="text-[10px] font-normal text-muted-foreground uppercase ml-1">{invoice.currency}</span>
         </p>
         {transaction.refundStatus && transaction.refundStatus !== 'NOT_APPLICABLE' && (

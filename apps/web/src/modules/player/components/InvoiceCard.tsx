@@ -69,24 +69,24 @@ export function InvoiceCard({ invoice, className }: InvoiceCardProps) {
         
         <div className="flex justify-between">
           <span className="text-muted-foreground">Tournament Base Fees</span>
-          <span className="text-foreground">${invoice.baseAmount}</span>
+          <span className="text-foreground">₹{invoice.baseAmount}</span>
         </div>
 
         {invoice.discountAmount > 0 && (
           <div className="flex justify-between text-emerald-400 font-medium">
             <span>Coupon Discount {invoice.couponCode ? `(${invoice.couponCode})` : ''}</span>
-            <span>-${invoice.discountAmount}</span>
+            <span>-₹{invoice.discountAmount}</span>
           </div>
         )}
 
         <div className="flex justify-between">
           <span className="text-muted-foreground">State Organizing Taxes (5%)</span>
-          <span className="text-foreground">${invoice.taxAmount}</span>
+          <span className="text-foreground">₹{invoice.taxAmount}</span>
         </div>
 
         <div className="flex justify-between items-center pt-3 border-t border-white/8 font-bold text-sm">
           <span className="text-foreground">Total Transacted Fee</span>
-          <span className="text-lg text-violet-400">${invoice.totalAmount}</span>
+          <span className="text-lg text-violet-400">₹{invoice.totalAmount}</span>
         </div>
       </div>
 

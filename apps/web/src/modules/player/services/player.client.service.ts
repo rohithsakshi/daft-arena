@@ -416,7 +416,7 @@ export class PlayerService {
       {
         transaction: {
           id: 'txn_101',
-          date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+          createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
           amount: 1500,
           currency: 'INR',
           status: 'COMPLETED',
@@ -428,18 +428,19 @@ export class PlayerService {
         invoice: {
           id: 'inv_101',
           status: 'PAID',
-          date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+          createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
           items: [{ description: 'Badminton Pollachi Test Match - Men\'s Singles Open', amount: 1500 }],
-          subtotal: 1500,
-          tax: 0,
-          total: 1500,
+          baseAmount: 1500,
+          discountAmount: 0,
+          taxAmount: 0,
+          totalAmount: 1500,
           currency: 'INR',
         }
       },
       {
         transaction: {
           id: 'txn_102',
-          date: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
+          createdAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
           amount: 500,
           currency: 'INR',
           status: 'COMPLETED',
@@ -451,11 +452,12 @@ export class PlayerService {
         invoice: {
           id: 'inv_102',
           status: 'PAID',
-          date: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
+          createdAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
           items: [{ description: 'Summer Smash 2026 - Men\'s Doubles', amount: 500 }],
-          subtotal: 500,
-          tax: 0,
-          total: 500,
+          baseAmount: 500,
+          discountAmount: 0,
+          taxAmount: 0,
+          totalAmount: 500,
           currency: 'INR',
         }
       }
