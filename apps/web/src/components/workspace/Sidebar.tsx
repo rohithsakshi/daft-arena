@@ -55,7 +55,7 @@ const adminNavigation: NavItem[] = [
   { name: 'Dashboard', href: '/workspace/tournament-admin', icon: Home, exact: true },
   { name: 'Tournaments', href: '/workspace/tournaments', icon: Trophy },
   { name: 'Operations', href: '/workspace/operations', icon: Activity },
-  { name: 'Organizations', href: '/workspace/organizations', icon: Shield },
+  // { name: 'Organizations', href: '/workspace/organizations', icon: Shield }, // admin-organization removed here
   { name: 'Finance', href: '/workspace/finance', icon: CreditCard },
   { name: 'Settings', href: '/workspace/tournament-admin/settings', icon: Settings },
 ];
