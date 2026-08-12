@@ -45,6 +45,7 @@ export function OrgDashboard({ orgId }: { orgId: string }) {
   const [editingTeam, setEditingTeam] = useState<any>(null);
   const [editName, setEditName] = useState('');
   const [editCategories, setEditCategories] = useState<string[]>(['U-19']);
+  const [teamToDelete, setTeamToDelete] = useState<string | null>(null);
 
   // Transfer creation states
   const [showTransferForm, setShowTransferForm] = useState(false);
@@ -203,8 +204,6 @@ export function OrgDashboard({ orgId }: { orgId: string }) {
   };
 
   const handleDeleteTeam = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this team?')) return;
-
     try {
       const res = await fetch(`/api/organizations/teams?id=${id}`, {
         method: 'DELETE'
@@ -308,7 +307,24 @@ export function OrgDashboard({ orgId }: { orgId: string }) {
     : 'Free Agent';
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-300 text-left">
+    <div className="space-y-8 animate-in fade-in duration-300 text-left relative">
+      {/* Confirm Delete Team In-App Modal */}
+      {teamToDelete && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-card border border-border p-6 rounded-2xl max-w-sm w-full shadow-2xl space-y-4 animate-in zoom-in duration-200">
+            <div className="flex items-center gap-3 text-amber-500">
+              <AlertCircle className="w-8 h-8" />
+              <h4 className="font-bold text-lg text-foreground">Confirm Delete</h4>
+            </div>
+            <p className="text-sm text-muted-foreground">Are you sure you want to delete this team? This action cannot be undone.</p>
+            <div className="flex justify-end gap-2 pt-2">
+              <Button variant="outline" onClick={() => setTeamToDelete(null)}>Cancel</Button>
+              <Button variant="destructive" onClick={() => { handleDeleteTeam(teamToDelete); setTeamToDelete(null); }}>Delete</Button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Overview Stats & Profile Card */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Profile Card */}
@@ -534,7 +550,7 @@ export function OrgDashboard({ orgId }: { orgId: string }) {
                           <Edit2 className="w-3.5 h-3.5" />
                         </button>
                         <button 
-                          onClick={() => handleDeleteTeam(team.id)} 
+                          onClick={() => setTeamToDelete(team.id)} 
                           className="p-1 text-muted-foreground hover:text-destructive transition-colors cursor-pointer"
                           title="Delete Team"
                         >
