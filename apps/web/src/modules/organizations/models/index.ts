@@ -38,6 +38,7 @@ export const TransferSchema = z.object({
   toOrgId: z.string(),
   status: z.enum(['Pending', 'Approved', 'Rejected']),
   effectiveDate: z.string(),
+  reason: z.string().optional(),
   createdAt: z.string().optional(),
   updatedAt: z.string().optional()
 });
