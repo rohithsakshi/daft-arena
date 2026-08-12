@@ -1,3 +1,5 @@
+/* ADMIN-ORGANIZATION REMOVED — entire flow commented out below. Do not delete.
+
 'use client';
 
 import React, { useEffect, useState } from 'react';
@@ -260,4 +262,11 @@ function CardForm({
       </form>
     </WidgetContainer>
   );
+}
+
+*/
+
+// Temporarily removed — page returns null until re-enabled
+export default function OrganizationsPage() {
+  return null;
 }
