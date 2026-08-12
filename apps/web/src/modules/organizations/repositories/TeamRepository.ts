@@ -1,15 +1,44 @@
 import { ITeam } from '../models';
+import { TeamModel } from '../models/TeamModel';
+import connectToDatabase from '@/lib/db/mongoose';
 
 export class TeamRepository {
-  private static teams: ITeam[] = [];
   
   async findByOrganization(orgId: string): Promise<ITeam[]> {
-    return TeamRepository.teams.filter(t => t.organizationId === orgId);
+    await connectToDatabase();
+    try {
+      const teams = await TeamModel.find({ organizationId: orgId });
+      return teams.map(t => ({
+        id: t._id.toString(),
+        name: t.name,
+        organizationId: t.organizationId,
+        category: t.category,
+        status: t.status as any,
+        members: t.members,
+        createdAt: t.createdAt?.toISOString() || new Date().toISOString()
+      }));
+    } catch {
+      return [];
+    }
   }
 
   async create(team: ITeam): Promise<ITeam> {
-    const newTeam = { ...team, id: `team_${Math.random().toString(36).substr(2, 9)}`, createdAt: new Date().toISOString() };
-    TeamRepository.teams.push(newTeam);
-    return newTeam;
+    await connectToDatabase();
+    const doc = await TeamModel.create({
+      name: team.name,
+      organizationId: team.organizationId,
+      category: team.category,
+      status: team.status || 'Active',
+      members: team.members || []
+    });
+    return {
+      id: doc._id.toString(),
+      name: doc.name,
+      organizationId: doc.organizationId,
+      category: doc.category,
+      status: doc.status as any,
+      members: doc.members,
+      createdAt: doc.createdAt?.toISOString() || new Date().toISOString()
+    };
   }
 }
