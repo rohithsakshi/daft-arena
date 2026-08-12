@@ -3,26 +3,22 @@ import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-const ALL_MOCK_ADS = [
-  { id: 1, type: 'IMAGE', url: 'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?q=80&w=2069&auto=format&fit=crop', duration: 5, sponsorName: 'Nike Sports', sport: 'Fitness' },
-  { id: 2, type: 'IMAGE', url: 'https://images.unsplash.com/photo-1599058917212-d750089bc07e?q=80&w=2069&auto=format&fit=crop', duration: 4, sponsorName: 'Gatorade', sport: 'Tennis' },
-  { id: 3, type: 'IMAGE', url: 'https://images.unsplash.com/photo-1627627256672-027a4613d028?q=80&w=2074&auto=format&fit=crop', duration: 4, sponsorName: 'Yonex', sport: 'Badminton' },
-  { id: 4, type: 'IMAGE', url: 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?q=80&w=2000&auto=format&fit=crop', duration: 4, sponsorName: 'MRF', sport: 'Cricket' },
-];
-
-export function SponsorAdWall({ playerSports = [] }: { playerSports?: string[] }) {
-  // Filter ads to only show ones relevant to the player's sports, or generic ones
-  const filteredAds = ALL_MOCK_ADS.filter(ad => 
-    playerSports.includes(ad.sport) || ad.sport === 'Fitness' || ad.sport === 'All'
+export function SponsorAdWall({ playerSports = [], campaigns = [] }: { playerSports?: string[], campaigns?: any[] }) {
+  // Filter ads to only show ones relevant to the player's sports, or generic ones (no sports specified)
+  const filteredAds = campaigns.filter(ad => 
+    !ad.sports || ad.sports.length === 0 || ad.sports.some((s: string) => playerSports.includes(s))
   );
   
-  const activeAds = filteredAds.length > 0 ? filteredAds : ALL_MOCK_ADS; // Fallback to all if none match
+  const activeAds = filteredAds.length > 0 ? filteredAds : campaigns; 
 
   const [isVisible, setIsVisible] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
+    // If no ads available to show, don't show the wall
+    if (activeAds.length === 0) return;
+    
     // Show every time for demonstration purposes (in production, we'd check sessionStorage)
     setIsVisible(true);
     document.body.style.overflow = 'hidden';

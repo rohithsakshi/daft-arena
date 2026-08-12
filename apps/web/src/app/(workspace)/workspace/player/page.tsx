@@ -17,6 +17,8 @@ import {
 import Link from 'next/link';
 import { SponsorAdWall } from '@/modules/player/components/SponsorAdWall';
 
+import { SponsorCampaignModel } from '@/modules/sponsor/models/Campaign';
+
 export const metadata = {
   title: 'Player Dashboard | DAFT Arena',
   description: 'Your personal DAFT Arena player hub.',
@@ -31,10 +33,11 @@ export default async function PlayerDashboardPage() {
     return <div className="p-10 text-center">Unauthorized. Please log in.</div>;
   }
 
-  const [profile, registrations, unreadNotificationCount] = await Promise.all([
+  const [profile, registrations, unreadNotificationCount, dbCampaigns] = await Promise.all([
     UserModel.findById(userId).lean(),
     RegistrationModel.find({ participantIds: userId }).populate('tournamentId').populate('eventId').lean(),
-    NotificationModel.countDocuments({ targetUserId: userId, status: 'UNREAD' })
+    NotificationModel.countDocuments({ targetUserId: userId, status: 'UNREAD' }),
+    SponsorCampaignModel.find({ status: 'Active' }).sort({ priority: -1 }).lean()
   ]);
 
   let activeRegistrations = registrations.filter(
@@ -68,9 +71,18 @@ export default async function PlayerDashboardPage() {
 
   const playerSports = Array.from(new Set(activeRegistrations.map((r: any) => r.tournamentId?.sport || 'Badminton')));
 
+  const mappedCampaigns = dbCampaigns.map(c => ({
+    id: c._id.toString(),
+    type: 'IMAGE',
+    url: c.bannerUrl || c.logoUrl,
+    duration: 5, // Default 5 seconds per ad
+    sponsorName: c.name,
+    sports: c.sports || [],
+  }));
+
   return (
     <div className="space-y-8 animate-in fade-in duration-500 pb-10">
-      <SponsorAdWall playerSports={playerSports} />
+      <SponsorAdWall playerSports={playerSports} campaigns={mappedCampaigns} />
       
       {/* Welcome header container */}
       <WidgetContainer className="p-6 md:p-8 bg-gradient-to-r from-violet-900/40 via-purple-900/30 to-card/60">
