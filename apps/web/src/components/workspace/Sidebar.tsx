@@ -26,7 +26,6 @@ const playerNavigation: NavItem[] = [
   { name: 'My Tournaments', href: '/workspace/player/my-tournaments', icon: Trophy },
   { name: 'Matches', href: '/workspace/player/matches', icon: Calendar },
   { name: 'Rankings', href: '/workspace/player/rankings', icon: Medal },
-  { name: 'Notifications', href: '/workspace/player/notifications', icon: Bell },
   { name: 'Transactions', href: '/workspace/player/transactions', icon: CreditCard },
   { name: 'Profile', href: '/workspace/player/profile', icon: User },
   { name: 'Settings', href: '/workspace/player/settings', icon: Settings },
