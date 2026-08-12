@@ -144,8 +144,8 @@ export default function Sidebar() {
         {loading ? (
           Array.from({ length: 6 }).map((_, index) => (
             <div key={index} className="flex items-center px-3 py-2.5 rounded-md animate-pulse">
-              <div className="h-5 w-5 bg-zinc-800/60 rounded-md mr-3 shrink-0" />
-              <div className="h-4 bg-zinc-800/60 rounded-md w-2/3" />
+              <div className="h-5 w-5 bg-muted/60 rounded-md mr-3 shrink-0" />
+              <div className="h-4 bg-muted/60 rounded-md w-2/3" />
             </div>
           ))
         ) : (
@@ -183,10 +183,10 @@ export default function Sidebar() {
       <div className="p-4 border-t border-border space-y-2">
         {loading ? (
           <div className="flex items-center gap-3 px-2 py-1.5 animate-pulse">
-            <div className="w-8 h-8 rounded-full bg-zinc-800/60 shrink-0" />
+            <div className="w-8 h-8 rounded-full bg-muted/60 shrink-0" />
             <div className="flex-1 space-y-2 min-w-0">
-              <div className="h-3 bg-zinc-800/60 rounded w-3/4" />
-              <div className="h-2 bg-zinc-800/60 rounded w-1/2" />
+              <div className="h-3 bg-muted/60 rounded w-3/4" />
+              <div className="h-2 bg-muted/60 rounded w-1/2" />
             </div>
           </div>
         ) : (

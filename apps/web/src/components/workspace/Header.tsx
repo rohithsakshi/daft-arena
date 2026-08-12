@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Bell, Search, Moon, Sun, ChevronDown, Menu } from 'lucide-react';
+import { Bell, Search, Moon, Sun, ChevronDown, Menu, Laptop } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useTheme } from 'next-themes';
 import Link from 'next/link';
@@ -17,6 +17,16 @@ export default function Header() {
 
   const toggleCommandPalette = () => {
     document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true, bubbles: true }));
+  };
+
+  const cycleTheme = () => {
+    if (theme === 'light') {
+      setTheme('dark');
+    } else if (theme === 'dark') {
+      setTheme('system');
+    } else {
+      setTheme('light');
+    }
   };
 
   return (
@@ -59,13 +69,15 @@ export default function Header() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-            title="Toggle theme"
+            onClick={cycleTheme}
+            title={`Current theme: ${theme}. Click to cycle light/dark/system.`}
           >
             {theme === 'dark' ? (
+              <Moon className="h-5 w-5 text-muted-foreground" />
+            ) : theme === 'light' ? (
               <Sun className="h-5 w-5 text-muted-foreground" />
             ) : (
-              <Moon className="h-5 w-5 text-muted-foreground" />
+              <Laptop className="h-5 w-5 text-muted-foreground" />
             )}
           </Button>
         )}

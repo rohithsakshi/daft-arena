@@ -115,51 +115,51 @@ export function OrgDashboard({ orgId }: { orgId: string }) {
       {/* Overview Stats & Profile Card */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Profile Card */}
-        <div className="lg:col-span-2 bg-zinc-900/20 rounded-2xl p-6 border border-white/5 shadow-lg flex flex-col justify-between">
+        <div className="lg:col-span-2 bg-card rounded-2xl p-6 border border-border shadow-lg flex flex-col justify-between">
           <div className="flex items-start gap-4">
-            <div className="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-400 shrink-0">
+            <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary shrink-0">
               <Building className="w-6 h-6" />
             </div>
             <div>
               <div className="flex items-center gap-2 flex-wrap">
-                <h2 className="text-2xl font-bold text-white">{org.name}</h2>
-                <span className="text-xs px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-400 font-semibold">{org.type}</span>
+                <h2 className="text-2xl font-bold text-foreground">{org.name}</h2>
+                <span className="text-xs px-2.5 py-0.5 rounded-full bg-primary/20 text-primary font-semibold">{org.type}</span>
               </div>
               <p className="text-sm text-muted-foreground mt-2 flex items-center gap-1.5">
-                <Mail className="w-4 h-4 text-zinc-500" /> {org.contactEmail}
+                <Mail className="w-4 h-4 text-muted-foreground" /> {org.contactEmail}
               </p>
               {org.address && (
                 <p className="text-sm text-muted-foreground mt-1.5 flex items-center gap-1.5">
-                  <MapPin className="w-4 h-4 text-zinc-500" /> {org.address}
+                  <MapPin className="w-4 h-4 text-muted-foreground" /> {org.address}
                 </p>
               )}
             </div>
           </div>
           
-          <div className="border-t border-white/5 pt-4 mt-6 flex justify-between items-center text-xs text-muted-foreground">
-            <span>Status: <strong className="text-green-400 font-semibold">{org.status}</strong></span>
+          <div className="border-t border-border pt-4 mt-6 flex justify-between items-center text-xs text-muted-foreground">
+            <span>Status: <strong className="text-green-500 font-semibold">{org.status}</strong></span>
             <span>Registered: {new Date(org.createdAt).toLocaleDateString()}</span>
           </div>
         </div>
 
         {/* Counter cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-6">
-          <div className="bg-zinc-900/20 rounded-2xl p-6 border border-white/5 shadow-lg flex items-center justify-between">
+          <div className="bg-card rounded-2xl p-6 border border-border shadow-lg flex items-center justify-between">
             <div>
-              <h3 className="text-zinc-500 text-sm font-semibold">Active Teams</h3>
-              <p className="text-4xl font-extrabold text-white mt-1">{teams.length}</p>
+              <h3 className="text-muted-foreground text-sm font-semibold">Active Teams</h3>
+              <p className="text-4xl font-extrabold text-foreground mt-1">{teams.length}</p>
             </div>
-            <div className="p-3 bg-violet-500/10 rounded-xl text-violet-400">
+            <div className="p-3 bg-primary/10 rounded-xl text-primary">
               <Users className="w-6 h-6" />
             </div>
           </div>
 
-          <div className="bg-zinc-900/20 rounded-2xl p-6 border border-white/5 shadow-lg flex items-center justify-between">
+          <div className="bg-card rounded-2xl p-6 border border-border shadow-lg flex items-center justify-between">
             <div>
-              <h3 className="text-zinc-500 text-sm font-semibold">Transfers Pending</h3>
-              <p className="text-4xl font-extrabold text-white mt-1">0</p>
+              <h3 className="text-muted-foreground text-sm font-semibold">Transfers Pending</h3>
+              <p className="text-4xl font-extrabold text-foreground mt-1">0</p>
             </div>
-            <div className="p-3 bg-amber-500/10 rounded-xl text-amber-400">
+            <div className="p-3 bg-amber-500/10 rounded-xl text-amber-600 dark:text-amber-400">
               <FolderOpen className="w-6 h-6" />
             </div>
           </div>
@@ -168,23 +168,23 @@ export function OrgDashboard({ orgId }: { orgId: string }) {
 
       {/* Teams Section */}
       <div className="space-y-4">
-        <div className="flex justify-between items-center border-b border-white/5 pb-3">
+        <div className="flex justify-between items-center border-b border-border pb-3">
           <div>
-            <h3 className="text-xl font-bold text-white">Teams List</h3>
+            <h3 className="text-xl font-bold text-foreground">Teams List</h3>
             <p className="text-sm text-muted-foreground">Configure teams, coaches, and rosters for matches.</p>
           </div>
           {!showTeamForm && (
-            <Button onClick={() => setShowTeamForm(true)} className="bg-violet-600 hover:bg-violet-700 text-white">
+            <Button onClick={() => setShowTeamForm(true)} className="bg-primary hover:bg-primary/90 text-primary-foreground">
               <PlusCircle className="w-4 h-4 mr-2" /> Add Team
             </Button>
           )}
         </div>
 
         {showTeamForm && (
-          <div className="bg-zinc-900/30 p-6 rounded-2xl border border-violet-500/20 max-w-lg">
-            <div className="flex justify-between items-center mb-4 border-b border-white/5 pb-2">
-              <h4 className="font-bold text-white">Register New Team</h4>
-              <button onClick={() => setShowTeamForm(false)} className="text-muted-foreground hover:text-white">
+          <div className="bg-muted/30 p-6 rounded-2xl border border-primary/20 max-w-lg">
+            <div className="flex justify-between items-center mb-4 border-b border-border pb-2">
+              <h4 className="font-bold text-foreground">Register New Team</h4>
+              <button onClick={() => setShowTeamForm(false)} className="text-muted-foreground hover:text-foreground">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -213,11 +213,11 @@ export function OrgDashboard({ orgId }: { orgId: string }) {
                   </select>
                 </div>
               </div>
-              <div className="flex justify-end gap-2 pt-2 border-t border-white/5">
+              <div className="flex justify-end gap-2 pt-2 border-t border-border">
                 <Button type="button" variant="outline" onClick={() => setShowTeamForm(false)}>
                   Cancel
                 </Button>
-                <Button type="submit" className="bg-violet-600 hover:bg-violet-700 text-white">
+                <Button type="submit" className="bg-primary hover:bg-primary/90 text-primary-foreground">
                   Add Team
                 </Button>
               </div>
@@ -226,9 +226,9 @@ export function OrgDashboard({ orgId }: { orgId: string }) {
         )}
 
         {teams.length === 0 ? (
-          <div className="text-center py-12 border border-dashed border-white/5 rounded-2xl bg-zinc-900/5">
-            <Users className="w-12 h-12 text-zinc-600 mx-auto mb-3" />
-            <h4 className="font-bold text-white">No Teams Registered</h4>
+          <div className="text-center py-12 border border-dashed border-border rounded-2xl bg-muted/5">
+            <Users className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
+            <h4 className="font-bold text-foreground">No Teams Registered</h4>
             <p className="text-sm text-muted-foreground max-w-xs mx-auto mt-1">
               Add a club team to start seeding players into tournament matches.
             </p>
@@ -236,19 +236,19 @@ export function OrgDashboard({ orgId }: { orgId: string }) {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {teams.map(team => (
-              <div key={team.id} className="p-5 rounded-2xl border border-white/5 bg-zinc-900/10 hover:border-violet-500/10 transition-colors flex flex-col justify-between h-40">
+              <div key={team.id} className="p-5 rounded-2xl border border-border bg-card hover:border-primary/10 transition-colors flex flex-col justify-between h-40">
                 <div>
                   <div className="flex justify-between items-start">
-                    <h4 className="font-bold text-lg text-white">{team.name}</h4>
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-violet-500/20 text-violet-400 font-semibold">{team.category}</span>
+                    <h4 className="font-bold text-lg text-foreground">{team.name}</h4>
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-primary/20 text-primary font-semibold">{team.category}</span>
                   </div>
                   <p className="text-xs text-muted-foreground mt-2">Members: {team.members?.length || 0} Registered</p>
                 </div>
-                <div className="border-t border-white/5 pt-3 mt-3 flex justify-between items-center text-xs">
-                  <span className="text-green-400 font-medium flex items-center gap-1">
+                <div className="border-t border-border pt-3 mt-3 flex justify-between items-center text-xs">
+                  <span className="text-green-500 font-medium flex items-center gap-1">
                     <CheckCircle className="w-3.5 h-3.5" /> {team.status}
                   </span>
-                  <span className="text-zinc-500">{new Date(team.createdAt).toLocaleDateString()}</span>
+                  <span className="text-muted-foreground">{new Date(team.createdAt).toLocaleDateString()}</span>
                 </div>
               </div>
             ))}

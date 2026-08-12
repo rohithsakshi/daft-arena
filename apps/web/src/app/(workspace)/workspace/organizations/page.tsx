@@ -83,7 +83,7 @@ export default function OrganizationsPage() {
           icon={Shield}
         />
         {orgs.length > 0 && !showForm && (
-          <Button onClick={() => setShowForm(true)} className="bg-violet-600 hover:bg-violet-700 text-white self-start sm:self-auto">
+          <Button onClick={() => setShowForm(true)} className="bg-primary hover:bg-primary/90 text-primary-foreground self-start sm:self-auto">
             <Plus className="w-4 h-4 mr-2" /> Add Organization
           </Button>
         )}
@@ -107,9 +107,9 @@ export default function OrganizationsPage() {
       {loading ? (
         <div className="text-center text-muted-foreground py-12 animate-pulse">Loading connected organizations...</div>
       ) : orgs.length === 0 ? (
-        <WidgetContainer className="p-12 text-center flex flex-col items-center justify-center border-dashed bg-card/10">
-          <div className="w-16 h-16 rounded-full bg-violet-500/10 flex items-center justify-center mb-4">
-            <Shield className="w-8 h-8 text-violet-400 opacity-80" />
+        <WidgetContainer className="p-12 text-center flex flex-col items-center justify-center border-dashed bg-card/40">
+          <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+            <Shield className="w-8 h-8 text-primary opacity-80" />
           </div>
           <h3 className="text-lg font-bold text-foreground mb-1">Organizations Center</h3>
           <p className="text-sm text-muted-foreground max-w-sm mx-auto mb-6">
@@ -118,7 +118,7 @@ export default function OrganizationsPage() {
           {!showForm && (
             <button 
               onClick={() => setShowForm(true)} 
-              className="px-6 py-2 bg-violet-500 hover:bg-violet-600 text-white font-medium rounded-xl transition-colors active:scale-95"
+              className="px-6 py-2 bg-primary hover:bg-primary/90 text-primary-foreground font-medium rounded-xl transition-colors active:scale-95 cursor-pointer"
             >
               Add Organization
             </button>
@@ -127,35 +127,35 @@ export default function OrganizationsPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {orgs.map((org) => (
-            <WidgetContainer key={org.id} className="p-6 flex flex-col justify-between h-48 border border-white/5 bg-zinc-900/10 hover:border-violet-500/20" hoverEffect glowEffect>
+            <WidgetContainer key={org.id} className="p-6 flex flex-col justify-between h-48 border border-border bg-card hover:border-primary/20" hoverEffect glowEffect>
               <div>
                 <div className="flex justify-between items-start mb-2">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-violet-500/10 flex items-center justify-center text-violet-400">
+                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
                       <Building className="w-5 h-5" />
                     </div>
                     <div>
                       <h4 className="font-bold text-lg text-foreground truncate max-w-[180px]">{org.name}</h4>
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-violet-500/20 text-violet-400 font-semibold">{org.type}</span>
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-primary/20 text-primary font-semibold">{org.type}</span>
                     </div>
                   </div>
                 </div>
                 
                 {org.address && (
                   <p className="text-xs text-muted-foreground flex items-center gap-1.5 mt-3">
-                    <MapPin className="w-3.5 h-3.5 text-zinc-500" />
+                    <MapPin className="w-3.5 h-3.5 text-muted-foreground" />
                     <span className="truncate">{org.address}</span>
                   </p>
                 )}
                 <p className="text-xs text-muted-foreground flex items-center gap-1.5 mt-1.5">
-                  <Mail className="w-3.5 h-3.5 text-zinc-500" />
+                  <Mail className="w-3.5 h-3.5 text-muted-foreground" />
                   <span className="truncate">{org.contactEmail}</span>
                 </p>
               </div>
 
               <div className="mt-4">
                 <Link href={`/workspace/organizations/${org.id}`} className="w-full">
-                  <Button size="sm" className="w-full bg-violet-500/10 border border-violet-500/20 text-violet-300 hover:bg-violet-500/20">
+                  <Button size="sm" className="w-full bg-primary/10 border border-primary/20 text-primary hover:bg-primary/20">
                     <ExternalLink className="w-3.5 h-3.5 mr-2" /> Manage Organization
                   </Button>
                 </Link>
