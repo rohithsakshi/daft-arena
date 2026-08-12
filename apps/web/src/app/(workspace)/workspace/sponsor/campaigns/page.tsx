@@ -85,6 +85,23 @@ export default function CampaignsPage() {
     );
   };
 
+  const updateStatusMutation = useMutation({
+    mutationFn: async ({ id, status }: { id: string, status: string }) => {
+      const res = await fetch(`/api/sponsor/campaigns/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status }),
+      });
+      if (!res.ok) { const e = await res.json(); throw new Error(e.error); }
+      return res.json();
+    },
+    onSuccess: () => {
+      toast.success('Campaign status updated!');
+      queryClient.invalidateQueries({ queryKey: ['sponsor-campaigns'] });
+    },
+    onError: (e: any) => toast.error(e.message),
+  });
+
   const campaigns: any[] = data?.data || [];
 
   return (
@@ -124,7 +141,23 @@ export default function CampaignsPage() {
                         <h3 className="text-lg font-bold">{c.name}</h3>
                         <p className="text-sm text-muted-foreground">{c.description}</p>
                       </div>
-                      <Badge variant={STATUS_COLORS[c.status] as any}>{c.status}</Badge>
+                      <div className="flex items-center gap-3">
+                        <Badge variant={STATUS_COLORS[c.status] as any}>{c.status}</Badge>
+                        <Select 
+                          value={c.status} 
+                          onValueChange={(val) => updateStatusMutation.mutate({ id: c._id, status: val })}
+                        >
+                          <SelectTrigger className="h-8 text-xs w-[110px]">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Draft">Draft</SelectItem>
+                            <SelectItem value="Active">Active</SelectItem>
+                            <SelectItem value="Paused">Paused</SelectItem>
+                            <SelectItem value="Completed">Completed</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
                     </div>
                     {c.bannerUrl && (
                       <img src={c.bannerUrl} alt="banner" className="w-full h-28 object-cover rounded-lg border border-white/10 mb-3" />
