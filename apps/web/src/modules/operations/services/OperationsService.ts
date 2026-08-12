@@ -9,6 +9,16 @@ import mongoose from 'mongoose';
 export class OperationsService {
   
   async getDashboardData(tournamentId: string): Promise<IOperationsDashboardData> {
+    let targetId = tournamentId;
+    if (tournamentId === 'current' || !mongoose.Types.ObjectId.isValid(tournamentId)) {
+      const firstTournament = await TournamentModel.findOne({});
+      if (firstTournament) {
+        targetId = firstTournament._id.toString();
+      } else {
+        targetId = new mongoose.Types.ObjectId().toString();
+      }
+    }
+
     const liveMatchesCount = await MatchModel.countDocuments({ 
       status: MatchState.IN_PROGRESS 
     });
@@ -25,7 +35,7 @@ export class OperationsService {
     });
     
     const checkedInPlayersCount = await RegistrationModel.countDocuments({
-      tournamentId,
+      tournamentId: targetId,
       status: RegistrationStatus.Approved // Representing active participants
     });
 

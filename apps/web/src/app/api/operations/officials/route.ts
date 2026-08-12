@@ -1,9 +1,11 @@
 // @ts-nocheck
 import { NextRequest, NextResponse } from 'next/server';
 import { OperationsService } from '../../../../modules/operations/services/OperationsService';
+import connectToDatabase from '@/lib/db/mongoose';
 
 export async function GET(req: NextRequest) {
   try {
+    await connectToDatabase();
     const { searchParams } = new URL(req.url);
     const tournamentId = searchParams.get('tournamentId') || 'default_tourney';
     
