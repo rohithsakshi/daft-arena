@@ -148,12 +148,13 @@ export default function BracketsPage() {
   };
 
   // Estimation Logic
-  const [numCourts, setNumCourts] = React.useState<number>(1);
-  const [matchDuration, setMatchDuration] = React.useState<number>(30); // in minutes
+  const [numCourts, setNumCourts] = React.useState<number | ''>(1);
+  const [matchDuration, setMatchDuration] = React.useState<number | ''>(30); // in minutes
 
   const totalMatches = generatedMatches.length;
-  const totalEstimatedTimeMinutes = totalMatches * matchDuration;
-  const estimatedDurationMinutes = numCourts > 0 ? totalEstimatedTimeMinutes / numCourts : 0;
+  const totalEstimatedTimeMinutes = totalMatches * (Number(matchDuration) || 0);
+  const courts = Number(numCourts) || 1;
+  const estimatedDurationMinutes = courts > 0 ? totalEstimatedTimeMinutes / courts : 0;
   
   const formatMinutes = (mins: number) => {
     if (mins === 0) return '0h 0m';
@@ -248,7 +249,7 @@ export default function BracketsPage() {
                   type="number" 
                   min="1" 
                   value={numCourts} 
-                  onChange={(e) => setNumCourts(parseInt(e.target.value) || 1)} 
+                  onChange={(e) => setNumCourts(e.target.value === '' ? '' : parseInt(e.target.value) || 1)} 
                   className="bg-background"
                 />
               </div>
@@ -259,7 +260,7 @@ export default function BracketsPage() {
                   type="number" 
                   min="1" 
                   value={matchDuration} 
-                  onChange={(e) => setMatchDuration(parseInt(e.target.value) || 30)} 
+                  onChange={(e) => setMatchDuration(e.target.value === '' ? '' : parseInt(e.target.value) || 30)} 
                   className="bg-background"
                 />
               </div>

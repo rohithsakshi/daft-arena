@@ -26,12 +26,12 @@ export default function ManageEventsPage() {
   const [gender, setGender] = React.useState<Gender>(Gender.Male);
   const [ageCategory, setAgeCategory] = React.useState<AgeCategory>(AgeCategory.Senior);
   const [drawType, setDrawType] = React.useState<DrawType>(DrawType.Knockout);
-  const [maxEntries, setMaxEntries] = React.useState(32);
-  const [entryFee, setEntryFee] = React.useState(0);
+  const [maxEntries, setMaxEntries] = React.useState<number | ''>(32);
+  const [entryFee, setEntryFee] = React.useState<number | ''>(0);
 
   // Team Tie rubber config state
-  const [rubberCount, setRubberCount] = React.useState(5);
-  const [winCondition, setWinCondition] = React.useState(3);
+  const [rubberCount, setRubberCount] = React.useState<number | ''>(5);
+  const [winCondition, setWinCondition] = React.useState<number | ''>(3);
   const [rubbers, setRubbers] = React.useState([
     { order: 1, rubberType: EventType.Singles,      name: 'Rubber 1 - Singles' },
     { order: 2, rubberType: EventType.Doubles,      name: 'Rubber 2 - Doubles' },
@@ -255,7 +255,7 @@ export default function ManageEventsPage() {
                     type="number"
                     min="2"
                     value={maxEntries}
-                    onChange={(e) => setMaxEntries(parseInt(e.target.value) || 32)}
+                    onChange={(e) => setMaxEntries(e.target.value === '' ? '' : parseInt(e.target.value) || 32)}
                   />
                 </div>
 
@@ -265,7 +265,7 @@ export default function ManageEventsPage() {
                     type="number"
                     min="0"
                     value={entryFee}
-                    onChange={(e) => setEntryFee(parseInt(e.target.value) || 0)}
+                    onChange={(e) => setEntryFee(e.target.value === '' ? '' : parseInt(e.target.value) || 0)}
                   />
                 </div>
               </div>
@@ -283,7 +283,7 @@ export default function ManageEventsPage() {
                         <Input
                           type="number" min="1" max={rubberCount}
                           value={winCondition}
-                          onChange={(e) => setWinCondition(parseInt(e.target.value) || 3)}
+                          onChange={(e) => setWinCondition(e.target.value === '' ? '' : parseInt(e.target.value) || 3)}
                           className="w-16 h-8 text-sm"
                         />
                         <span className="text-xs text-muted-foreground">rubbers to win</span>
