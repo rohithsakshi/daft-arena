@@ -50,7 +50,7 @@ export async function POST(req: Request, props: { params: Promise<{ tournamentId
         matchNumber: node.matchNumber,
         participant1Id: p1Registration,
         participant2Id: p2Registration,
-        status: MatchStatus.Scheduled,
+        status: (node.player1 === 'BYE' || node.player2 === 'BYE') ? MatchStatus.Walkover : MatchStatus.Scheduled,
         scoreType: ScoreType.Games,
         scores: { p1: [], p2: [] },
         winnerId: winnerRegistration,

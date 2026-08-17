@@ -15,8 +15,8 @@ export interface MatchNode {
 export class DrawGenerator {
   
   static generateKnockoutDraw(event: ITournamentEvent, registrations: IRegistration[]): MatchNode[] {
-    // Keep the entire Registration object, just shuffle them
-    const participants = [...registrations].sort(() => Math.random() - 0.5); 
+    // Keep the entire Registration object, preserving the passed order
+    const participants = [...registrations]; 
     
     // Calculate nearest power of 2
     const n = participants.length;
